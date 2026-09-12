@@ -129,9 +129,9 @@ const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`
 const getInitials = (name) => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 
 const parseScore = (score) => {
- if (typeof score === 'number') return score;
- const n = parseFloat(String(score).replace('/10', ''));
- return Number.isFinite(n) ? n : 0;
+ if (typeof score === 'number') return score > 10 ? score / 10 : score;
+ const match = String(score ?? '').match(/(\d+(\.\d+)?)/);
+ return match ? Number(match[1]) : 0;
 };
 
 const getScoreStyles = (score) => {
@@ -231,7 +231,14 @@ export default function JobDashboardPage() {
 
  const itemsPerPageApp = 5;
  const appSearch = appSearchQuery.trim().toLowerCase();
- const filteredAppCandidates = candidateList.filter(c => {
+ const liveCandidates = candidateList.map(c => {
+ const mock = MOCK_CANDIDATES.find(m => m.id === c.id);
+ return mock ? { ...c, score: mock.score } : c;
+ });
+ const previewCandidate = liveCandidates.find(c => c.id === selectedAppCandidate?.id) || selectedAppCandidate;
+ const previewScore = parseScore(previewCandidate?.score);
+ const showRejectCta = previewScore < 5;
+ const filteredAppCandidates = liveCandidates.filter(c => {
  if (!appSearch) return true;
  return (
  c.name.toLowerCase().includes(appSearch) ||
@@ -1210,15 +1217,13 @@ export default function JobDashboardPage() {
   </div>
 
   {/* Right Panel: AI Screening Results */}
-  <div className="w-[300px] lg:w-[360px] border-l border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex flex-col shrink-0">
-  
-  <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+  <div className="w-[300px] lg:w-[360px] border-l border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex flex-col shrink-0 min-h-0">
   {selectedAppCandidate ? (
   <>
-  {/* Top Match Score Card */}
+  <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
   {(() => {
-  const scoreTone = getScoreStyles(selectedAppCandidate.score);
-  const scoreValue = selectedAppCandidate.score.replace('/10', '');
+  const scoreTone = getScoreStyles(previewScore);
+  const scoreValue = String(previewCandidate.score).replace('/10', '');
   return (
   <div className={`rounded-xl p-4 border flex flex-col ${scoreTone.card}`}>
   <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">Overall Score</p>
@@ -1230,17 +1235,15 @@ export default function JobDashboardPage() {
   );
   })()}
 
-  {/* AI Screening Summary */}
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
   <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 space-y-2 leading-relaxed">
   <p>Excellent fit for the technical requirements.</p>
   <p>Strong React, Node.js and architecture experience.</p>
-  <p className="font-bold text-[#212b36] dark:text-white mt-1">Recommended for Technical Interview.</p>
+  <p className="font-bold text-[#212b36] dark:text-white mt-1">{showRejectCta ? 'Recommended: Reject and notify the agency.' : 'Recommended for Technical Interview.'}</p>
   </div>
   </div>
 
-  {/* Key Screening Criteria */}
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
   <div className="space-y-4">
@@ -1259,28 +1262,38 @@ export default function JobDashboardPage() {
   </div>
   </div>
 
-  {/* Gap Analysis */}
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
   <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[12px] text-[#454f5b] dark:text-gray-300 leading-relaxed">
   Minor gaps: limited exposure to enterprise-scale delivery and formal people management.
   </div>
   </div>
+  </div>
 
+  <div className="shrink-0 p-4 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
+  {showRejectCta ? (
+  <button
+  type="button"
+  onClick={() => openRejectModal([selectedAppCandidate.id])}
+  className="w-full py-3 text-xs font-bold text-white bg-[#FF5630] hover:bg-[#FF5630]/90 rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2 cursor-pointer"
+  >
+  <UserX size={16} /> Reject & Notify Agency
+  </button>
+  ) : (
   <button className="w-full py-3 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2 cursor-pointer">
   <CheckCircle size={16} /> Recommended: Move to Technical Interview
   </button>
-
+  )}
+  </div>
   </>
   ) : (
-  <div className="h-full flex flex-col items-center justify-center text-center">
+  <div className="flex-1 flex flex-col items-center justify-center text-center p-5">
   <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
   <Activity size={24} className="text-gray-400" />
   </div>
   <p className="text-xs text-gray-500 font-medium">Select a candidate to view AI screening insights.</p>
   </div>
   )}
-  </div>
   </div>
 
 
