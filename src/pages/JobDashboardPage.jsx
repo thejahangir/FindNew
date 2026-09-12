@@ -93,21 +93,21 @@ const AGENCY_BENCH = [
 
 const MOCK_CANDIDATES = [
   { id: 1, name: 'Ananya Sharma', stage: 'Technical Interview', score: '9.8/10', date: '2 days ago' },
-  { id: 2, name: 'Rahul Verma', stage: 'Culture Fit', score: '9.5/10', date: '1 day ago' },
-  { id: 3, name: 'Priya Patel', stage: 'Application Review', score: '8.8/10', date: '5 hours ago' },
-  { id: 4, name: 'Arjun Kumar', stage: 'Reference Check', score: '9.2/10', date: '4 days ago' },
-  { id: 5, name: 'Ravi Desai', stage: 'Applied', score: '9.2/10', date: '2 hours ago' },
-  { id: 6, name: 'Sneha Patil', stage: 'Screening', score: '8.8/10', date: '5 hours ago' },
-  { id: 7, name: 'Karan Mehra', stage: 'Interviewing', score: '8.5/10', date: '1 day ago' },
+  { id: 2, name: 'Rahul Verma', stage: 'Culture Fit', score: '6.0/10', date: '1 day ago' },
+  { id: 3, name: 'Priya Patel', stage: 'Application Review', score: '3.2/10', date: '5 hours ago' },
+  { id: 4, name: 'Arjun Kumar', stage: 'Reference Check', score: '8.4/10', date: '4 days ago' },
+  { id: 5, name: 'Ravi Desai', stage: 'Applied', score: '4.5/10', date: '2 hours ago' },
+  { id: 6, name: 'Sneha Patil', stage: 'Screening', score: '4.2/10', date: '5 hours ago' },
+  { id: 7, name: 'Karan Mehra', stage: 'Interviewing', score: '7.1/10', date: '1 day ago' },
   { id: 8, name: 'Ankita Rao', stage: 'Offer', score: '8.1/10', date: '1 day ago' },
-  { id: 9, name: 'Varun Khanna', stage: 'Applied', score: '7.9/10', date: '2 days ago' },
+  { id: 9, name: 'Varun Khanna', stage: 'Applied', score: '2.8/10', date: '2 days ago' },
   { id: 10, name: 'Pooja Iyer', stage: 'Screening', score: '9.4/10', date: '1 day ago' },
-  { id: 11, name: 'Divya Singh', stage: 'Technical Interview', score: '8.9/10', date: '3 days ago' },
-  { id: 12, name: 'Nitin Gupta', stage: 'Put On Hold', score: '9.0/10', date: '5 days ago' },
-  { id: 13, name: 'Neha Sharma', stage: 'Applied', score: '8.4/10', date: '1 week ago' },
-  { id: 14, name: 'Amit Singh', stage: 'Screening', score: '8.6/10', date: '1 week ago' },
-  { id: 15, name: 'Kavita Das', stage: 'Reference Check', score: '9.1/10', date: '2 weeks ago' },
-  { id: 16, name: 'Rohit Joshi', stage: 'Offer', score: '9.7/10', date: '2 days ago' },
+  { id: 11, name: 'Divya Singh', stage: 'Technical Interview', score: '6.8/10', date: '3 days ago' },
+  { id: 12, name: 'Nitin Gupta', stage: 'Put On Hold', score: '4.9/10', date: '5 days ago' },
+  { id: 13, name: 'Neha Sharma', stage: 'Applied', score: '7.9/10', date: '1 week ago' },
+  { id: 14, name: 'Amit Singh', stage: 'Screening', score: '3.1/10', date: '1 week ago' },
+  { id: 15, name: 'Kavita Das', stage: 'Reference Check', score: '8.6/10', date: '2 weeks ago' },
+  { id: 16, name: 'Rohit Joshi', stage: 'Offer', score: '5.2/10', date: '2 days ago' },
  ].map((c, i) => ({ ...c, ...AGENCY_BENCH[i % AGENCY_BENCH.length] }));
 
 const roleOptions = [
@@ -127,6 +127,52 @@ const recentActivity = [
 const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`;
 
 const getInitials = (name) => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+const parseScore = (score) => {
+ if (typeof score === 'number') return score;
+ const n = parseFloat(String(score).replace('/10', ''));
+ return Number.isFinite(n) ? n : 0;
+};
+
+const getScoreStyles = (score) => {
+ const n = parseScore(score);
+ if (n >= 8) {
+ return {
+ label: 'Strong match',
+ text: 'text-[#00A76F]',
+ muted: 'text-[#00A76F]/70',
+ badge: 'text-white bg-[#00A76F]',
+ fill: 'bg-[#00A76F] text-white',
+ card: 'bg-[#00A76F]/10 border-[#00A76F]/20'
+ };
+ }
+ if (n >= 5) {
+ return {
+ label: 'Moderate match',
+ text: 'text-[#1890FF]',
+ muted: 'text-[#1890FF]/70',
+ badge: 'text-white bg-[#1890FF]',
+ fill: 'bg-[#1890FF] text-white',
+ card: 'bg-[#1890FF]/10 border-[#1890FF]/20'
+ };
+ }
+ return {
+ label: 'Weak match',
+ text: 'text-[#FF5630]',
+ muted: 'text-[#FF5630]/70',
+ badge: 'text-white bg-[#FF5630]',
+ fill: 'bg-[#FF5630] text-white',
+ card: 'bg-[#FF5630]/10 border-[#FF5630]/20'
+ };
+};
+
+const SCREENING_CRITERIA = [
+ { label: 'Technical skills', score: 9.2, text: 'React, Node.js, AWS and architecture are a strong match. Demonstrates deep proficiency in modern frontend frameworks, backend services, and cloud infrastructure.' },
+ { label: 'Relevant experience', score: 6.5, text: 'Useful delivery history, but not fully at the seniority this mandate needs. Has led projects with measurable impact; people-management depth is still developing.' },
+ { label: 'Industry knowledge', score: 3.2, text: 'Limited exposure to the specific domain. Lacks direct experience in AI research or adjacent scientific fields, which may require additional onboarding and ramp-up time.' },
+ { label: 'Role alignment', score: 8.2, text: 'Experience and seniority closely match this role. Career progression shows consistent growth into senior technical leadership positions.' },
+ { label: 'Communication', score: 5.4, text: 'Clear enough in written screening, but weaker stakeholder storytelling. Can present to engineers; less proven with non-technical audiences.' }
+];
 
 function MiniCheckbox({ checked, indeterminate = false, visible, onChange, label, revealGroup = 'cand' }) {
  const revealCls = revealGroup === 'list'
@@ -258,9 +304,12 @@ export default function JobDashboardPage() {
  const [scheduleErrors, setScheduleErrors] = useState({});
 
  // Hot reload sync for mock data
+ const candidateMockKey = MOCK_CANDIDATES.map(c => `${c.id}:${c.score}`).join('|');
  useEffect(() => {
  setInterviewsList(upcomingInterviews);
- }, []);
+ setCandidateList(MOCK_CANDIDATES);
+ setSelectedAppCandidate(prev => MOCK_CANDIDATES.find(c => c.id === prev?.id) || MOCK_CANDIDATES[0]);
+ }, [candidateMockKey]);
 
  useEffect(() => {
  const closeMenus = () => {
@@ -851,7 +900,7 @@ export default function JobDashboardPage() {
  <td className="px-6 py-4">
  <span className="bg-[#1890FF]/10 text-[#1890FF] px-2.5 py-1 rounded-md text-xs font-bold">{cand.stage}</span>
  </td>
- <td className="px-6 py-4 font-black text-[#00A76F]">{cand.score}</td>
+ <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
  <td className="px-6 py-4 font-medium">{cand.date}</td>
  <td className="px-6 py-4 text-right">
  <div className="flex items-center justify-end gap-2">
@@ -1001,7 +1050,7 @@ export default function JobDashboardPage() {
  <ArrowUpRight size={14} />
  </button>
  </div>
- <span className="text-[10px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded shrink-0">{cand.score}</span>
+ <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
  </div>
  <div className="flex justify-between items-center mt-2 relative">
  <div className="relative">
@@ -1042,6 +1091,39 @@ export default function JobDashboardPage() {
  </div>
  );
  })}
+ {selectedAppCandidates.length > 0 && currentAppCandidates.length > 0 && (
+ <div className="mx-1 mt-2 bg-[#1890FF] border border-[#1890FF] p-2.5 rounded-xl shadow-[0_8px_30px_rgba(24,144,255,0.2)] flex items-center justify-between text-white animate-fade-in">
+ <div className="flex items-center gap-2">
+ <span className="text-[11px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">{selectedAppCandidates.length} Selected</span>
+ </div>
+ <div className="flex items-center gap-2 relative">
+ <button
+ onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
+ className="text-[11px] font-bold text-white hover:text-white/80 flex items-center gap-1 transition-colors cursor-pointer"
+ >
+ Stage <ChevronDown size={14} />
+ </button>
+ {isBulkStageMenuOpen && (
+ <div
+ className="absolute bottom-full right-0 mb-2 w-36 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 z-50"
+ onClick={(e) => e.stopPropagation()}
+ >
+ {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => (
+ <button
+ key={stage}
+ onClick={() => handleBulkStageChange(stage)}
+ className={`w-full text-left px-3 py-1.5 text-[11px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer ${stage === 'Reject' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}
+ >
+ {stage}
+ </button>
+ ))}
+ </div>
+ )}
+ <div className="w-px h-3 bg-white/30"></div>
+ <button onClick={() => setSelectedAppCandidates([])} className="text-white/70 hover:text-white transition-colors cursor-pointer p-0.5"><X size={14} /></button>
+ </div>
+ </div>
+ )}
  </div>
  {filteredAppCandidates.length > itemsPerPageApp && (
  <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/30">
@@ -1063,41 +1145,6 @@ export default function JobDashboardPage() {
  </div>
  )}
 
- {/* Compact Bulk Action Bar - Localized to Left Panel */}
- {selectedAppCandidates.length > 0 && (
- <div className={`absolute left-4 right-4 bg-[#1890FF] border border-[#1890FF] p-2.5 rounded-xl shadow-[0_8px_30px_rgba(24,144,255,0.2)] flex items-center justify-between z-50 animate-fade-in text-white ${totalPagesApp > 1 ? 'bottom-[72px]' : 'bottom-4'}`}>
- <div className="flex items-center gap-2">
- <span className="text-[11px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">{selectedAppCandidates.length} Selected</span>
- </div>
- 
- <div className="flex items-center gap-2 relative">
- <button 
- onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
- className="text-[11px] font-bold text-white hover:text-white/80 flex items-center gap-1 transition-colors cursor-pointer"
- >
- Stage <ChevronDown size={14} />
- </button>
- {isBulkStageMenuOpen && (
- <div
- className="absolute bottom-full right-0 mb-2 w-36 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1"
- onClick={(e) => e.stopPropagation()}
- >
- {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => (
- <button 
- key={stage} 
- onClick={() => handleBulkStageChange(stage)}
- className={`w-full text-left px-3 py-1.5 text-[11px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer ${stage === 'Reject' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}
- >
- {stage}
- </button>
- ))}
- </div>
- )}
- <div className="w-px h-3 bg-white/30"></div>
- <button onClick={() => setSelectedAppCandidates([])} className="text-white/70 hover:text-white transition-colors cursor-pointer p-0.5"><X size={14} /></button>
- </div>
- </div>
- )}
  </div>
 
  {/* Right Panel: Smart Profile */}
@@ -1169,13 +1216,19 @@ export default function JobDashboardPage() {
   {selectedAppCandidate ? (
   <>
   {/* Top Match Score Card */}
-  <div className="bg-[#1890FF]/10 rounded-xl p-4 border border-[#1890FF]/20 flex flex-col">
-  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">Overall Match Score</p>
+  {(() => {
+  const scoreTone = getScoreStyles(selectedAppCandidate.score);
+  const scoreValue = selectedAppCandidate.score.replace('/10', '');
+  return (
+  <div className={`rounded-xl p-4 border flex flex-col ${scoreTone.card}`}>
+  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">Overall Score</p>
   <div className="flex justify-between items-center">
-  <div className="text-4xl font-black text-[#1890FF]">{selectedAppCandidate.score.replace('/10', '')}<span className="text-2xl text-[#1890FF]/70">/10</span></div>
-  <span className="text-[13px] font-bold text-[#00A76F]">Strong match</span>
+  <div className={`text-4xl font-black ${scoreTone.text}`}>{scoreValue}<span className={`text-2xl ${scoreTone.muted}`}>/10</span></div>
+  <span className={`text-[13px] font-bold ${scoreTone.text}`}>{scoreTone.label}</span>
   </div>
   </div>
+  );
+  })()}
 
   {/* AI Screening Summary */}
   <div>
@@ -1191,47 +1244,18 @@ export default function JobDashboardPage() {
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
   <div className="space-y-4">
-  
-  <div className="flex gap-4">
-  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">9</div>
+  {SCREENING_CRITERIA.map((item) => {
+  const tone = getScoreStyles(item.score);
+  return (
+  <div key={item.label} className="flex gap-4">
+  <div className={`w-9 h-9 rounded-full ${tone.fill} flex items-center justify-center font-bold text-sm shrink-0 shadow-sm`}>{item.score}</div>
   <div>
-  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Technical skills</h5>
-  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">React, Node.js, AWS and architecture are a strong match. Demonstrates deep proficiency in modern frontend frameworks, backend services, and cloud infrastructure. Experience with CI/CD pipelines and microservices is a plus.</p>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">{item.label}</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">{item.text}</p>
   </div>
   </div>
-
-  <div className="flex gap-4">
-  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">8.1</div>
-  <div>
-  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Relevant experience</h5>
-  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Strong track record delivering scalable, relevant products. Has led cross-functional teams on multiple enterprise projects with measurable impact on performance and user engagement.</p>
-  </div>
-  </div>
-
-  <div className="flex gap-4">
-  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">8.5</div>
-  <div>
-  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Role alignment</h5>
-  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Experience and seniority closely match this role. Career progression shows consistent growth into senior technical leadership positions with scope matching this opportunity.</p>
-  </div>
-  </div>
-
-  <div className="flex gap-4">
-  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">9.5</div>
-  <div>
-  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Communication</h5>
-  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Clear communication with strong collaboration and leadership. Demonstrates ability to present complex technical concepts to non-technical stakeholders and mentor junior engineers effectively.</p>
-  </div>
-  </div>
-
-  <div className="flex gap-4">
-  <div className="w-9 h-9 rounded-full bg-[#FF5630] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">3.2</div>
-  <div>
-  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Industry knowledge</h5>
-  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Limited exposure to the specific domain. Lacks direct experience in AI research or adjacent scientific fields, which may require additional onboarding and ramp-up time.</p>
-  </div>
-  </div>
-
+  );
+  })}
   </div>
   </div>
 

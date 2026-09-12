@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, MoreVertical, Briefcase, MapPin, 
  Users, Clock, CheckCircle, AlertCircle, Calendar, 
- ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft } from 'lucide-react';
+ ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft, GripVertical } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import findNewIco from '../assets/findnew-ico.png';
 
@@ -24,6 +24,9 @@ const MOCK_JOBS = [
  { id: 15, title: 'QA Automation Engineer', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-22', hiringManager: 'Michael Lee', score: 0 }
 ];
 
+const DEFAULT_CHATBOT_WIDTH = 320;
+const MAX_CHATBOT_WIDTH = 600;
+
 export default function JobsPage() {
  const navigate = useNavigate();
  const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +47,7 @@ export default function JobsPage() {
  const [currentPage, setCurrentPage] = useState(1);
  const itemsPerPage = 5;
 
- const [chatbotWidth, setChatbotWidth] = useState(320);
+ const [chatbotWidth, setChatbotWidth] = useState(DEFAULT_CHATBOT_WIDTH);
  const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(false);
  const [isChatbotResizing, setIsChatbotResizing] = useState(false);
  const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
@@ -52,27 +55,31 @@ export default function JobsPage() {
 
  useEffect(() => {
  const handleMouseMove = (e) => {
- if (!isChatbotResizing) return;
+ if (!isChatbotResizing || isChatbotCollapsed) return;
+ e.preventDefault();
  const newWidth = document.body.clientWidth - e.clientX;
- if (newWidth < 80) {
- setIsChatbotCollapsed(true);
+ if (newWidth < DEFAULT_CHATBOT_WIDTH) {
+ setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
  return;
  }
- if (newWidth >= 280 && newWidth <= 600) {
- setIsChatbotCollapsed(false);
- setChatbotWidth(newWidth);
- }
+ setChatbotWidth(Math.min(MAX_CHATBOT_WIDTH, newWidth));
  };
  const handleMouseUp = () => setIsChatbotResizing(false);
  if (isChatbotResizing) {
+ document.body.style.cursor = 'w-resize';
+ document.body.style.userSelect = 'none';
+ document.documentElement.style.cursor = 'w-resize';
  document.addEventListener('mousemove', handleMouseMove);
  document.addEventListener('mouseup', handleMouseUp);
  }
  return () => {
+ document.body.style.cursor = '';
+ document.body.style.userSelect = '';
+ document.documentElement.style.cursor = '';
  document.removeEventListener('mousemove', handleMouseMove);
  document.removeEventListener('mouseup', handleMouseUp);
  };
- }, [isChatbotResizing]);
+ }, [isChatbotResizing, isChatbotCollapsed]);
 
  useEffect(() => {
  const handleClickOutside = () => setOpenActionMenuId(null);
@@ -185,6 +192,9 @@ export default function JobsPage() {
 
  return (
  <>
+ {isChatbotResizing && (
+ <div className="fixed inset-0 z-[200] cursor-w-resize" />
+ )}
  <div className="p-6 space-y-6 relative">
  {/* Header */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -225,7 +235,7 @@ export default function JobsPage() {
  ))}
  </div>
 
- <div className="flex flex-col xl:flex-row gap-6 relative items-start">
+ <div className="flex flex-col xl:flex-row gap-6 relative items-start overflow-x-hidden">
  <div className="flex-1 min-w-0 space-y-6">
  {/* Filters & Search */}
  <div className="bg-white dark:bg-[#161c24] p-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col xl:flex-row gap-4 justify-between items-center">
@@ -518,29 +528,59 @@ export default function JobsPage() {
  </div>
  </div>
 
- {!isChatbotCollapsed && (
- <div className="hidden xl:block shrink-0" style={{ width: chatbotWidth }} />
- )}
+ <div
+ className="hidden xl:block shrink-0"
+ style={{
+ width: isChatbotCollapsed ? 0 : DEFAULT_CHATBOT_WIDTH,
+ transition: isChatbotResizing ? 'none' : 'width 300ms cubic-bezier(0.22, 1, 0.36, 1)'
+ }}
+ />
 
- {isChatbotCollapsed ? (
  <button
  type="button"
- onClick={() => setIsChatbotCollapsed(false)}
- className="hidden xl:flex absolute right-0 top-4 z-40 items-center gap-1.5 pl-2 pr-3 py-2 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-l-xl shadow-sm text-[#1890FF] hover:bg-[#1890FF]/5 transition-colors cursor-pointer"
+ onClick={() => {
+ setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
+ setIsChatbotCollapsed(false);
+ }}
+ className={`hidden xl:flex absolute right-0 top-4 z-40 items-center gap-1.5 pl-2 pr-3 py-2 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-l-xl shadow-sm text-[#1890FF] hover:bg-[#1890FF]/5 cursor-pointer ${
+ isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
+ } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
  aria-label="Expand FindNew AI"
  >
  <ChevronsLeft size={16} />
  <img src={findNewIco} alt="" className="w-4 h-4 object-contain" />
  </button>
- ) : (
- <div 
- style={{ width: chatbotWidth }}
- className={`absolute right-0 top-0 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden ${isChatbotResizing ? 'select-none pointer-events-none' : ''}`}
+
+ <div
+ style={{
+ width: chatbotWidth,
+ transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
+ transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1)'
+ }}
+ className={`absolute right-0 top-0 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+ chatbotWidth > DEFAULT_CHATBOT_WIDTH && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
+ } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'pointer-events-none' : ''}`}
  >
- <div 
- onMouseDown={() => setIsChatbotResizing(true)}
- className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#1890FF] bg-transparent transition-colors z-10"
- />
+ <div
+ onMouseDown={(e) => {
+ e.preventDefault();
+ if (!isChatbotCollapsed) setIsChatbotResizing(true);
+ }}
+ className={`absolute left-0 top-0 bottom-0 w-4 z-10 flex items-center justify-center cursor-w-resize group ${
+ isChatbotResizing ? 'bg-[#1890FF]/15' : 'hover:bg-[#1890FF]/10'
+ }`}
+ title="Drag left to widen"
+ >
+ <span
+ className={`flex items-center justify-center w-[18px] h-11 rounded-full border shadow-sm transition-colors ${
+ isChatbotResizing
+ ? 'bg-[#1890FF] border-[#1890FF] text-white'
+ : 'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-600 text-[#454f5b] dark:text-gray-300 group-hover:border-[#1890FF] group-hover:text-[#1890FF]'
+ }`}
+ >
+ <GripVertical size={14} />
+ </span>
+ </div>
  <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/20">
  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
  <img src={findNewIco} alt="FindNew AI" className="w-8 h-8 object-contain" />
@@ -597,7 +637,6 @@ export default function JobsPage() {
  </div>
  </div>
  </div>
- )}
  </div>
  </div>
 
