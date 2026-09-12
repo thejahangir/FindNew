@@ -32,7 +32,7 @@ export default function AuthPage() {
  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm border border-white/20">
  <BrainCircuit size={32} className="text-white" />
  </div>
- <span className="text-3xl font-bold ">TalentFlow</span>
+ <span className="text-3xl font-bold ">FindNew</span>
  </div>
 
  {/* Value Proposition */}
@@ -41,7 +41,7 @@ export default function AuthPage() {
  Hire Smarter, <br/> Scale Faster with AI.
  </h1>
  <p className="text-lg text-white/80 mb-8 animate-fade-in" style={{animationDelay: '0.2s'}}>
- TalentFlow revolutionizes applicant tracking by leveraging advanced AI to find, engage, and hire the world's best talent effortlessly.
+ FindNew revolutionizes applicant tracking by leveraging advanced AI to find, engage, and hire the world's best talent effortlessly.
  </p>
  
  <div className="flex items-center gap-4 text-sm font-medium animate-fade-in" style={{animationDelay: '0.4s'}}>
@@ -58,7 +58,7 @@ export default function AuthPage() {
 
  {/* Footer/Trust */}
  <div className="relative z-10 text-white/60 text-sm">
- © 2026 TalentFlow AI. All rights reserved.
+ © 2026 FindNew AI. All rights reserved.
  </div>
  </div>
 
@@ -81,7 +81,7 @@ export default function AuthPage() {
  <div className="p-2 bg-brand-blue/10 rounded-xl text-brand-blue">
  <BrainCircuit size={28} />
  </div>
- <span className="text-2xl font-bold ">TalentFlow</span>
+ <span className="text-2xl font-bold ">FindNew</span>
  </div>
 
  {/* Dynamic Form Rendering */}

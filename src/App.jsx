@@ -7,7 +7,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 function App() {
  return (
  <ThemeProvider>
- <Router basename="/TalentFlow">
+ <Router basename="/FindNew">
  <Routes>
  <Route path="/" element={<LandingPage />} />
  <Route path="/auth" element={<AuthPage />} />

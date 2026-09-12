@@ -27,9 +27,9 @@ export default function LoginForm({ setView }) {
 
  const handleQuickLogin = (type) => {
  let creds = { email: '', password: 'password123' };
- if (type === 'Agencies') creds.email = 'agency@talentflow.com';
- else if (type === 'Corporate') creds.email = 'corporate@talentflow.com';
- else if (type === 'Super Admin') creds.email = 'admin@talentflow.com';
+ if (type === 'Agencies') creds.email = 'agency@findnew.com';
+ else if (type === 'Corporate') creds.email = 'corporate@findnew.com';
+ else if (type === 'Super Admin') creds.email = 'admin@findnew.com';
  
  setEmail(creds.email);
  setPassword(creds.password);
@@ -40,9 +40,9 @@ export default function LoginForm({ setView }) {
  e.preventDefault();
  if (validate()) {
  let userType = 'User';
- if (email === 'agency@talentflow.com') userType = 'Agencies';
- if (email === 'corporate@talentflow.com') userType = 'Corporate';
- if (email === 'admin@talentflow.com') userType = 'Super Admin';
+ if (email === 'agency@findnew.com') userType = 'Agencies';
+ if (email === 'corporate@findnew.com') userType = 'Corporate';
+ if (email === 'admin@findnew.com') userType = 'Super Admin';
  
  console.log('Login attempt', { email, password, userType });
  navigate('/dashboard', { state: { userType } });
@@ -52,7 +52,7 @@ export default function LoginForm({ setView }) {
  return (
  <div className="w-full animate-fade-in">
  <div className="mb-8">
- <h4 className="text-[1.5rem] font-bold text-[#212b36] mb-3">Sign in to TalentFlow</h4>
+ <h4 className="text-[1.5rem] font-bold text-[#212b36] mb-3">Sign in to FindNew</h4>
  <p className="text-[0.875rem] text-black">
  New user?{' '}
  <button onClick={() => setView('signup')} className="text-[#00A76F] font-semibold hover:underline transition-all">

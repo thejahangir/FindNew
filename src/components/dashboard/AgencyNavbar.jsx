@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { HelpCircle, Bell, Menu, Sun, Moon } from 'lucide-react';
+import { HelpCircle, Bell, Menu, Sun, Moon, Search } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import TalentFlowLogo from '../../assets/talentflow-logo.png';
+import FindNewLogo from '../../assets/findnew-logo.png';
 import { useTheme } from '../../contexts/ThemeContext';
 import NotificationPanel from './NotificationPanel';
 import { mockNotifications } from '../../data/mockNotifications';
@@ -29,7 +29,7 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
  <div className={`flex items-center px-4 transition-all duration-300 h-full border-r border-transparent ${isSidebarCollapsed ? 'w-20 justify-center' : 'w-64 justify-between'}`}>
  {!isSidebarCollapsed && (
  <Link to="/" className="flex items-center">
- <img src={TalentFlowLogo} alt="TalentFlow Logo" className="h-8 object-contain" />
+ <img src={FindNewLogo} alt="FindNew Logo" className="h-8 object-contain" />
  </Link>
  )}
  <button 
@@ -61,6 +61,18 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
  </Link>
  );
  })}
+ </div>
+ </div>
+
+ {/* Search Bar */}
+ <div className="hidden lg:flex flex-1 max-w-md mx-4 xl:mx-8">
+ <div className="relative w-full">
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+ <input 
+ type="text" 
+ placeholder="Search candidates, jobs, or agencies..." 
+ className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#161c24] border border-gray-200 dark:border-gray-800/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all text-[#212b36] dark:text-white"
+ />
  </div>
  </div>
 

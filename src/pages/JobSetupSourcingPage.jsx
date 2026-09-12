@@ -104,7 +104,7 @@ export default function JobSetupSourcingPage() {
  <label className="block text-xs font-bold text-[#212b36] dark:text-white mb-2">Outreach Message Template</label>
  <div className="p-3 bg-white dark:bg-[#161c24] rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-[#454f5b] dark:text-gray-300">
  Hi {'{candidate_name}'},<br/><br/>
- I came across your profile and was impressed by your experience with {'{top_skill}'}. We're looking for a {jobData?.title || 'great candidate'} at TalentFlow and I think you'd be a great fit.
+ I came across your profile and was impressed by your experience with {'{top_skill}'}. We're looking for a {jobData?.title || 'great candidate'} at FindNew and I think you'd be a great fit.
  </div>
  </div>
  </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
-import TaentFlowLogo from '../../assets/talentflow-logo.png';
+import FindNewLogo from '../../assets/findnew-logo.png';
 
 export default function Navbar() {
  return (
@@ -12,7 +12,7 @@ export default function Navbar() {
  <Link to="/" className="flex items-center gap-3">
  
  <div>
- <img src={TaentFlowLogo} alt="TalentFlowLogo" className='logo-talentflow' />
+ <img src={FindNewLogo} alt="FindNewLogo" className='logo-findnew' />
  </div>
  </Link>
 

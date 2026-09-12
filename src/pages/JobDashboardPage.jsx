@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
+import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
 
 // --- MOCK DATA ---
 const pipelineData = [
@@ -82,24 +83,32 @@ const upcomingInterviews = [
  { id: 7, candidate: 'Meera Reddy', role: 'UX Designer', time: 'Next Mon, 10:00 AM', duration: '30 mins', platform: 'Zoom', score: 81, type: 'Portfolio Review', interviewer: 'Amit', status: 'Pending' },
 ];
 
-const candidateList = [
- { id: 1, name: 'Ananya Sharma', stage: 'Technical Interview', score: '98/100', date: '2 days ago' },
- { id: 2, name: 'Rahul Verma', stage: 'Culture Fit', score: '95/100', date: '1 day ago' },
- { id: 3, name: 'Priya Patel', stage: 'Application Review', score: '88/100', date: '5 hours ago' },
- { id: 4, name: 'Arjun Kumar', stage: 'Reference Check', score: '92/100', date: '4 days ago' },
- { id: 5, name: 'Ravi Desai', stage: 'Applied', score: '92/100', date: '2 hours ago' },
- { id: 6, name: 'Sneha Patil', stage: 'Screening', score: '88/100', date: '5 hours ago' },
- { id: 7, name: 'Karan Mehra', stage: 'Interviewing', score: '85/100', date: '1 day ago' },
- { id: 8, name: 'Ankita Rao', stage: 'Offer', score: '81/100', date: '1 day ago' },
- { id: 9, name: 'Varun Khanna', stage: 'Applied', score: '79/100', date: '2 days ago' },
- { id: 10, name: 'Pooja Iyer', stage: 'Screening', score: '94/100', date: '1 day ago' },
- { id: 11, name: 'Divya Singh', stage: 'Technical Interview', score: '89/100', date: '3 days ago' },
- { id: 12, name: 'Nitin Gupta', stage: 'Put On Hold', score: '90/100', date: '5 days ago' },
- { id: 13, name: 'Neha Sharma', stage: 'Applied', score: '84/100', date: '1 week ago' },
- { id: 14, name: 'Amit Singh', stage: 'Screening', score: '86/100', date: '1 week ago' },
- { id: 15, name: 'Kavita Das', stage: 'Reference Check', score: '91/100', date: '2 weeks ago' },
- { id: 16, name: 'Rohit Joshi', stage: 'Offer', score: '97/100', date: '2 days ago' },
+const AGENCY_BENCH = [
+ { agency: 'TechTalent Partners', agencyEmail: 'desk@techtalentpartners.com' },
+ { agency: 'Elite Hiring Solutions', agencyEmail: 'submissions@elitehiring.com' },
+ { agency: 'Vanguard Recruitment', agencyEmail: 'jobs@vanguardrecruit.com' },
+ { agency: 'Global Recruiters Inc.', agencyEmail: 'india@globalrecruiters.com' },
+ { agency: 'NextGen Staffing', agencyEmail: 'profiles@nextgenstaffing.com' },
 ];
+
+const MOCK_CANDIDATES = [
+  { id: 1, name: 'Ananya Sharma', stage: 'Technical Interview', score: '9.8/10', date: '2 days ago' },
+  { id: 2, name: 'Rahul Verma', stage: 'Culture Fit', score: '9.5/10', date: '1 day ago' },
+  { id: 3, name: 'Priya Patel', stage: 'Application Review', score: '8.8/10', date: '5 hours ago' },
+  { id: 4, name: 'Arjun Kumar', stage: 'Reference Check', score: '9.2/10', date: '4 days ago' },
+  { id: 5, name: 'Ravi Desai', stage: 'Applied', score: '9.2/10', date: '2 hours ago' },
+  { id: 6, name: 'Sneha Patil', stage: 'Screening', score: '8.8/10', date: '5 hours ago' },
+  { id: 7, name: 'Karan Mehra', stage: 'Interviewing', score: '8.5/10', date: '1 day ago' },
+  { id: 8, name: 'Ankita Rao', stage: 'Offer', score: '8.1/10', date: '1 day ago' },
+  { id: 9, name: 'Varun Khanna', stage: 'Applied', score: '7.9/10', date: '2 days ago' },
+  { id: 10, name: 'Pooja Iyer', stage: 'Screening', score: '9.4/10', date: '1 day ago' },
+  { id: 11, name: 'Divya Singh', stage: 'Technical Interview', score: '8.9/10', date: '3 days ago' },
+  { id: 12, name: 'Nitin Gupta', stage: 'Put On Hold', score: '9.0/10', date: '5 days ago' },
+  { id: 13, name: 'Neha Sharma', stage: 'Applied', score: '8.4/10', date: '1 week ago' },
+  { id: 14, name: 'Amit Singh', stage: 'Screening', score: '8.6/10', date: '1 week ago' },
+  { id: 15, name: 'Kavita Das', stage: 'Reference Check', score: '9.1/10', date: '2 weeks ago' },
+  { id: 16, name: 'Rohit Joshi', stage: 'Offer', score: '9.7/10', date: '2 days ago' },
+ ].map((c, i) => ({ ...c, ...AGENCY_BENCH[i % AGENCY_BENCH.length] }));
 
 const roleOptions = [
  { value: 'interviewer', label: 'Interviewer', description: 'Can score candidates' },
@@ -115,15 +124,133 @@ const recentActivity = [
  { id: 4, action: 'Automated screening rejected 12 candidates', time: 'Yesterday, 9:00 AM', icon: UserX, color: 'text-[#FF5630] bg-[#FF5630]/10' },
 ];
 
+const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`;
+
+const getInitials = (name) => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+function MiniCheckbox({ checked, indeterminate = false, visible, onChange, label, revealGroup = 'cand' }) {
+ const revealCls = revealGroup === 'list'
+ ? 'group-hover/list:opacity-100 group-hover/list:scale-100'
+ : 'group-hover/cand:opacity-100 group-hover/cand:scale-100';
+ return (
+ <button
+ type="button"
+ role="checkbox"
+ aria-checked={indeterminate ? 'mixed' : checked}
+ aria-label={label}
+ onClick={(e) => { e.stopPropagation(); onChange(); }}
+ className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+ >
+ <span
+ className={`flex items-center justify-center w-3.5 h-3.5 rounded-[4px] border-[1.5px] shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-all duration-150 ${
+ checked || indeterminate
+ ? 'bg-[#1890FF] border-[#1890FF] scale-100 opacity-100'
+ : `bg-white dark:bg-[#161c24] border-gray-300 dark:border-gray-500 ${visible ? 'opacity-100 scale-100' : `opacity-0 scale-75 ${revealCls}`}`
+ }`}
+ >
+ {checked && !indeterminate && <Check size={9} strokeWidth={3.5} className="text-white" />}
+ {indeterminate && <span className="block w-1.5 h-[1.5px] rounded-full bg-white" />}
+ </span>
+ </button>
+ );
+}
+
 export default function JobDashboardPage() {
  const navigate = useNavigate();
+ const location = useLocation();
  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
  const [inviteRole, setInviteRole] = useState('');
  const [showInviteSuccess, setShowInviteSuccess] = useState(false);
- const [activeTab, setActiveTab] = useState('Overview');
+ const [activeTab, setActiveTab] = useState(location.state?.tab || 'Overview');
  const [pipelineBoard, setPipelineBoard] = useState(initialPipelineBoardData);
  const [selectedCandidate, setSelectedCandidate] = useState(null);
  const [moveDropdownId, setMoveDropdownId] = useState(null);
+
+ const [candidateList, setCandidateList] = useState(MOCK_CANDIDATES);
+ const [selectedAppCandidate, setSelectedAppCandidate] = useState(
+ MOCK_CANDIDATES.find(c => String(c.id) === String(location.state?.selectedCandidateId)) || MOCK_CANDIDATES[0]
+ );
+ const [isUploadingResume, setIsUploadingResume] = useState(false);
+ const [isAIScreening, setIsAIScreening] = useState(false);
+
+ // Applications Tab State
+ const [selectedAppCandidates, setSelectedAppCandidates] = useState([]);
+ const [currentPageApp, setCurrentPageApp] = useState(1);
+ const [openStageMenuId, setOpenStageMenuId] = useState(null);
+ const [isBulkStageMenuOpen, setIsBulkStageMenuOpen] = useState(false);
+ const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+ const [rejectCards, setRejectCards] = useState([]);
+ const [appSearchQuery, setAppSearchQuery] = useState('');
+ const [selectionLimitAlert, setSelectionLimitAlert] = useState(null);
+
+ const itemsPerPageApp = 5;
+ const appSearch = appSearchQuery.trim().toLowerCase();
+ const filteredAppCandidates = candidateList.filter(c => {
+ if (!appSearch) return true;
+ return (
+ c.name.toLowerCase().includes(appSearch) ||
+ c.stage.toLowerCase().includes(appSearch) ||
+ (c.agency && c.agency.toLowerCase().includes(appSearch))
+ );
+ });
+ const totalPagesApp = Math.max(1, Math.ceil(filteredAppCandidates.length / itemsPerPageApp));
+ const currentAppCandidates = filteredAppCandidates.slice((currentPageApp - 1) * itemsPerPageApp, currentPageApp * itemsPerPageApp);
+ const MAX_APP_SELECTION = 5;
+
+ const toggleAppCandidateSelect = (id) => {
+ if (selectedAppCandidates.includes(id)) {
+ setSelectedAppCandidates(prev => prev.filter(x => x !== id));
+ return;
+ }
+ if (selectedAppCandidates.length >= MAX_APP_SELECTION) {
+ const cand = candidateList.find(c => c.id === id);
+ setSelectionLimitAlert({ name: cand?.name || 'this candidate' });
+ return;
+ }
+ setSelectedAppCandidates(prev => [...prev, id]);
+ };
+
+ const openRejectModal = (ids) => {
+ const uniqueIds = [...new Set(ids)];
+ setRejectCards(candidateList.filter(c => uniqueIds.includes(c.id)));
+ setIsRejectModalOpen(true);
+ setOpenStageMenuId(null);
+ setIsBulkStageMenuOpen(false);
+ };
+
+ const handleCandidateStageChange = (candidateId, stage) => {
+ if (stage === 'Reject') {
+ openRejectModal([candidateId]);
+ return;
+ }
+ setCandidateList(prev => prev.map(c => c.id === candidateId ? { ...c, stage } : c));
+ setSelectedAppCandidate(prev => prev?.id === candidateId ? { ...prev, stage } : prev);
+ setOpenStageMenuId(null);
+ };
+
+ const handleBulkStageChange = (stage) => {
+ if (stage === 'Reject') {
+ openRejectModal(selectedAppCandidates);
+ return;
+ }
+ setCandidateList(prev => prev.map(c => selectedAppCandidates.includes(c.id) ? { ...c, stage } : c));
+ setSelectedAppCandidate(prev => prev && selectedAppCandidates.includes(prev.id) ? { ...prev, stage } : prev);
+ setIsBulkStageMenuOpen(false);
+ setSelectedAppCandidates([]);
+ };
+
+ const closeRejectModal = () => {
+ setIsRejectModalOpen(false);
+ setRejectCards([]);
+ };
+
+ const handleSendRejectEmails = (cards) => {
+ const ids = cards.map(card => card.id);
+ setCandidateList(prev => prev.map(c => ids.includes(c.id) ? { ...c, stage: 'Reject' } : c));
+ setSelectedAppCandidate(prev => prev && ids.includes(prev.id) ? { ...prev, stage: 'Reject' } : prev);
+ setSelectedAppCandidates(prev => prev.filter(id => !ids.includes(id)));
+ closeRejectModal();
+ };
 
  const [interviewsList, setInterviewsList] = useState(upcomingInterviews);
  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -133,6 +260,15 @@ export default function JobDashboardPage() {
  // Hot reload sync for mock data
  useEffect(() => {
  setInterviewsList(upcomingInterviews);
+ }, []);
+
+ useEffect(() => {
+ const closeMenus = () => {
+ setOpenStageMenuId(null);
+ setIsBulkStageMenuOpen(false);
+ };
+ document.addEventListener('click', closeMenus);
+ return () => document.removeEventListener('click', closeMenus);
  }, []);
 
  // Candidate Tab State
@@ -148,7 +284,7 @@ export default function JobDashboardPage() {
  const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage);
  const currentCandidates = filteredCandidates.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
- const tabs = ['Overview', 'Job Description', 'Pipeline', 'Candidates', 'Interviews', 'Team & Scorecards', 'Settings'];
+ const tabs = ['Overview', 'Applications', 'Job Description', 'Pipeline', 'Candidates', 'Interviews', 'Team & Scorecards', 'Settings'];
 
  const handleMoveCandidate = (candidate, fromStage, toStage) => {
  setPipelineBoard(prev => {
@@ -778,6 +914,355 @@ export default function JobDashboardPage() {
  )}
  </div>
  )}
+  {/* APPLICATIONS TAB - Immersive Redesign */}
+ {activeTab === 'Applications' && (
+ <div className="flex flex-col h-[800px] bg-white dark:bg-[#161c24] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 overflow-hidden animate-fade-in">
+ {/* Top Toolbar */}
+ <div className="flex flex-wrap items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-800/10 gap-4">
+ <div className="flex items-center gap-3">
+ <button onClick={() => document.getElementById('new-applicant-upload').click()} className="px-4 py-2 text-sm font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 rounded-lg shadow-sm transition-colors flex items-center gap-2 cursor-pointer">
+ <Plus size={16} /> New Applicant
+ </button>
+ <input type="file" id="new-applicant-upload" accept=".pdf" className="hidden" onChange={() => { setIsUploadingResume(true); setTimeout(() => setIsUploadingResume(false), 1500); }} />
+ </div>
+ 
+ <div className="flex items-center gap-3">
+ <button className="px-4 py-2 text-sm font-bold text-white bg-[#212b36] dark:bg-white dark:text-[#212b36] rounded-lg shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors cursor-pointer">
+ Rank All
+ </button>
+ <button onClick={() => { setIsAIScreening(true); setTimeout(() => setIsAIScreening(false), 2000); }} className="px-4 py-2 text-sm font-bold text-[#1890FF] bg-[#1890FF]/10 hover:bg-[#1890FF]/20 rounded-lg transition-colors flex items-center gap-2 cursor-pointer">
+ {isAIScreening ? <Activity className="animate-pulse" size={16} /> : <Activity size={16} />}
+ Run Screening
+ </button>
+ </div>
+ </div>
+
+ <div className="flex flex-1 overflow-hidden relative">
+ {/* Left Panel: Candidates List */}
+ <div className="w-[320px] lg:w-[380px] border-r border-gray-100 dark:border-gray-800/50 flex flex-col bg-white dark:bg-[#161c24] shrink-0 relative">
+ <div className="p-3 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="relative">
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+ <input
+ type="text"
+ value={appSearchQuery}
+ onChange={(e) => { setAppSearchQuery(e.target.value); setCurrentPageApp(1); }}
+ placeholder="Search by name, stage, or agency..."
+ className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white"
+ />
+ </div>
+ </div>
+ <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
+ {currentAppCandidates.length === 0 ? (
+ <div className="px-3 py-10 text-center">
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white">No applicants found</p>
+ <p className="text-[12px] text-gray-500 mt-1">
+ {appSearchQuery.trim() ? `No matches for “${appSearchQuery.trim()}”` : 'No applicants in this list yet.'}
+ </p>
+ </div>
+ ) : currentAppCandidates.map(cand => {
+ const isChecked = selectedAppCandidates.includes(cand.id);
+ const showChecks = selectedAppCandidates.length > 0;
+ return (
+ <div 
+ key={cand.id} 
+ onClick={() => setSelectedAppCandidate(cand)}
+ className={`group/cand p-3 rounded-xl cursor-pointer transition-all border flex gap-3 ${selectedAppCandidate?.id === cand.id ? 'bg-[#1890FF]/5 border-[#1890FF]/30 shadow-sm' : 'border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+ >
+ <div className={`relative w-8 h-8 shrink-0 rounded-full flex items-center justify-center mt-0.5 transition-all duration-150 ${isChecked ? 'bg-[#1890FF]/15 ring-2 ring-[#1890FF]/30' : 'bg-[#1890FF]/10 dark:bg-[#1890FF]/15'}`}>
+ <span className={`text-[10px] font-bold tracking-wide text-[#1890FF] transition-opacity duration-150 ${isChecked || showChecks ? 'opacity-0' : 'group-hover/cand:opacity-0'}`}>
+ {getInitials(cand.name)}
+ </span>
+ <MiniCheckbox
+ checked={isChecked}
+ visible={isChecked || showChecks}
+ onChange={() => toggleAppCandidateSelect(cand.id)}
+ label={isChecked ? `Deselect ${cand.name}` : `Select ${cand.name}`}
+ />
+ </div>
+ <div className="flex-1 min-w-0">
+ <div className="flex justify-between items-start mb-1">
+ <div className="flex items-center gap-1 min-w-0 flex-1 pr-2">
+ <h4 className={`text-[13px] font-bold truncate ${selectedAppCandidate?.id === cand.id ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF]'}`}>{cand.name}</h4>
+ <button
+ type="button"
+ title="Open full profile"
+ onClick={(e) => {
+ e.stopPropagation();
+ navigate(`/dashboard/candidates/${cand.id}`, {
+ state: {
+ candidate: cand,
+ from: { name: 'Applications', path: '/dashboard/agencies', tab: 'Applications' }
+ }
+ });
+ }}
+ className="opacity-0 group-hover/cand:opacity-100 p-0.5 rounded-md text-[#1890FF] hover:bg-[#1890FF]/10 shrink-0 cursor-pointer transition-opacity"
+ >
+ <ArrowUpRight size={14} />
+ </button>
+ </div>
+ <span className="text-[10px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded shrink-0">{cand.score}</span>
+ </div>
+ <div className="flex justify-between items-center mt-2 relative">
+ <div className="relative">
+ <button 
+ onClick={(e) => { e.stopPropagation(); setOpenStageMenuId(openStageMenuId === cand.id ? null : cand.id); }}
+ className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer ${cand.stage === 'Reject' ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-gray-300'}`}
+ >
+ {cand.stage} <ChevronDown size={10} />
+ </button>
+ {openStageMenuId === cand.id && (
+ <div
+ className="absolute top-full left-0 mt-1 w-36 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden py-1"
+ onClick={(e) => e.stopPropagation()}
+ >
+ {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => {
+ const isSelected = cand.stage === stage;
+ return (
+ <button 
+ key={stage} 
+ onClick={(e) => { e.stopPropagation(); handleCandidateStageChange(cand.id, stage); }}
+ className={`w-full text-left px-3 py-1.5 text-[10px] font-bold flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+ isSelected
+ ? stage === 'Reject' ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-[#1890FF]/10 text-[#1890FF]'
+ : stage === 'Reject' ? 'text-[#FF5630] hover:bg-gray-50 dark:hover:bg-gray-800' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+ }`}
+ >
+ <span>{stage}</span>
+ {isSelected && <Check size={12} strokeWidth={3} />}
+ </button>
+ );
+ })}
+ </div>
+ )}
+ </div>
+ <span className="text-[10px] text-gray-400">{cand.date}</span>
+ </div>
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ {filteredAppCandidates.length > itemsPerPageApp && (
+ <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/30">
+ <button 
+ disabled={currentPageApp === 1}
+ onClick={() => setCurrentPageApp(p => p - 1)}
+ className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+ >
+ <ChevronRight size={16} className="rotate-180" />
+ </button>
+ <span className="text-[11px] font-bold text-gray-500">Page {currentPageApp} of {totalPagesApp}</span>
+ <button 
+ disabled={currentPageApp === totalPagesApp}
+ onClick={() => setCurrentPageApp(p => p + 1)}
+ className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+ >
+ <ChevronRight size={16} />
+ </button>
+ </div>
+ )}
+
+ {/* Compact Bulk Action Bar - Localized to Left Panel */}
+ {selectedAppCandidates.length > 0 && (
+ <div className={`absolute left-4 right-4 bg-[#1890FF] border border-[#1890FF] p-2.5 rounded-xl shadow-[0_8px_30px_rgba(24,144,255,0.2)] flex items-center justify-between z-50 animate-fade-in text-white ${totalPagesApp > 1 ? 'bottom-[72px]' : 'bottom-4'}`}>
+ <div className="flex items-center gap-2">
+ <span className="text-[11px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">{selectedAppCandidates.length} Selected</span>
+ </div>
+ 
+ <div className="flex items-center gap-2 relative">
+ <button 
+ onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
+ className="text-[11px] font-bold text-white hover:text-white/80 flex items-center gap-1 transition-colors cursor-pointer"
+ >
+ Stage <ChevronDown size={14} />
+ </button>
+ {isBulkStageMenuOpen && (
+ <div
+ className="absolute bottom-full right-0 mb-2 w-36 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1"
+ onClick={(e) => e.stopPropagation()}
+ >
+ {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => (
+ <button 
+ key={stage} 
+ onClick={() => handleBulkStageChange(stage)}
+ className={`w-full text-left px-3 py-1.5 text-[11px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer ${stage === 'Reject' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}
+ >
+ {stage}
+ </button>
+ ))}
+ </div>
+ )}
+ <div className="w-px h-3 bg-white/30"></div>
+ <button onClick={() => setSelectedAppCandidates([])} className="text-white/70 hover:text-white transition-colors cursor-pointer p-0.5"><X size={14} /></button>
+ </div>
+ </div>
+ )}
+ </div>
+
+ {/* Right Panel: Smart Profile */}
+ <div className="flex-1 flex flex-col bg-gray-50/50 dark:bg-black/20 relative min-w-0">
+ {isUploadingResume && (
+ <div className="absolute inset-0 bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-sm z-50 flex items-center justify-center">
+ <div className="text-center">
+ <div className="w-12 h-12 border-4 border-[#1890FF] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+ <p className="text-sm font-bold text-[#212b36] dark:text-white">Uploading new applicant resume...</p>
+ </div>
+ </div>
+ )}
+
+ {selectedAppCandidate ? (
+ <div className="h-full flex flex-col min-h-0 animate-fade-in">
+ <div className="shrink-0 bg-white dark:bg-[#161c24] px-4 py-2.5 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between gap-3">
+ <div className="flex items-center gap-2 min-w-0">
+ <FileText size={16} className="text-[#1890FF] shrink-0" />
+ <div className="min-w-0">
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
+ {selectedAppCandidate.name.replace(/\s+/g, '_')}_Resume.pdf
+ </p>
+ <p className="text-[11px] text-gray-400">PDF resume</p>
+ </div>
+ </div>
+ <div className="flex items-center gap-1 shrink-0">
+ <a
+ href={SAMPLE_RESUME_URL}
+ target="_blank"
+ rel="noreferrer"
+ className="p-2 text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors"
+ title="Open in new tab"
+ >
+ <ExternalLink size={16} />
+ </a>
+ <a
+ href={SAMPLE_RESUME_URL}
+ download={`${selectedAppCandidate.name.replace(/\s+/g, '_')}_Resume.pdf`}
+ className="p-2 text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors"
+ title="Download resume"
+ >
+ <Download size={16} />
+ </a>
+ </div>
+ </div>
+ <div className="flex-1 min-h-0 bg-[#525659]">
+ <iframe
+ key={selectedAppCandidate.id}
+ title={`${selectedAppCandidate.name} resume`}
+ src={`${SAMPLE_RESUME_URL}#toolbar=1&navpanes=0`}
+ className="w-full h-full border-0 bg-white"
+ />
+ </div>
+ </div>
+ ) : (
+ <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+ <div className="w-16 h-16 bg-white dark:bg-gray-800 shadow-sm rounded-full flex items-center justify-center mb-4">
+ <Users size={32} className="text-gray-400" />
+ </div>
+ <p className="font-medium text-sm">Select a candidate to view their resume</p>
+ </div>
+ )}
+  </div>
+
+  {/* Right Panel: AI Screening Results */}
+  <div className="w-[300px] lg:w-[360px] border-l border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex flex-col shrink-0">
+  
+  <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+  {selectedAppCandidate ? (
+  <>
+  {/* Top Match Score Card */}
+  <div className="bg-[#1890FF]/10 rounded-xl p-4 border border-[#1890FF]/20 flex flex-col">
+  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">Overall Match Score</p>
+  <div className="flex justify-between items-center">
+  <div className="text-4xl font-black text-[#1890FF]">{selectedAppCandidate.score.replace('/10', '')}<span className="text-2xl text-[#1890FF]/70">/10</span></div>
+  <span className="text-[13px] font-bold text-[#00A76F]">Strong match</span>
+  </div>
+  </div>
+
+  {/* AI Screening Summary */}
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
+  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 space-y-2 leading-relaxed">
+  <p>Excellent fit for the technical requirements.</p>
+  <p>Strong React, Node.js and architecture experience.</p>
+  <p className="font-bold text-[#212b36] dark:text-white mt-1">Recommended for Technical Interview.</p>
+  </div>
+  </div>
+
+  {/* Key Screening Criteria */}
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
+  <div className="space-y-4">
+  
+  <div className="flex gap-4">
+  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">9</div>
+  <div>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Technical skills</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">React, Node.js, AWS and architecture are a strong match. Demonstrates deep proficiency in modern frontend frameworks, backend services, and cloud infrastructure. Experience with CI/CD pipelines and microservices is a plus.</p>
+  </div>
+  </div>
+
+  <div className="flex gap-4">
+  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">8.1</div>
+  <div>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Relevant experience</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Strong track record delivering scalable, relevant products. Has led cross-functional teams on multiple enterprise projects with measurable impact on performance and user engagement.</p>
+  </div>
+  </div>
+
+  <div className="flex gap-4">
+  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">8.5</div>
+  <div>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Role alignment</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Experience and seniority closely match this role. Career progression shows consistent growth into senior technical leadership positions with scope matching this opportunity.</p>
+  </div>
+  </div>
+
+  <div className="flex gap-4">
+  <div className="w-9 h-9 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">9.5</div>
+  <div>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Communication</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Clear communication with strong collaboration and leadership. Demonstrates ability to present complex technical concepts to non-technical stakeholders and mentor junior engineers effectively.</p>
+  </div>
+  </div>
+
+  <div className="flex gap-4">
+  <div className="w-9 h-9 rounded-full bg-[#FF5630] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">3.2</div>
+  <div>
+  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-1">Industry knowledge</h5>
+  <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">Limited exposure to the specific domain. Lacks direct experience in AI research or adjacent scientific fields, which may require additional onboarding and ramp-up time.</p>
+  </div>
+  </div>
+
+  </div>
+  </div>
+
+  {/* Gap Analysis */}
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
+  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[12px] text-[#454f5b] dark:text-gray-300 leading-relaxed">
+  Minor gaps: limited exposure to enterprise-scale delivery and formal people management.
+  </div>
+  </div>
+
+  <button className="w-full py-3 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2 cursor-pointer">
+  <CheckCircle size={16} /> Recommended: Move to Technical Interview
+  </button>
+
+  </>
+  ) : (
+  <div className="h-full flex flex-col items-center justify-center text-center">
+  <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
+  <Activity size={24} className="text-gray-400" />
+  </div>
+  <p className="text-xs text-gray-500 font-medium">Select a candidate to view AI screening insights.</p>
+  </div>
+  )}
+  </div>
+  </div>
+
+
+  </div>
+  </div>
+  )}
 
  {/* INTERVIEWS TAB */}
  {activeTab === 'Interviews' && (
@@ -875,6 +1360,35 @@ export default function JobDashboardPage() {
  <CheckCircle size={20} className="text-[#00A76F]" />
  </div>
  </div>
+ </div>
+ </div>
+ )}
+
+ {/* Reject & notify agencies */}
+ <RejectAgencyModal
+ open={isRejectModalOpen}
+ candidates={rejectCards}
+ onClose={closeRejectModal}
+ onSent={handleSendRejectEmails}
+ />
+
+ {selectionLimitAlert && (
+ <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 dark:border-gray-800/50 text-center p-7">
+ <div className="w-14 h-14 mx-auto rounded-full bg-[#FFC107]/15 text-[#b78103] dark:text-[#FFC107] flex items-center justify-center mb-4">
+ <AlertCircle size={28} />
+ </div>
+ <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-2">Selection limit reached</h3>
+ <p className="text-[13px] text-[#637381] dark:text-gray-400 leading-relaxed mb-6">
+ You can select up to <span className="font-bold text-[#1890FF]">5</span> candidates at a time for bulk actions. Deselect one before adding <span className="font-bold text-[#212b36] dark:text-white">{selectionLimitAlert.name}</span>.
+ </p>
+ <button
+ type="button"
+ onClick={() => setSelectionLimitAlert(null)}
+ className="w-full py-2.5 text-sm font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors cursor-pointer"
+ >
+ Got it
+ </button>
  </div>
  </div>
  )}

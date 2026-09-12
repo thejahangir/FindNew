@@ -16,12 +16,12 @@ export default function About() {
  
  {/* Left Text Content */}
  <div className="lg:w-1/2">
- <h2 className="text-sm font-bold text-brand-blue uppercase mb-3">About TalentFlow</h2>
+ <h2 className="text-sm font-bold text-brand-blue uppercase mb-3">About FindNew</h2>
  <h3 className="text-3xl md:text-4xl font-bold text-brand-dark mb-6 leading-tight">
  Recruitment is broken. <br /> We're fixing it with AI.
  </h3>
  <p className="text-lg text-gray-600 mb-8 leading-relaxed">
- Traditional applicant tracking systems are just digital filing cabinets. TalentFlow is an active intelligence that works alongside your team. By automating the tedious parts of sourcing and screening, we let recruiters do what they do best: build relationships with incredible people.
+ Traditional applicant tracking systems are just digital filing cabinets. FindNew is an active intelligence that works alongside your team. By automating the tedious parts of sourcing and screening, we let recruiters do what they do best: build relationships with incredible people.
  </p>
  
  <div className="space-y-4 mb-10">

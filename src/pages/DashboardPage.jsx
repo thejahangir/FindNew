@@ -17,6 +17,7 @@ import JobSetupRankingRulesPage from './JobSetupRankingRulesPage';
 import JobSetupAgenciesPage from './JobSetupAgenciesPage';
 import JobSetupNotificationsPage from './JobSetupNotificationsPage';
 import ApprovalsPage from './ApprovalsPage';
+import CandidateProfilePage from './CandidateProfilePage';
 
 const PlaceholderPage = ({ title }) => (
  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center min-h-[400px]">
@@ -74,6 +75,7 @@ export default function DashboardPage() {
  <Route path="integrations" element={<PlaceholderPage title="Integrations" />} />
  
  {/* Main Sidebar Routes */}
+ <Route path="candidates/:id" element={<CandidateProfilePage />} />
  <Route path="candidates" element={<PlaceholderPage title="Candidates" />} />
  <Route path="sourcing" element={<PlaceholderPage title="Sourcing" />} />
  <Route path="pipeline" element={<PlaceholderPage title="Pipeline" />} />

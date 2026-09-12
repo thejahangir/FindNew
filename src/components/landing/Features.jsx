@@ -38,7 +38,7 @@ export default function Features() {
  Everything you need to scale your team
  </h2>
  <p className="text-lg text-gray-600">
- TalentFlow combines traditional ATS features with cutting-edge AI to streamline your entire recruitment pipeline.
+ FindNew combines traditional ATS features with cutting-edge AI to streamline your entire recruitment pipeline.
  </p>
  </div>
 

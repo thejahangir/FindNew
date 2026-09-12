@@ -49,13 +49,13 @@ export default function Hero() {
  <h1 className="text-5xl md:text-7xl font-bold text-brand-dark mb-8 animate-slide-up" style={{animationDelay: '0.1s'}}>
  Hire the best talent. <br/>
  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-green">
- On TalentFlow.
+ On FindNew.
  </span>
  </h1>
 
  {/* Subheadline */}
  <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-10 animate-fade-in font-medium" style={{animationDelay: '0.3s'}}>
- TalentFlow uses advanced AI to source, screen, and engage top candidates faster than ever before. Reclaim your time and build your dream team.
+ FindNew uses advanced AI to source, screen, and engage top candidates faster than ever before. Reclaim your time and build your dream team.
  </p>
 
  {/* CTA Buttons */}

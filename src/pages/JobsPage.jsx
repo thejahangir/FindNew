@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, MoreVertical, Briefcase, MapPin, 
  Users, Clock, CheckCircle, AlertCircle, Calendar, 
- ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2 } from 'lucide-react';
+ ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
+import findNewIco from '../assets/findnew-ico.png';
 
 const MOCK_JOBS = [
  { id: 1, title: 'Senior AI Research Scientist', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Published', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', hiringManager: 'Amit Sharma', score: 98 },
@@ -42,6 +43,36 @@ export default function JobsPage() {
 
  const [currentPage, setCurrentPage] = useState(1);
  const itemsPerPage = 5;
+
+ const [chatbotWidth, setChatbotWidth] = useState(320);
+ const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(false);
+ const [isChatbotResizing, setIsChatbotResizing] = useState(false);
+ const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
+ const [selectedJobToView, setSelectedJobToView] = useState(null);
+
+ useEffect(() => {
+ const handleMouseMove = (e) => {
+ if (!isChatbotResizing) return;
+ const newWidth = document.body.clientWidth - e.clientX;
+ if (newWidth < 80) {
+ setIsChatbotCollapsed(true);
+ return;
+ }
+ if (newWidth >= 280 && newWidth <= 600) {
+ setIsChatbotCollapsed(false);
+ setChatbotWidth(newWidth);
+ }
+ };
+ const handleMouseUp = () => setIsChatbotResizing(false);
+ if (isChatbotResizing) {
+ document.addEventListener('mousemove', handleMouseMove);
+ document.addEventListener('mouseup', handleMouseUp);
+ }
+ return () => {
+ document.removeEventListener('mousemove', handleMouseMove);
+ document.removeEventListener('mouseup', handleMouseUp);
+ };
+ }, [isChatbotResizing]);
 
  useEffect(() => {
  const handleClickOutside = () => setOpenActionMenuId(null);
@@ -194,6 +225,8 @@ export default function JobsPage() {
  ))}
  </div>
 
+ <div className="flex flex-col xl:flex-row gap-6 relative items-start">
+ <div className="flex-1 min-w-0 space-y-6">
  {/* Filters & Search */}
  <div className="bg-white dark:bg-[#161c24] p-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col xl:flex-row gap-4 justify-between items-center">
  <div className="flex flex-wrap gap-2 w-full xl:w-auto">
@@ -213,19 +246,15 @@ export default function JobsPage() {
  </div>
  
  <div className="flex gap-3 w-full md:w-auto">
- <div className="relative flex-1 md:w-64">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+ <div className="relative md:w-64">
  <input 
  type="text" 
  placeholder="Search jobs..." 
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-lg text-sm focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
+ className="w-full px-4 py-2 text-xs bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-lg focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
  />
  </div>
- <button className="px-3 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-lg text-black dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
- <Search size={18} />
- </button>
  </div>
  </div>
 
@@ -236,9 +265,7 @@ export default function JobsPage() {
  <thead>
  <tr className="bg-gray-50/50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Job Details</th>
- <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Status</th>
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Active Candidates</th>
- <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Hiring Manager</th>
  <th className="px-6 py-4 text-center text-xs font-bold text-black dark:text-gray-400 ">Actions</th>
  </tr>
  </thead>
@@ -256,7 +283,14 @@ export default function JobsPage() {
  </div>
  <div>
  <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors cursor-pointer">{job.title}</h4>
- <div className="flex items-center gap-2 mt-1 text-xs font-medium text-black dark:text-gray-400">
+ <div className="flex items-center gap-2 mt-1 mb-1">
+ <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getStatusColor(job.status)} inline-flex items-center gap-1`}>
+ <span className="w-1 h-1 rounded-full bg-current"></span>
+ {job.status}
+ </span>
+ <span className="text-[10px] text-gray-500 font-medium border-l border-gray-300 dark:border-gray-600 pl-2">Posted: {job.postedDate}</span>
+ </div>
+ <div className="flex items-center gap-2 mt-0.5 text-xs font-medium text-black dark:text-gray-400">
  <span className="flex items-center gap-1"><MapPin size={12} /> {job.location}</span>
  <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
  <span>{job.department}</span>
@@ -265,13 +299,6 @@ export default function JobsPage() {
  </div>
  </div>
  </div>
- </td>
- <td className="px-6 py-4">
- <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${getStatusColor(job.status)} flex inline-flex items-center gap-1.5 w-fit`}>
- <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
- {job.status}
- </span>
- <p className="text-[11px] text-black dark:text-gray-500 mt-1.5 font-medium">Posted: {job.postedDate}</p>
  </td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
@@ -301,14 +328,6 @@ export default function JobsPage() {
  </div>
  </td>
  <td className="px-6 py-4">
- <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-full bg-[#1890FF]/20 text-[#1890FF] flex items-center justify-center text-[10px] font-bold">
- {job.hiringManager.split(' ').map(n=>n[0]).join('')}
- </div>
- <span className="text-sm font-medium text-[#212b36] dark:text-gray-300">{job.hiringManager}</span>
- </div>
- </td>
- <td className="px-6 py-4">
  <div className="flex items-center justify-center gap-2 relative">
  <button 
  onClick={(e) => {
@@ -334,6 +353,18 @@ export default function JobsPage() {
  >
  <Send size={14} />
  Send to Agency
+ </button>
+ <button 
+ onClick={(e) => {
+ e.stopPropagation();
+ setSelectedJobToView(job);
+ setIsViewJobModalOpen(true);
+ setOpenActionMenuId(null);
+ }}
+ className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+ >
+ <FileText size={14} />
+ View Job
  </button>
  <button 
  onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
@@ -411,6 +442,159 @@ export default function JobsPage() {
  >
  Next
  </button>
+ </div>
+ </div>
+ )}
+ </div>
+ </div>
+
+ {/* Right Sidebar */}
+ <div className="w-full xl:w-[320px] shrink-0 space-y-6">
+ {/* Recent Activity */}
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
+ <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3">Recent Activity</h3>
+ <div className="space-y-3">
+ {[
+ { time: '2h ago', action: 'New applicant', target: 'Frontend Engineer', icon: Users, color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
+ { time: '4h ago', action: 'Offer accepted', target: 'UX Researcher', icon: CheckCircle, color: 'text-[#00A76F]', bg: 'bg-[#00A76F]/10' },
+ { time: '1d ago', action: 'Job published', target: 'DevOps Engineer', icon: Briefcase, color: 'text-[#8E33FF]', bg: 'bg-[#8E33FF]/10' },
+ { time: '2d ago', action: 'Interview scheduled', target: 'Product Manager', icon: Calendar, color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' },
+ ].map((activity, i) => (
+ <div key={i} className="flex gap-2.5">
+ <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${activity.bg}`}>
+ <activity.icon size={12} className={activity.color} />
+ </div>
+ <div>
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{activity.action}</p>
+ <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{activity.target} • {activity.time}</p>
+ </div>
+ </div>
+ ))}
+ </div>
+ <button className="w-full mt-3 py-1.5 text-xs font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors cursor-pointer">View All Activity</button>
+ </div>
+
+ {/* Upcoming Interviews */}
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
+ <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3">Upcoming Interviews</h3>
+ <div className="space-y-2.5">
+ {[
+ { candidate: 'Sarah Jenkins', role: 'UX', time: 'Today, 2:00 PM', type: 'Tech', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026024d' },
+ { candidate: 'Michael Lee', role: 'Frontend', time: 'Tmrw, 10:30 AM', type: 'Culture', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }
+ ].map((interview, i) => (
+ <div key={i} className="flex items-center gap-2.5 p-2 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">
+ <img src={interview.avatar} alt={interview.candidate} className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-800" />
+ <div className="flex-1 min-w-0">
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{interview.candidate}</p>
+ <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{interview.role} • {interview.type}</p>
+ </div>
+ </div>
+ ))}
+ </div>
+ <button className="w-full mt-3 py-1.5 text-xs font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors cursor-pointer">View Schedule</button>
+ </div>
+
+ {/* Action Items */}
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
+ <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3 flex items-center gap-2">
+ <AlertCircle size={16} className="text-[#FF5630]" /> Needs Attention
+ </h3>
+ <div className="space-y-2">
+ {[
+ { title: 'Review candidates', desc: '5 new applicants', action: 'Review', color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
+ { title: 'Draft expires soon', desc: 'Expires in 2 days', action: 'Publish', color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' }
+ ].map((item, i) => (
+ <div key={i} className="flex flex-col gap-1.5 p-2.5 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">
+ <div>
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.title}</p>
+ <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</p>
+ </div>
+ <button className={`self-start mt-0.5 px-2.5 py-1 rounded-md text-[10px] font-bold ${item.color} ${item.bg} hover:opacity-80 transition-opacity cursor-pointer`}>
+ {item.action}
+ </button>
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+
+ {!isChatbotCollapsed && (
+ <div className="hidden xl:block shrink-0" style={{ width: chatbotWidth }} />
+ )}
+
+ {isChatbotCollapsed ? (
+ <button
+ type="button"
+ onClick={() => setIsChatbotCollapsed(false)}
+ className="hidden xl:flex absolute right-0 top-4 z-40 items-center gap-1.5 pl-2 pr-3 py-2 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-l-xl shadow-sm text-[#1890FF] hover:bg-[#1890FF]/5 transition-colors cursor-pointer"
+ aria-label="Expand FindNew AI"
+ >
+ <ChevronsLeft size={16} />
+ <img src={findNewIco} alt="" className="w-4 h-4 object-contain" />
+ </button>
+ ) : (
+ <div 
+ style={{ width: chatbotWidth }}
+ className={`absolute right-0 top-0 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden ${isChatbotResizing ? 'select-none pointer-events-none' : ''}`}
+ >
+ <div 
+ onMouseDown={() => setIsChatbotResizing(true)}
+ className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#1890FF] bg-transparent transition-colors z-10"
+ />
+ <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/20">
+ <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+ <img src={findNewIco} alt="FindNew AI" className="w-8 h-8 object-contain" />
+ </div>
+ <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNew AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>
+ <button
+ type="button"
+ onClick={() => setIsChatbotCollapsed(true)}
+ className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0"
+ aria-label="Collapse FindNew AI"
+ >
+ <ChevronsRight size={16} />
+ </button>
+ </div>
+  <div className="flex-1 p-4 overflow-y-auto space-y-4">
+  <div className="flex flex-col gap-1 items-start max-w-[85%]">
+  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
+  Hi! I can help you analyze your hiring pipeline, find jobs, or summarize candidates.
+  </div>
+  </div>
+  
+  <div className="flex flex-col gap-1 items-end ml-auto max-w-[85%]">
+  <div className="bg-[#1890FF] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-[13px] font-medium shadow-sm">
+  Which jobs need attention today?
+  </div>
+  </div>
+
+  <div className="flex flex-col gap-1 items-start max-w-[90%]">
+  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
+  <p className="mb-2">Three areas need attention:</p>
+  <ul className="list-disc pl-4 space-y-1">
+  <li><span className="font-bold">Product Design Lead</span> — still in Draft</li>
+  <li><span className="font-bold">Backend Developer</span> — no candidates yet</li>
+  <li><span className="font-bold">Data Engineer</span> — 12 active candidates</li>
+  </ul>
+  </div>
+  </div>
+
+  <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
+  <p className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Suggested Questions</p>
+  <div className="space-y-2">
+  {["Who are my top candidates?", "Which jobs are overdue?", "Summarize this week"].map((q, i) => (
+  <button key={i} className="w-full text-left px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl text-[12px] font-medium text-[#212b36] dark:text-white transition-colors cursor-pointer shadow-sm">
+  {q}
+  </button>
+  ))}
+  </div>
+  </div>
+  </div>
+ <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
+ <div className="relative">
+ <input type="text" placeholder="Ask me anything..." className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-[#212b36] dark:text-white"/>
+ <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg"><Send size={16} /></button>
+ </div>
  </div>
  </div>
  )}
@@ -806,6 +990,31 @@ export default function JobsPage() {
  </div>
  </div>
  )}
+
+  {/* View Job Modal */}
+  {isViewJobModalOpen && selectedJobToView && (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold text-[#212b36] dark:text-white">{selectedJobToView.title}</h2>
+            <p className="text-sm text-gray-500 mt-1">{selectedJobToView.department} • {selectedJobToView.type} • {selectedJobToView.location}</p>
+          </div>
+          <button onClick={() => setIsViewJobModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div><p className="text-xs text-gray-500">Status</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.status}</p></div>
+            <div><p className="text-xs text-gray-500">Posted Date</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.postedDate}</p></div>
+            <div><p className="text-xs text-gray-500">Hiring Manager</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.hiringManager}</p></div>
+            <div><p className="text-xs text-gray-500">Active Candidates</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.applicants}</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
 
  {/* Toast Notification */}
  {successMessage && (

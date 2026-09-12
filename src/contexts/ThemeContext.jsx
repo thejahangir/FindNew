@@ -7,12 +7,12 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }) => {
  const [theme, setTheme] = useState(() => {
  // Read from localStorage or default to 'light'
- const savedTheme = localStorage.getItem('talentflow-theme');
+ const savedTheme = localStorage.getItem('findnew-theme');
  return savedTheme || 'light';
  });
 
  useEffect(() => {
- localStorage.setItem('talentflow-theme', theme);
+ localStorage.setItem('findnew-theme', theme);
  }, [theme]);
 
  const toggleTheme = () => {

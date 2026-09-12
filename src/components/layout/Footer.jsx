@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrainCircuit, MessageSquare, Briefcase, Globe, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import TaentFlowLogoFooter from '../../assets/talentflow-logo-footer.png';
+import FindNewLogoFooter from '../../assets/findnew-logo-footer.png';
 
 export default function Footer() {
  return (
@@ -14,7 +14,7 @@ export default function Footer() {
  <div className="lg:col-span-4">
  <Link to="/" className="flex items-center gap-3 mb-6">
  <div>
- <img src={TaentFlowLogoFooter} alt="TalentFlowLogo" className='logo-talentflow-footer' />
+ <img src={FindNewLogoFooter} alt="FindNewLogo" className='logo-findnew-footer' />
  </div>
  </Link>
  <p className="text-gray-400 text-sm leading-relaxed mb-8 pr-4">
@@ -72,7 +72,7 @@ export default function Footer() {
  {/* Bottom Bar */}
  <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
  <p className="text-gray-500 text-sm">
- © {new Date().getFullYear()} TalentFlow AI. All rights reserved.
+ © {new Date().getFullYear()} FindNew AI. All rights reserved.
  </p>
  <div className="flex items-center gap-4">
  <a href="#" className="text-gray-500 hover:text-brand-blue transition-colors p-2">

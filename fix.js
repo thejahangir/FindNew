@@ -1,0 +1,1 @@
+const fs = require('fs'); let code = fs.readFileSync('src/pages/JobsPage.jsx', 'utf8'); code = code.replace(/\}\)[\s\S]*?\{.*?Right Sidebar.*?\}/, '})\n  </div>\n\n  {/* Right Sidebar */}'); fs.writeFileSync('src/pages/JobsPage.jsx', code);

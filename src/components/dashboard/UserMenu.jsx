@@ -64,7 +64,7 @@ export default function UserMenu({ isSidebarCollapsed }) {
  {!isSidebarCollapsed && (
  <div className="text-left truncate">
  <p className="text-sm font-semibold text-[#212b36] dark:text-white truncate">Corporate HR</p>
- <p className="text-xs text-black dark:text-white truncate">admin@talentflow.com</p>
+ <p className="text-xs text-black dark:text-white truncate">admin@findnew.com</p>
  </div>
  )}
  </div>
@@ -78,7 +78,7 @@ export default function UserMenu({ isSidebarCollapsed }) {
  <LogOut size={28} className="text-[#FF5630]" />
  </div>
  <h2 className="text-xl font-bold text-[#212b36] dark:text-white mb-2">Ready to Leave?</h2>
- <p className="text-sm text-black dark:text-white mb-8 px-2">You are about to log out of your TalentFlow account. You will need to log back in to access your dashboard.</p>
+ <p className="text-sm text-black dark:text-white mb-8 px-2">You are about to log out of your FindNew account. You will need to log back in to access your dashboard.</p>
  <div className="flex items-center gap-3 w-full">
  <button 
  onClick={() => setShowLogoutConfirm(false)} 

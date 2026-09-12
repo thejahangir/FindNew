@@ -6,7 +6,7 @@ export default function SignUpForm({ setView }) {
  <div className="animate-fade-in">
  <div className="text-center mb-8">
  <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
- <p className="text-gray-500 text-sm">Join TalentFlow and revolutionize your hiring.</p>
+ <p className="text-gray-500 text-sm">Join FindNew and revolutionize your hiring.</p>
  </div>
 
  <form className="space-y-4">

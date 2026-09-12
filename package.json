@@ -1,6 +1,6 @@
 {
-  "name": "talentflow",
-  "homepage": "https://github.com/thejahangir/TalentFlow",
+  "name": "findnew",
+  "homepage": "https://github.com/thejahangir/FindNew",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -25,6 +25,8 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@babel/core": "^8.0.5",
+    "@babel/preset-react": "^8.0.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.17",
