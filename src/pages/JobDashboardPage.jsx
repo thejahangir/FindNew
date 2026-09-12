@@ -141,7 +141,7 @@ const getScoreStyles = (score) => {
  label: 'Strong match',
  text: 'text-[#00A76F]',
  muted: 'text-[#00A76F]/70',
- badge: 'text-white bg-[#00A76F]',
+ badge: 'text-[#00A76F] bg-[#00A76F]/10',
  fill: 'bg-[#00A76F] text-white',
  card: 'bg-[#00A76F]/10 border-[#00A76F]/20'
  };
@@ -151,7 +151,7 @@ const getScoreStyles = (score) => {
  label: 'Moderate match',
  text: 'text-[#1890FF]',
  muted: 'text-[#1890FF]/70',
- badge: 'text-white bg-[#1890FF]',
+ badge: 'text-[#1890FF] bg-[#1890FF]/10',
  fill: 'bg-[#1890FF] text-white',
  card: 'bg-[#1890FF]/10 border-[#1890FF]/20'
  };
@@ -160,7 +160,7 @@ const getScoreStyles = (score) => {
  label: 'Weak match',
  text: 'text-[#FF5630]',
  muted: 'text-[#FF5630]/70',
- badge: 'text-white bg-[#FF5630]',
+ badge: 'text-[#FF5630] bg-[#FF5630]/10',
  fill: 'bg-[#FF5630] text-white',
  card: 'bg-[#FF5630]/10 border-[#FF5630]/20'
  };
