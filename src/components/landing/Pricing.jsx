@@ -71,7 +71,7 @@ export default function Pricing() {
  className={`relative rounded-3xl p-8 border ${tier.popular ? 'border-brand-blue ring-1 ring-brand-blue scale-105 bg-white z-10' : 'border-gray-200 bg-gray-50'} flex flex-col h-full`}
  >
  {tier.popular && (
- <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-brand-blue text-white px-4 py-1 rounded-full text-xs font-bold uppercase ">
+ <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-brand-blue text-white px-4 py-1 rounded-full text-xs font-bold ">
  Most Popular
  </div>
  )}

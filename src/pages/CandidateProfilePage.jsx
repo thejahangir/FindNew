@@ -4,11 +4,78 @@ import {
  ArrowLeft, Briefcase, MapPin, Clock, FileText, MessageSquare,
  Mail, Copy, ArrowRightLeft, GitBranch, MoreVertical, ChevronDown, Send,
  ChevronsRight, ChevronsLeft, Calendar, User, Star, Sparkles, UserPlus,
- CheckCircle, Video, StickyNote
+ CheckCircle, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu
 } from 'lucide-react';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
 
 const getInitials = (name = '') => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+const MOCK_SCORECARDS = [
+  {
+  id: 'sc-1',
+  interviewer: 'Amit Sharma',
+  stage: 'Technical Interview',
+  date: '10 Mar 2026',
+  score: '9.0/10',
+  takeaways: 'Strong technical foundation. Cleared the system design question easily. Communication was clear.',
+  notes: 'I asked about handling race conditions in distributed systems. Candidate mapped out a robust distributed lock mechanism using Redis.',
+  softSkills: 8.0,
+  hardSkills: 9.6,
+  attributes: [
+  { name: 'System Design', rating: 'positive' },
+  { name: 'React/Node', rating: 'positive' },
+  { name: 'Communication', rating: 'neutral' },
+  ]
+  },
+  {
+  id: 'sc-2',
+  interviewer: 'Priya Patel',
+  stage: 'Culture Fit',
+  date: '12 Mar 2026',
+  score: '9.2/10',
+  takeaways: 'Great alignment with our core values. Shows high ownership and bias for action.',
+  notes: 'Candidate discussed their experience leading a cross-functional team under a tight deadline. Exhibited strong empathy and pragmatism.',
+  softSkills: 9.8,
+  hardSkills: 8.4,
+  attributes: [
+  { name: 'Ownership', rating: 'positive' },
+  { name: 'Empathy', rating: 'positive' },
+  { name: 'Conflict Resolution', rating: 'positive' },
+  ]
+  },
+  {
+  id: 'sc-3',
+  interviewer: 'David Chen',
+  stage: 'Product Sense',
+  date: '14 Mar 2026',
+  score: '7.5/10',
+  takeaways: 'Good overall grasp of product lifecycle but struggled slightly to prioritize features under resource constraints.',
+  notes: 'Asked about launching a hypothetical feature in an emerging market. Candidate identified key user pain points but over-indexed on engineering complexity rather than time-to-market.',
+  softSkills: 7.0,
+  hardSkills: 8.0,
+  attributes: [
+  { name: 'Product Strategy', rating: 'positive' },
+  { name: 'Prioritization', rating: 'neutral' },
+  { name: 'User Empathy', rating: 'positive' },
+  ]
+  },
+  {
+  id: 'sc-4',
+  interviewer: 'Sarah Jenkins',
+  stage: 'Executive Review',
+  date: '15 Mar 2026',
+  score: '8.8/10',
+  takeaways: 'Very mature candidate with strong leadership potential. Highly articulate and strategic.',
+  notes: 'Discussed long-term technical vision. The candidate has a clear framework for balancing technical debt against product velocity. Confident hire.',
+  softSkills: 9.6,
+  hardSkills: 9.0,
+  attributes: [
+  { name: 'Leadership', rating: 'positive' },
+  { name: 'Strategic Vision', rating: 'positive' },
+  { name: 'Executive Presence', rating: 'positive' },
+  ]
+  }
+];
 
 const STAGE_HISTORY = [
  {
@@ -118,7 +185,7 @@ const TEAM_CHAT = [
 
 const MOVE_STAGES = ['Application Review', 'Interview · Technical', 'Interview · Hiring Manager', 'Reference Check', 'Offer', 'To Be Rejected'];
 const TRANSFER_JOBS = ['Senior ML Engineer', 'Applied Scientist', 'Staff Frontend Engineer'];
-const KEBAB_ACTIONS = ['Add private note', 'Download resume', 'Share with hiring team', 'Put on hold', 'Reject profile'];
+const KEBAB_ACTIONS = ['Copy profile', 'Mail profile', 'Download resume', 'Reject profile'];
 
 const ACTIVITY_FILTERS = ['All', 'Stages', 'Interviews', 'Communications', 'Notes'];
 
@@ -347,7 +414,7 @@ export default function CandidateProfilePage() {
  agency: 'TechTalent Partners'
  };
 
- const [activeTab, setActiveTab] = useState('Stage');
+ const [activeTab, setActiveTab] = useState('Overview');
  const [openStages, setOpenStages] = useState(['interview-hm']);
  const [isChatCollapsed, setIsChatCollapsed] = useState(false);
  const [chatInput, setChatInput] = useState('');
@@ -357,8 +424,9 @@ export default function CandidateProfilePage() {
  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
  const [profileStage, setProfileStage] = useState(candidate.stage);
  const [activityFilter, setActivityFilter] = useState('All');
+ const [openScorecards, setOpenScorecards] = useState(['sc-1']);
 
- const tabs = ['Stage', 'Scorecards', 'Activity Feed'];
+ const tabs = ['Overview', 'Stage', 'Scorecards', 'Activity Log'];
 
  useEffect(() => {
  const close = () => setOpenMenu(null);
@@ -423,23 +491,33 @@ export default function CandidateProfilePage() {
  <span className="flex items-center gap-1"><Clock size={13} /> Applied {candidate.date}</span>
  {candidate.agency && <span>Sourced by {candidate.agency}</span>}
  </p>
+ <p className="text-[12px] text-gray-400 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
+ <span className="flex items-center gap-1.5"><Mail size={13} /> {candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
+ <span className="flex items-center gap-1.5"><Phone size={13} /> +1 (555) 123-4567</span>
+ <span className="flex items-center gap-1.5"><Globe size={13} /> EST (UTC-5)</span>
+ </p>
  </div>
  </div>
 
  <div className="flex items-center gap-1.5 shrink-0 relative">
- <button type="button" title="Mail the profile" onClick={() => showToast('Profile emailed to your inbox')} className={iconBtn}>
- <Mail size={16} />
+ <button type="button" title="Follow Candidate" onClick={() => showToast('You are now following this candidate')} className={iconBtn}>
+ <Bookmark size={16} />
  </button>
- <button type="button" title="Copy the profile" onClick={() => { navigator.clipboard?.writeText(`${candidate.name} · Senior AI Research Scientist · ${candidate.stage}`); showToast('Profile link copied'); }} className={iconBtn}>
- <Copy size={16} />
+ <button type="button" title="Interview Prep Kit" onClick={() => showToast('Interview Prep Kit opened')} className={iconBtn}>
+ <BookOpen size={16} />
  </button>
+ <button type="button" title="Schedule Interview" onClick={() => showToast('Schedule Interview modal opened')} className={iconBtn}>
+ <Calendar size={16} />
+ </button>
+
+
  <div className="relative">
  <button type="button" title="Transfer to other requirement" onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'transfer' ? null : 'transfer'); }} className={iconBtn}>
  <ArrowRightLeft size={16} />
  </button>
  {openMenu === 'transfer' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
- <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Transfer to</p>
+ <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 tracking-wider">Transfer to</p>
  {TRANSFER_JOBS.map(job => (
  <button key={job} type="button" onClick={() => { setOpenMenu(null); showToast(`Transfer queued to ${job}`); }} className="w-full text-left px-3 py-2 text-[13px] font-bold text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
  {job}
@@ -454,7 +532,7 @@ export default function CandidateProfilePage() {
  </button>
  {openMenu === 'move' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
- <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Move stage</p>
+ <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 tracking-wider">Move stage</p>
  {MOVE_STAGES.map(stage => (
  <button key={stage} type="button" onClick={() => { setOpenMenu(null); showToast(`Stage move: ${stage}`); }} className={`w-full text-left px-3 py-2 text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${stage === 'To Be Rejected' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}>
  {stage}
@@ -479,6 +557,15 @@ export default function CandidateProfilePage() {
  setIsRejectModalOpen(true);
  return;
  }
+ if (action === 'Copy profile') {
+ navigator.clipboard?.writeText(`${candidate.name} · Senior AI Research Scientist · ${candidate.stage}`);
+ showToast('Profile link copied');
+ return;
+ }
+ if (action === 'Mail profile') {
+ showToast('Profile emailed to your inbox');
+ return;
+ }
  showToast(action);
  }}
  className={`w-full text-left px-3 py-2 text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${action === 'Reject profile' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}
@@ -492,7 +579,135 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="flex items-center gap-6 border-b border-gray-200 dark:border-gray-800/50">
+ 
+<div className="flex flex-col xl:flex-row gap-5 items-start">
+ 
+<div className="w-[380px] shrink-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 flex flex-col gap-4">
+ <h2 className="text-[14px] font-bold text-[#212b36] dark:text-white tracking-wider mb-2">Application Details</h2>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
+ <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Name</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300 truncate">{candidate.name}</p>
+ </div>
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
+ <p className="text-[11px] font-semibold text-[#1890FF] break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">+91 98765 43210</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Location</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.location || 'Bangalore, KA'}</p>
+ </div>
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Time Zone</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">IST (UTC +5:30)</p>
+ </div>
+ </div>
+ </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
+ <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Exp</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
+ </div>
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
+ </div>
+ </div>
+ </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Application Info</h3>
+ <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Applied Date</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Aug 24, 2026</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Stage</p>
+ <p className="text-[11px] font-semibold text-[#1890FF]">{profileStage}</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Source</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.agency ? 'Agency' : 'Direct'}</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Referred By</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.agency || 'N/A'}</p>
+ </div>
+ </div>
+ </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Logistics</h3>
+ <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
+ </div>
+ </div>
+ </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Agency / Referrer Details</h3>
+ <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Agency Name</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">TechTalent Partners</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Recruiter</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Sarah Jenkins</p>
+ </div>
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Recruiter Email</p>
+ <p className="text-[11px] font-semibold text-[#1890FF] break-all">sarah.j@techtalentpartners.com</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Referral Status</p>
+ <p className="text-[11px] font-semibold text-[#00A76F]">Verified</p>
+ </div>
+ <div>
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Submitted CV</p>
+ <p className="text-[11px] font-semibold text-[#1890FF] flex items-center gap-1 cursor-pointer hover:underline"><FileText size={10} /> View PDF</p>
+ </div>
+ <div className="col-span-2">
+ <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Candidate Notes</p>
+ <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Candidate is highly motivated for AI roles. Available for interview next week.</p>
+ </div>
+ </div>
+ </div>
+</div>
+
+ 
+<div className="flex-1 min-w-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 flex flex-col overflow-hidden">
+ <div className="px-5 pt-3 border-b border-gray-200 dark:border-gray-800/50">
+ <div className="flex items-center gap-6">
  {tabs.map(tab => (
  <button
  key={tab}
@@ -506,9 +721,115 @@ export default function CandidateProfilePage() {
  </button>
  ))}
  </div>
+ </div>
+ <div className="p-0">
+ {activeTab === 'Overview' && (
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-6 space-y-8 animate-fade-in">
+ 
+  {/* Executive Summary */}
+  <div>
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3 tracking-wider">Executive Summary</h3>
+  <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">
+  Highly motivated and experienced AI Research Scientist with over 5 years of experience in developing state-of-the-art machine learning models. Proven track record in natural language processing and generative AI, with multiple publications in top-tier conferences. Passionate about applying AI to solve complex real-world problems.
+  </p>
+  </div>
+  
+  <hr className="border-gray-100 dark:border-gray-800/50" />
 
+  {/* Progress & Status */}
+  <div>
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><GitBranch size={16} className="text-[#1890FF]" /> Current Progress</h3>
+  <div className="bg-gray-50/50 dark:bg-gray-800/30 p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col md:flex-row gap-6 items-center">
+  <div className="flex-1 w-full">
+  <div className="flex justify-between items-center mb-2">
+  <span className="text-[13px] font-bold text-[#212b36] dark:text-white">Interview · Hiring Manager</span>
+  <span className="text-[12px] font-bold text-[#1890FF]">Round 3 of 4</span>
+  </div>
+  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+  <div className="bg-[#1890FF] h-2 rounded-full" style={{ width: '75%' }}></div>
+  </div>
+  <p className="text-[11px] text-gray-500 mt-2">Next up: Reference Check</p>
+  </div>
+  </div>
+  </div>
+
+  {/* Feedback Summaries */}
+  <div>
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Star size={16} className="text-[#FFC107]" /> Feedback Summaries</h3>
+  <div className="grid grid-cols-1 space-y-4">
+  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
+  <div className="flex justify-between items-start">
+  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><Bot size={14} /> AI Screening</div>
+  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">9.8/10</span>
+  </div>
+  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate strongly matches the technical requirements. Excellent overlap in React, Node, and AWS architecture. Note: slight gap in people management experience.</p>
+  </div>
+  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
+  <div className="flex justify-between items-start">
+  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><Cpu size={14} /> AI Interview</div>
+  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">8.5/10</span>
+  </div>
+  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate communicated clearly. AI agent noted strong problem-solving skills but hesitated slightly on complex behavioral questions.</p>
+  </div>
+  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
+  <div className="flex justify-between items-start">
+  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><User size={14} /> Human Interviews</div>
+  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">9.0/10</span>
+  </div>
+  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Round 1 (Tech) and Round 2 (Design) cleared. Cleared live coding easily. Good system design sense but needs probe on research ownership in next round.</p>
+  </div>
+  </div>
+  </div>
+
+  {/* Reminders */}
+  <div>
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Bell size={16} className="text-[#FF5630]" /> Upcoming Reminders</h3>
+  <div className="space-y-3">
+  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex items-center gap-3">
+  <div className="w-10 h-10 rounded-full bg-[#FF5630]/10 flex items-center justify-center text-[#FF5630]">
+  <Video size={16} />
+  </div>
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">HM Interview with Amit</h4>
+  <p className="text-[11px] text-gray-500">Scheduled for today, 4:00 PM</p>
+  </div>
+  </div>
+  <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Amit</span>
+  </div>
+  
+  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex items-center gap-3">
+  <div className="w-10 h-10 rounded-full bg-[#1890FF]/10 flex items-center justify-center text-[#1890FF]">
+  <MessageSquare size={16} />
+  </div>
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Collect Scorecard (System Design)</h4>
+  <p className="text-[11px] text-[#FF5630]">Overdue by 2 hours</p>
+  </div>
+  </div>
+  <span className="text-[11px] font-bold bg-[#FF5630]/10 text-[#FF5630] px-3 py-1 rounded">Owner: Amit</span>
+  </div>
+
+  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex items-center gap-3">
+  <div className="w-10 h-10 rounded-full bg-[#00A76F]/10 flex items-center justify-center text-[#00A76F]">
+  <FileText size={16} />
+  </div>
+  <div>
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Review Background Check</h4>
+  <p className="text-[11px] text-gray-500">Due tomorrow, 10:00 AM</p>
+  </div>
+  </div>
+  <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Priya</span>
+  </div>
+  </div>
+  </div>
+  
+  </div>
+ )}
  {activeTab === 'Stage' && (
- <div className="flex gap-5 items-stretch min-h-[640px] relative">
+ 
  <div className="flex-1 min-w-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5">
  <div className="flex items-center justify-between mb-5">
  <div>
@@ -578,19 +899,19 @@ export default function CandidateProfilePage() {
  <div className="rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/70 dark:bg-gray-800/30 p-4 space-y-3">
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
  <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Entered</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Entered</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.entered}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Exited</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Exited</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.exited || '—'}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Time in stage</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Time in stage</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.days} {stage.days === 1 ? 'day' : 'days'}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Decision</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Decision</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.outcome}</p>
  </div>
  </div>
@@ -610,6 +931,263 @@ export default function CandidateProfilePage() {
  })}
  </div>
  </div>
+ )}
+ {activeTab === 'Scorecards' && (
+ <div className="space-y-6 animate-fade-in">
+  {/* Summary Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex justify-between items-start">
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><Bot size={14} className="text-[#00A76F]" /> AI Screening</h3>
+  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.8/10</span>
+  </div>
+  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Excellent alignment on technical stack. Profile demonstrates high agency.</p>
+  </div>
+  
+  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex justify-between items-start">
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><Cpu size={14} className="text-[#00A76F]" /> AI Interview</h3>
+  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">8.5/10</span>
+  </div>
+  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.</p>
+  </div>
+
+  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
+  <div className="flex justify-between items-start">
+  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><User size={14} className="text-[#00A76F]" /> Human Interviews</h3>
+  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.0/10</span>
+  </div>
+  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Strong technical performance and cultural fit. Highly recommended by the panel.</p>
+  </div>
+  </div>
+
+  {/* Expandable Scorecards */}
+  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden">
+  <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/20">
+  <h2 className="text-[14px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+  <FileText size={16} className="text-[#1890FF]" /> Interview Scorecards
+  </h2>
+  <button 
+  onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
+  className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+  >
+  {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
+  </button>
+  </div>
+
+  <div className="divide-y divide-gray-100 dark:divide-gray-800/50">
+  {MOCK_SCORECARDS.map(scorecard => {
+  const isOpen = openScorecards.includes(scorecard.id);
+  return (
+  <div key={scorecard.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+  <button 
+  onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
+  className="w-full flex items-center justify-between p-5 cursor-pointer"
+  >
+  <div className="flex items-center gap-4">
+  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+  {getInitials(scorecard.interviewer)}
+  </div>
+  <div className="text-left">
+  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
+  <p className="text-[11px] text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+  </div>
+  </div>
+  <div className="flex items-center gap-6">
+  <div className="text-right hidden sm:block">
+  <div className="text-[14px] font-bold text-[#00A76F]">{scorecard.score}</div>
+  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Overall</div>
+  </div>
+  <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+  </div>
+  </button>
+  
+  <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+  <div className="overflow-hidden">
+  <div className="p-5 pt-0 grid grid-cols-1 xl:grid-cols-3 gap-6">
+  {/* Left Col: Takeaways & Notes */}
+  <div className="xl:col-span-2 space-y-5">
+  <div>
+  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Key Takeaways</h5>
+  <p className="text-[13px] text-[#212b36] dark:text-gray-300 leading-relaxed bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800/50 shadow-sm">
+  {scorecard.takeaways}
+  </p>
+  </div>
+  <div>
+  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Public Notes</h5>
+  <p className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed pl-1">
+  {scorecard.notes}
+  </p>
+  </div>
+  </div>
+  
+  {/* Right Col: Metrics */}
+  <div className="space-y-5">
+  <div>
+  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Weighting</h5>
+  <div className="space-y-4">
+  <div>
+  <div className="flex justify-between text-[12px] mb-1.5">
+  <span className="text-[#212b36] dark:text-gray-300 font-bold">Hard Skills</span>
+  <span className={`font-bold ${scorecard.hardSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.hardSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.hardSkills).toFixed(1)}/10.0</span>
+  </div>
+  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
+  <div className={`h-2 rounded-full ${scorecard.hardSkills >= 8.0 ? 'bg-[#00A76F]' : scorecard.hardSkills >= 5.0 ? 'bg-[#FFC107]' : 'bg-[#FF5630]'}`} style={{ width: `${(scorecard.hardSkills / 10) * 100}%` }}></div>
+  </div>
+  </div>
+  <div>
+  <div className="flex justify-between text-[12px] mb-1.5">
+  <span className="text-[#212b36] dark:text-gray-300 font-bold">Soft Skills</span>
+  <span className={`font-bold ${scorecard.softSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.softSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.softSkills).toFixed(1)}/10.0</span>
+  </div>
+  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
+  <div className={`h-2 rounded-full ${scorecard.softSkills >= 8.0 ? 'bg-[#00A76F]' : scorecard.softSkills >= 5.0 ? 'bg-[#FFC107]' : 'bg-[#FF5630]'}`} style={{ width: `${(scorecard.softSkills / 10) * 100}%` }}></div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+  <div>
+  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Attributes</h5>
+  <div className="flex flex-wrap gap-2">
+  {scorecard.attributes.map((attr, idx) => {
+  let emoji = '➖';
+  if (attr.rating === 'positive') emoji = '👍';
+  else if (attr.rating === 'negative') emoji = '👎';
+  
+  return (
+  <span key={idx} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+  attr.rating === 'positive' 
+  ? 'bg-[#00A76F]/10 text-[#00A76F] border-[#00A76F]/20'
+  : attr.rating === 'negative'
+  ? 'bg-[#FF5630]/10 text-[#FF5630] border-[#FF5630]/20'
+  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+  }`}>
+  <span className="text-[12px]">{emoji}</span>
+  {attr.name}
+  </span>
+  );
+  })}
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  );
+  })}
+  </div>
+  </div>
+ </div>
+ )}
+
+ {activeTab === 'Activity Log' && (
+ <div className="space-y-6 animate-fade-in">
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 mb-6">
+ <div className="mb-4">
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Stage Transitions</h2>
+ <p className="text-[12px] text-gray-500 mt-0.5">Time spent and outcomes for each step of the pipeline.</p>
+ </div>
+ <div className="space-y-3">
+ {STAGE_HISTORY.map((stage) => (
+ <div key={stage.id} className="p-4 rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-800/20 hover:border-[#1890FF]/30 transition-colors">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+ <div className="flex-1">
+ <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-1.5">{stage.name}</h3>
+ <p className="text-[11px] text-gray-500 flex flex-wrap items-center gap-x-2">
+ <span>Entered: <span className="font-semibold text-[#212b36] dark:text-gray-300">{stage.entered}</span></span>
+ <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+ <span>Exited: <span className="font-semibold text-[#212b36] dark:text-gray-300">{stage.exited || <span className="italic font-normal">present</span>}</span></span>
+ </p>
+ </div>
+ <div className="flex items-center gap-4 sm:justify-end">
+ <div className="text-right hidden sm:block">
+ <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{stage.days} {stage.days === 1 ? 'day' : 'days'}</p>
+ <p className="text-[10px] text-gray-500 uppercase tracking-wide">Time in stage</p>
+ </div>
+ <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
+ <span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 ${
+ stage.outcome.includes('Advance') || stage.outcome.includes('Moved') ? 'bg-[#00A76F]/10 text-[#00A76F]' :
+ stage.outcome.includes('progress') || stage.outcome.includes('Kept') ? 'bg-[#1890FF]/10 text-[#1890FF]' :
+ 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+ }`}>
+ {stage.outcome}
+ </span>
+ </div>
+ </div>
+ </div>
+ ))}
+ </div>
+ </div>
+
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5">
+ <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+ <div>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Activity on this profile</h2>
+ <p className="text-[12px] text-gray-500 mt-0.5">Stage moves, interviews, agency emails, and hiring-team notes — newest first.</p>
+ </div>
+ <span className="text-[11px] font-bold text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-md w-fit">{activityFeed.length} events</span>
+ </div>
+
+ <div className="flex flex-wrap gap-1.5 mb-6">
+ {ACTIVITY_FILTERS.map(filter => (
+ <button
+ key={filter}
+ type="button"
+ onClick={() => setActivityFilter(filter)}
+ className={`px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors cursor-pointer ${
+ activityFilter === filter
+ ? 'bg-[#1890FF] text-white'
+ : 'bg-gray-50 dark:bg-gray-800 text-[#212b36] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+ }`}
+ >
+ {filter}
+ </button>
+ ))}
+ </div>
+
+ {activityFeed.length === 0 ? (
+ <p className="text-sm text-gray-500 py-8 text-center">No activity in this filter yet.</p>
+ ) : (
+ <div className="space-y-6">
+ {Object.entries(activityGroups).map(([date, items]) => (
+ <div key={date}>
+ <p className="text-[11px] font-bold text-gray-400 tracking-wider mb-3">{date}</p>
+ <div className="relative space-y-4">
+ <div className="absolute top-2 bottom-2 left-[15px] w-px bg-gray-100 dark:bg-gray-800/50" />
+ {items.map(item => {
+ const Icon = item.icon;
+ return (
+ <div key={item.id} className="relative flex gap-3">
+ <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ring-4 ring-white dark:ring-[#161c24] z-[1] ${TONE_STYLES[item.tone]}`}>
+ <Icon size={14} />
+ </div>
+ <div className="flex-1 min-w-0 rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20 px-3.5 py-3">
+ <div className="flex items-start justify-between gap-3">
+ <div className="min-w-0">
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white leading-snug">{item.title}</p>
+ <p className="text-[11px] text-gray-500 mt-0.5">{item.actor} · {item.role}</p>
+ </div>
+ <span className="text-[11px] text-gray-400 shrink-0">{item.time}</span>
+ </div>
+ {item.detail && (
+ <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed mt-2">{item.detail}</p>
+ )}
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ </div>
+ ))}
+ </div>
+ )}
+ </div>
+ </div>
+ )}
+ </div>
+</div>
 
  {isChatCollapsed ? (
  <button
@@ -660,84 +1238,9 @@ export default function CandidateProfilePage() {
  </div>
  </div>
  )}
- </div>
- )}
+</div>
 
- {activeTab === 'Scorecards' && (
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-8 text-center">
- <FileText size={28} className="text-[#1890FF] mx-auto mb-3" />
- <h2 className="text-base font-bold text-[#212b36] dark:text-white">Scorecards</h2>
- <p className="text-sm text-gray-500 mt-1">Interview scorecards for this profile will live here.</p>
- </div>
- )}
-
- {activeTab === 'Activity Feed' && (
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5">
- <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
- <div>
- <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Activity on this profile</h2>
- <p className="text-[12px] text-gray-500 mt-0.5">Stage moves, interviews, agency emails, and hiring-team notes — newest first.</p>
- </div>
- <span className="text-[11px] font-bold text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-md w-fit">{activityFeed.length} events</span>
- </div>
-
- <div className="flex flex-wrap gap-1.5 mb-6">
- {ACTIVITY_FILTERS.map(filter => (
- <button
- key={filter}
- type="button"
- onClick={() => setActivityFilter(filter)}
- className={`px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors cursor-pointer ${
- activityFilter === filter
- ? 'bg-[#1890FF] text-white'
- : 'bg-gray-50 dark:bg-gray-800 text-[#212b36] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
- }`}
- >
- {filter}
- </button>
- ))}
- </div>
-
- {activityFeed.length === 0 ? (
- <p className="text-sm text-gray-500 py-8 text-center">No activity in this filter yet.</p>
- ) : (
- <div className="space-y-6">
- {Object.entries(activityGroups).map(([date, items]) => (
- <div key={date}>
- <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">{date}</p>
- <div className="relative space-y-4">
- <div className="absolute top-2 bottom-2 left-[15px] w-px bg-gray-100 dark:bg-gray-800/50" />
- {items.map(item => {
- const Icon = item.icon;
- return (
- <div key={item.id} className="relative flex gap-3">
- <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ring-4 ring-white dark:ring-[#161c24] z-[1] ${TONE_STYLES[item.tone]}`}>
- <Icon size={14} />
- </div>
- <div className="flex-1 min-w-0 rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20 px-3.5 py-3">
- <div className="flex items-start justify-between gap-3">
- <div className="min-w-0">
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white leading-snug">{item.title}</p>
- <p className="text-[11px] text-gray-500 mt-0.5">{item.actor} · {item.role}</p>
- </div>
- <span className="text-[11px] text-gray-400 shrink-0">{item.time}</span>
- </div>
- {item.detail && (
- <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed mt-2">{item.detail}</p>
- )}
- </div>
- </div>
- );
- })}
- </div>
- </div>
- ))}
- </div>
- )}
- </div>
- )}
-
- {toast && (
+{toast && (
  <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
  {toast}
  </div>

@@ -42,14 +42,14 @@ export default function SearchableSelect({
  {/* Select Trigger */}
  <div 
  onClick={() => setIsOpen(!isOpen)}
- className={`w-full ${size === 'sm' ? 'px-3 py-1.5' : 'px-4 py-2.5'} bg-gray-50 dark:bg-gray-800/50 border rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+ className={`w-full ${size === 'xs' ? 'px-2 py-1' : size === 'sm' ? 'px-3 py-1.5' : 'px-4 py-2.5'} bg-gray-50 dark:bg-gray-800/50 border ${size === 'xs' ? 'rounded-lg' : 'rounded-xl'} flex items-center justify-between cursor-pointer transition-all ${
  isOpen ? 'border-[#1890FF] ring-2 ring-[#1890FF]/20 bg-white dark:bg-[#161c24]' : (hasError ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10' : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700/50')
  }`}
  >
- <span className={`text-sm ${selectedOption ? 'text-[#212b36] dark:text-white font-medium' : 'text-gray-400 dark:text-gray-400'}`}>
+ <span className={`${size === 'xs' ? 'text-[11px]' : 'text-sm'} ${selectedOption ? 'text-[#212b36] dark:text-white font-medium' : 'text-gray-400 dark:text-gray-400'}`}>
  {selectedOption ? selectedOption.label : placeholder}
  </span>
- <span className="text-gray-400 font-bold px-2 text-xs">{isOpen ? '▲' : '▼'}</span>
+ <span className={`text-gray-400 font-bold px-1 ${size === 'xs' ? 'text-[9px]' : 'text-xs'}`}>{isOpen ? '▲' : '▼'}</span>
  </div>
 
  {/* Dropdown Menu */}

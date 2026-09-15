@@ -4,8 +4,7 @@ import { Columns, GitBranch, ArrowRight, Settings, Plus, Zap, Settings2, Trash2,
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import SearchableSelect from '../components/ui/SearchableSelect';
-import JobSetupHeader from '../components/dashboard/JobSetupHeader';
+import SearchableSelect from '../../ui/SearchableSelect';
 
 const SYSTEM_STAGES = [
  'Applied', 'Screening', 'Interview', 'Offer', 'Hired', 'Rejected'
@@ -31,7 +30,7 @@ const TerminalSwitch = ({ isTerminal, onChange }) => (
  <div className={`relative w-8 h-4 rounded-full transition-colors duration-300 ${isTerminal ? 'bg-[#FF5630]' : 'bg-gray-200 dark:bg-gray-700'}`}>
  <div className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-300 ${isTerminal ? 'translate-x-4' : 'translate-x-0'}`}></div>
  </div>
- <span className={`text-[11px] font-semibold uppercase ${isTerminal ? 'text-[#FF5630]' : 'text-gray-400'}`}>
+ <span className={`text-[11px] font-semibold ${isTerminal ? 'text-[#FF5630]' : 'text-gray-400'}`}>
  {isTerminal ? 'Terminal' : 'Active'}
  </span>
  </div>
@@ -122,11 +121,11 @@ const StageDetailsPanel = ({ stage, isEditing, onUpdateStage }) => {
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-lg flex flex-col h-full sticky top-6 animate-fade-in">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3 mb-2">
- <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${getStageColor(stage.systemStage)}`}>
+ <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${getStageColor(stage.systemStage)}`}>
  {stage.systemStage}
  </div>
  {stage.isTerminal && (
- <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+ <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
  Terminal Stage
  </span>
  )}
@@ -258,13 +257,14 @@ const SortableStageItem = ({ stage, index, totalStages, getStageColor, updateSta
  {/* Mapping & Terminal Toggle Row */}
  <div className="flex items-center justify-between pl-16">
  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
- <div className="w-[140px] bg-gray-50/50 dark:bg-[#1a222c] rounded-md border border-gray-100 dark:border-gray-800 text-xs">
+ <div className="w-[140px]">
  <SearchableSelect 
  options={SYSTEM_STAGES.map(sys => ({ label: sys, value: sys }))}
  value={stage.systemStage}
  onChange={(value) => updateStage(index, 'systemStage', value)}
  placeholder="Mapping..."
  showSearch={false}
+ size="xs"
  />
  </div>
  </div>
@@ -308,7 +308,7 @@ const ReadOnlyStageItem = ({ stage, index, totalStages, getStageColor, isSelecte
  {stage.systemStage}
  </span>
  {isTerminal && (
- <span className="text-[10px] font-bold text-[#FF5630] uppercase ">
+ <span className="text-[10px] font-bold text-[#FF5630] ">
  Terminal
  </span>
  )}
@@ -325,12 +325,14 @@ const ReadOnlyStageItem = ({ stage, index, totalStages, getStageColor, isSelecte
  );
 };
 
-export default function JobSetupPipelinePage() {
+export default function SettingsPipeline({ setSettingsActiveNav }) {
+ const navigate = () => {};
+ const location = { state: null };
  const [isEditing, setIsEditing] = useState(false);
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
- const location = useLocation();
- const navigate = useNavigate();
- const initialJobData = location.state?.jobData;
+ 
+ 
+ const initialJobData = {};
  const [jobData, setJobData] = useState({ ...initialJobData });
 
  const [stages, setStages] = useState([
@@ -405,12 +407,7 @@ export default function JobSetupPipelinePage() {
  return (
  <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
  
- <JobSetupHeader 
- title="Recruitment Process" 
- subtitle="Design the stages candidates will go through for this job." 
- isConfidential={jobData?.isConfidential}
- onConfidentialChange={(val) => handleJobDataChange('isConfidential', val)}
- />
+ 
 
  <div className="flex-1">
  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-start">
@@ -505,7 +502,7 @@ export default function JobSetupPipelinePage() {
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto shrink-0">
  <button 
- onClick={() => navigate('/dashboard/job-setup/hiring-team', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Hiring Team')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Hiring Team
@@ -518,10 +515,10 @@ export default function JobSetupPipelinePage() {
  Save and Exit
  </button>
  <button 
- onClick={() => navigate('/dashboard/job-setup/applications', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Scorecards')}
  className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
- Save and Continue to 'Applications'
+ Save and Continue to 'Scorecards'
  </button>
  </div>
  </div>

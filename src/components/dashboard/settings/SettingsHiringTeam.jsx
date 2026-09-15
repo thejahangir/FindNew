@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Plus, Mail, Trash2, Shield , Settings2, X} from 'lucide-react';
+import { Users, Plus, Mail, Trash2, Shield , Settings2, X, LayoutGrid, List } from 'lucide-react';
 
-import JobSetupHeader from '../components/dashboard/JobSetupHeader';
-import SearchableSelect from '../components/ui/SearchableSelect';
+import SearchableSelect from '../../ui/SearchableSelect';
 
-export default function JobSetupHiringTeamPage() {
+export default function SettingsHiringTeam({ setSettingsActiveNav }) {
+ const navigate = () => {};
+ const location = { state: null };
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
  const [deleteConfirmMemberId, setDeleteConfirmMemberId] = useState(null);
  const [newMember, setNewMember] = useState({ name: '', role: 'Interviewer' });
  const [formErrors, setFormErrors] = useState({});
- const location = useLocation();
- const navigate = useNavigate();
- const initialJobData = location.state?.jobData;
+ const [viewMode, setViewMode] = useState('cards');
+ 
+ const initialJobData = {};
  const [jobData, setJobData] = useState({ ...initialJobData });
 
  const handleJobDataChange = (field, value) => {
@@ -82,12 +83,7 @@ export default function JobSetupHiringTeamPage() {
 
  return (
  <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
- <JobSetupHeader 
- title="Hiring Team Setup" 
- subtitle={`Configure the team members who will manage and interview candidates for ${jobData?.title || 'this job'}.`}
- isConfidential={jobData?.isConfidential}
- onConfidentialChange={(val) => handleJobDataChange('isConfidential', val)}
- />
+ 
 
  <div className="flex-1 space-y-6">
 
@@ -97,11 +93,18 @@ export default function JobSetupHiringTeamPage() {
  <Users size={20} className="text-[#00A76F]" />
  Team Members
  </h2>
+ <div className="flex gap-3">
+ <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center">
+ <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
+ <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
+ </div>
  <button onClick={() => setIsAddMemberModalOpen(true)} className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-lg text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer">
  <Plus size={16} /> Add Member
  </button>
  </div>
+ </div>
 
+ {viewMode === 'cards' ? (
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
  {team.map(member => (
  <div key={member.id} className="flex flex-col h-full bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative group/card overflow-hidden">
@@ -123,19 +126,60 @@ export default function JobSetupHiringTeamPage() {
  <h4 className="text-[17px] font-bold text-[#212b36] dark:text-white leading-snug w-full truncate px-4">
  {member.name}
  </h4>
- <span className="mt-2 text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full uppercase">
+ <span className="mt-2 text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full ">
  {member.role}
  </span>
  </div>
  </div>
  ))}
  </div>
+ ) : (
+ <div className="overflow-x-auto">
+ <table className="w-full text-left border-collapse">
+ <thead>
+ <tr className="bg-gray-50 dark:bg-gray-800/50">
+ <th className="p-4 text-xs font-bold text-gray-500 rounded-l-xl">Name</th>
+ <th className="p-4 text-xs font-bold text-gray-500 ">Role</th>
+ <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>
+ </tr>
+ </thead>
+ <tbody>
+ {team.map(member => (
+ <tr key={member.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+ <td className="p-4">
+ <div className="flex items-center gap-3">
+ <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${member.avatar} shadow-sm border border-current/10`}>
+ {member.initials}
+ </div>
+ <span className="text-sm font-bold text-[#212b36] dark:text-white">{member.name}</span>
+ </div>
+ </td>
+ <td className="p-4">
+ <span className="text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full ">
+ {member.role}
+ </span>
+ </td>
+ <td className="p-4 text-center">
+ <button 
+ onClick={() => setDeleteConfirmMemberId(member.id)}
+ className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors cursor-pointer inline-flex"
+ title="Remove Member"
+ >
+ <Trash2 size={16} />
+ </button>
+ </td>
+ </tr>
+ ))}
+ </tbody>
+ </table>
+ </div>
+ )}
  </div>
  </div>
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto">
  <button 
- onClick={() => navigate('/dashboard/job-setup/description-skills', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Description & Skills')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Description & Skills
@@ -148,7 +192,7 @@ export default function JobSetupHiringTeamPage() {
  Save and Exit
  </button>
  <button 
- onClick={() => navigate('/dashboard/job-setup/pipeline', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Pipeline')}
  className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
  Save and Continue to 'Pipeline'

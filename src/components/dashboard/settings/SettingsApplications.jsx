@@ -17,8 +17,7 @@ import {
  rectSortingStrategy, useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import JobSetupHeader from '../components/dashboard/JobSetupHeader';
-import SearchableSelect from '../components/ui/SearchableSelect';
+import SearchableSelect from '../../ui/SearchableSelect';
 
 const PIPELINE_STAGES = [
  { id: 'applied', title: 'Applied' },
@@ -220,7 +219,9 @@ const PipelineSwimlane = ({ stage, candidates, onMoveStage, onOpenHiddenCandidat
  );
 };
 
-export default function JobSetupApplicationsPage() {
+export default function SettingsApplications() {
+ const navigate = () => {};
+ const location = { state: null };
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [hiddenCandidatesModal, setHiddenCandidatesModal] = useState({ isOpen: false, stageTitle: '', candidates: [] });
  const [candidates, setCandidates] = useState(INITIAL_CANDIDATES);
@@ -238,9 +239,9 @@ export default function JobSetupApplicationsPage() {
  ));
  };
  
- const location = useLocation();
- const navigate = useNavigate();
- const initialJobData = location.state?.jobData;
+ 
+ 
+ const initialJobData = {};
  const [jobData, setJobData] = useState({ ...initialJobData });
 
  const handleJobDataChange = (field, value) => {
@@ -324,12 +325,7 @@ export default function JobSetupApplicationsPage() {
  return (
  <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
  
- <JobSetupHeader 
- title="Candidate Board" 
- subtitle="Manage and track applicants for this role across pipeline stages." 
- isConfidential={jobData?.isConfidential}
- onConfidentialChange={(val) => handleJobDataChange('isConfidential', val)}
- />
+ 
 
  <div className="flex-1 flex flex-col bg-white dark:bg-[#161c24] p-4 sm:p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 overflow-hidden">
  

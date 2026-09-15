@@ -8,20 +8,13 @@ import findNewIco from '../assets/findnew-ico.png';
 
 const MOCK_JOBS = [
  { id: 1, title: 'Senior AI Research Scientist', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Published', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', hiringManager: 'Amit Sharma', score: 98 },
- { id: 2, title: 'Frontend Engineer (React)', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Published', applicants: 105, newApplicants: 45, postedDate: '2026-08-12', hiringManager: 'Priya Patel', score: 92 },
- { id: 3, title: 'Product Design Lead', department: 'Design', location: 'San Francisco, CA', type: 'Hybrid', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-20', hiringManager: 'Sarah Jenkins', score: 0 },
- { id: 4, title: 'VP of Marketing', department: 'Marketing', location: 'New York, NY', type: 'Full-time', status: 'Closed', applicants: 89, newApplicants: 0, postedDate: '2026-07-01', hiringManager: 'David Chen', score: 100 },
- { id: 5, title: 'Data Engineer', department: 'Data Science', location: 'London, UK', type: 'Full-time', status: 'Internal', applicants: 12, newApplicants: 2, postedDate: '2026-08-18', hiringManager: 'Amit Sharma', score: 85 },
- { id: 6, title: 'Backend Developer (Node.js)', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Published', applicants: 320, newApplicants: 12, postedDate: '2026-08-15', hiringManager: 'Priya Patel', score: 88 },
- { id: 7, title: 'UX Researcher', department: 'Design', location: 'London, UK', type: 'Contract', status: 'Published', applicants: 156, newApplicants: 30, postedDate: '2026-08-16', hiringManager: 'Sarah Jenkins', score: 95 },
- { id: 8, title: 'Sales Director', department: 'Sales', location: 'San Francisco, CA', type: 'Full-time', status: 'Internal', applicants: 45, newApplicants: 5, postedDate: '2026-08-10', hiringManager: 'David Chen', score: 82 },
- { id: 9, title: 'DevOps Engineer', department: 'Engineering', location: 'Bangalore, India', type: 'Hybrid', status: 'Published', applicants: 210, newApplicants: 50, postedDate: '2026-08-19', hiringManager: 'Amit Sharma', score: 90 },
- { id: 10, title: 'HR Manager', department: 'Human Resources', location: 'New York, NY', type: 'Full-time', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-21', hiringManager: 'Michael Lee', score: 0 },
- { id: 11, title: 'Product Manager', department: 'Product', location: 'Remote', type: 'Full-time', status: 'Published', applicants: 530, newApplicants: 80, postedDate: '2026-08-05', hiringManager: 'Sarah Jenkins', score: 91 },
- { id: 12, title: 'Customer Support Lead', department: 'Support', location: 'London, UK', type: 'Full-time', status: 'Closed', applicants: 180, newApplicants: 0, postedDate: '2026-07-15', hiringManager: 'David Chen', score: 85 },
- { id: 13, title: 'Security Analyst', department: 'IT', location: 'Remote', type: 'Contract', status: 'Published', applicants: 95, newApplicants: 15, postedDate: '2026-08-18', hiringManager: 'Amit Sharma', score: 89 },
- { id: 14, title: 'Content Writer', department: 'Marketing', location: 'New York, NY', type: 'Part-time', status: 'Published', applicants: 400, newApplicants: 120, postedDate: '2026-08-12', hiringManager: 'Priya Patel', score: 93 },
- { id: 15, title: 'QA Automation Engineer', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-22', hiringManager: 'Michael Lee', score: 0 }
+ { id: 2, title: 'Product Design Lead', department: 'Design', location: 'San Francisco, CA', type: 'Hybrid', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-20', hiringManager: 'Sarah Jenkins', score: 0 },
+ { id: 3, title: 'VP of Marketing', department: 'Marketing', location: 'New York, NY', type: 'Full-time', status: 'Closed', applicants: 89, newApplicants: 0, postedDate: '2026-07-01', hiringManager: 'David Chen', score: 100 },
+ { id: 4, title: 'Data Engineer', department: 'Data Science', location: 'London, UK', type: 'Full-time', status: 'Internal', applicants: 12, newApplicants: 2, postedDate: '2026-08-18', hiringManager: 'Amit Sharma', score: 85 },
+ { id: 5, title: 'Frontend Developer', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Published', applicants: 210, newApplicants: 15, postedDate: '2026-08-21', hiringManager: 'Amit Sharma', score: 92 },
+ { id: 6, title: 'DevOps Engineer', department: 'Engineering', location: 'Bangalore, India', type: 'Contract', status: 'Published', applicants: 85, newApplicants: 8, postedDate: '2026-08-22', hiringManager: 'Sarah Jenkins', score: 88 },
+ { id: 7, title: 'HR Business Partner', department: 'HR', location: 'New York, NY', type: 'Hybrid', status: 'Internal', applicants: 5, newApplicants: 1, postedDate: '2026-08-15', hiringManager: 'David Chen', score: 75 },
+ { id: 8, title: 'Sales Executive', department: 'Sales', location: 'London, UK', type: 'Full-time', status: 'Closed', applicants: 120, newApplicants: 0, postedDate: '2026-07-10', hiringManager: 'Amit Sharma', score: 90 }
 ];
 
 const DEFAULT_CHATBOT_WIDTH = 320;
@@ -283,7 +276,7 @@ export default function JobsPage() {
  {paginatedJobs.length > 0 ? paginatedJobs.map((job, index) => (
  <tr 
  key={job.id} 
- onClick={() => navigate('/dashboard/agencies')}
+ onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
  className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors group cursor-pointer"
  >
  <td className="px-6 py-4">
@@ -595,41 +588,41 @@ export default function JobsPage() {
  <ChevronsRight size={16} />
  </button>
  </div>
-  <div className="flex-1 p-4 overflow-y-auto space-y-4">
-  <div className="flex flex-col gap-1 items-start max-w-[85%]">
-  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
-  Hi! I can help you analyze your hiring pipeline, find jobs, or summarize candidates.
-  </div>
-  </div>
-  
-  <div className="flex flex-col gap-1 items-end ml-auto max-w-[85%]">
-  <div className="bg-[#1890FF] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-[13px] font-medium shadow-sm">
-  Which jobs need attention today?
-  </div>
-  </div>
+ <div className="flex-1 p-4 overflow-y-auto space-y-4">
+ <div className="flex flex-col gap-1 items-start max-w-[85%]">
+ <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
+ Hi! I can help you analyze your hiring pipeline, find jobs, or summarize candidates.
+ </div>
+ </div>
+ 
+ <div className="flex flex-col gap-1 items-end ml-auto max-w-[85%]">
+ <div className="bg-[#1890FF] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-[13px] font-medium shadow-sm">
+ Which jobs need attention today?
+ </div>
+ </div>
 
-  <div className="flex flex-col gap-1 items-start max-w-[90%]">
-  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
-  <p className="mb-2">Three areas need attention:</p>
-  <ul className="list-disc pl-4 space-y-1">
-  <li><span className="font-bold">Product Design Lead</span> — still in Draft</li>
-  <li><span className="font-bold">Backend Developer</span> — no candidates yet</li>
-  <li><span className="font-bold">Data Engineer</span> — 12 active candidates</li>
-  </ul>
-  </div>
-  </div>
+ <div className="flex flex-col gap-1 items-start max-w-[90%]">
+ <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
+ <p className="mb-2">Three areas need attention:</p>
+ <ul className="list-disc pl-4 space-y-1">
+ <li><span className="font-bold">Product Design Lead</span> — still in Draft</li>
+ <li><span className="font-bold">Backend Developer</span> — no candidates yet</li>
+ <li><span className="font-bold">Data Engineer</span> — 12 active candidates</li>
+ </ul>
+ </div>
+ </div>
 
-  <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
-  <p className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Suggested Questions</p>
-  <div className="space-y-2">
-  {["Who are my top candidates?", "Which jobs are overdue?", "Summarize this week"].map((q, i) => (
-  <button key={i} className="w-full text-left px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl text-[12px] font-medium text-[#212b36] dark:text-white transition-colors cursor-pointer shadow-sm">
-  {q}
-  </button>
-  ))}
-  </div>
-  </div>
-  </div>
+ <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
+ <p className="text-[10px] font-bold text-gray-400 mb-2 tracking-wider">Suggested Questions</p>
+ <div className="space-y-2">
+ {["Who are my top candidates?", "Which jobs are overdue?", "Summarize this week"].map((q, i) => (
+ <button key={i} className="w-full text-left px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl text-[12px] font-medium text-[#212b36] dark:text-white transition-colors cursor-pointer shadow-sm">
+ {q}
+ </button>
+ ))}
+ </div>
+ </div>
+ </div>
  <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
  <div className="relative">
  <input type="text" placeholder="Ask me anything..." className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-[#212b36] dark:text-white"/>
@@ -1011,7 +1004,7 @@ export default function JobsPage() {
  };
  setJobs([...jobs, newJob]);
  setSuccessMessage(`Job "${newJobData.title}" created successfully!`);
- navigate('/dashboard/job-setup/overview', { state: { jobData: newJob, from: { name: 'Job List', path: '/dashboard/jobs' } } });
+ navigate('/dashboard/agencies', { state: { tab: 'Job Setup', jobData: newJob, from: { name: 'Job List', path: '/dashboard/jobs' } } });
  }
  setTimeout(() => setSuccessMessage(null), 4000);
  handleCloseModal();
@@ -1030,30 +1023,30 @@ export default function JobsPage() {
  </div>
  )}
 
-  {/* View Job Modal */}
-  {isViewJobModalOpen && selectedJobToView && (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold text-[#212b36] dark:text-white">{selectedJobToView.title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{selectedJobToView.department} • {selectedJobToView.type} • {selectedJobToView.location}</p>
-          </div>
-          <button onClick={() => setIsViewJobModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
-            <X size={20} />
-          </button>
-        </div>
-        <div className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div><p className="text-xs text-gray-500">Status</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.status}</p></div>
-            <div><p className="text-xs text-gray-500">Posted Date</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.postedDate}</p></div>
-            <div><p className="text-xs text-gray-500">Hiring Manager</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.hiringManager}</p></div>
-            <div><p className="text-xs text-gray-500">Active Candidates</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.applicants}</p></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )}
+ {/* View Job Modal */}
+ {isViewJobModalOpen && selectedJobToView && (
+ <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+ <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col">
+ <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+ <div>
+ <h2 className="text-xl font-bold text-[#212b36] dark:text-white">{selectedJobToView.title}</h2>
+ <p className="text-sm text-gray-500 mt-1">{selectedJobToView.department} • {selectedJobToView.type} • {selectedJobToView.location}</p>
+ </div>
+ <button onClick={() => setIsViewJobModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
+ <X size={20} />
+ </button>
+ </div>
+ <div className="p-6 space-y-4">
+ <div className="grid grid-cols-2 gap-4">
+ <div><p className="text-xs text-gray-500">Status</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.status}</p></div>
+ <div><p className="text-xs text-gray-500">Posted Date</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.postedDate}</p></div>
+ <div><p className="text-xs text-gray-500">Hiring Manager</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.hiringManager}</p></div>
+ <div><p className="text-xs text-gray-500">Active Candidates</p><p className="text-sm font-bold text-[#212b36] dark:text-white">{selectedJobToView.applicants}</p></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ )}
 
  {/* Toast Notification */}
  {successMessage && (

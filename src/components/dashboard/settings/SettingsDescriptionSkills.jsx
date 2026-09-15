@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, X, Settings2, Minus, Trash2, CheckCircle2, Circle, Code2, FileText, PlusCircle } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import JobSetupHeader from '../components/dashboard/JobSetupHeader';
 
-export default function JobSetupDescriptionSkillsPage() {
+export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
+ const navigate = () => {};
+ const location = { state: null };
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
- const location = useLocation();
- const navigate = useNavigate();
- const initialJobData = location.state?.jobData;
+ 
+ 
+ const initialJobData = {};
 
  const [jobData, setJobData] = useState({
  jdText: initialJobData?.jdText || '',
@@ -66,12 +67,7 @@ export default function JobSetupDescriptionSkillsPage() {
 
  return (
  <div className="p-6 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in">
- <JobSetupHeader 
- title="Job Setup: Description & Skills" 
- subtitle="Define the role requirements and required candidate skills." 
- isConfidential={jobData.isConfidential}
- onConfidentialChange={(val) => handleInputChange('isConfidential', val)}
- />
+ 
 
  <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4 items-start">
  {/* Description Panel */}
@@ -261,7 +257,7 @@ export default function JobSetupDescriptionSkillsPage() {
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto">
  <button 
- onClick={() => navigate('/dashboard/job-setup/overview', { state: { jobData: updatedJobData } })}
+ onClick={() => setSettingsActiveNav('Overview')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Overview
@@ -274,7 +270,7 @@ export default function JobSetupDescriptionSkillsPage() {
  Save and Exit
  </button>
  <button 
- onClick={() => navigate('/dashboard/job-setup/hiring-team', { state: { jobData: updatedJobData } })}
+ onClick={() => setSettingsActiveNav('Hiring Team')}
  className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
  Save and Continue to 'Hiring Team'

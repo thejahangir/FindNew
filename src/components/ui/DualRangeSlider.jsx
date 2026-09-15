@@ -36,6 +36,8 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
 
  return (
  <div className="relative w-full pt-6 pb-2">
+ {/* Custom Slider Track and Inputs Container */}
+ <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full z-10 flex items-center">
  <input
  type="range"
  min={min}
@@ -48,7 +50,7 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
  minValRef.current = value;
  onChange([value, maxVal]);
  }}
- className="absolute w-full h-0 z-30 outline-none appearance-none pointer-events-none"
+ className={`absolute w-full h-full left-0 outline-none appearance-none pointer-events-none top-1/2 -translate-y-1/2 ${minVal > maxVal - 50000 ? 'z-50' : 'z-30'}`}
  style={{ WebkitAppearance: 'none' }}
  />
  <input
@@ -63,20 +65,19 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
  maxValRef.current = value;
  onChange([minVal, value]);
  }}
- className="absolute w-full h-0 z-40 outline-none appearance-none pointer-events-none"
+ className="absolute w-full h-full left-0 z-40 outline-none appearance-none pointer-events-none top-1/2 -translate-y-1/2"
  style={{ WebkitAppearance: 'none' }}
  />
 
- {/* Custom Slider Track */}
- <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full z-10">
  <div ref={range} className="absolute h-2 bg-[#1890FF] rounded-full z-20"></div>
- {/* Custom Thumbs (Rendered via CSS to bypass pointer-events-none on the inputs) */}
+ 
+ {/* Custom Thumbs */}
  <div 
- className="absolute w-5 h-5 bg-white border-2 border-[#1890FF] rounded-full z-30 top-1/2 -translate-y-1/2 -ml-2.5 shadow-md"
+ className="absolute w-5 h-5 bg-white border-2 border-[#1890FF] rounded-full z-30 top-1/2 -translate-y-1/2 -ml-2.5 shadow-md pointer-events-none"
  style={{ left: `${getPercent(minVal)}%` }}
  ></div>
  <div 
- className="absolute w-5 h-5 bg-white border-2 border-[#1890FF] rounded-full z-40 top-1/2 -translate-y-1/2 -ml-2.5 shadow-md"
+ className="absolute w-5 h-5 bg-white border-2 border-[#1890FF] rounded-full z-40 top-1/2 -translate-y-1/2 -ml-2.5 shadow-md pointer-events-none"
  style={{ left: `${getPercent(maxVal)}%` }}
  ></div>
  </div>
@@ -94,16 +95,16 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
  <style>{`
  input[type=range]::-webkit-slider-thumb {
  pointer-events: all;
- width: 24px;
- height: 24px;
+ width: 40px;
+ height: 40px;
  -webkit-appearance: none;
  opacity: 0;
  cursor: pointer;
  }
  input[type=range]::-moz-range-thumb {
  pointer-events: all;
- width: 24px;
- height: 24px;
+ width: 40px;
+ height: 40px;
  opacity: 0;
  cursor: pointer;
  }

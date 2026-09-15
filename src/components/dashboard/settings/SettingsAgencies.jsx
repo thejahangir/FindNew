@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pause, Play, Trash2, X, Building2, Calendar, Check, Search, AlertTriangle } from 'lucide-react';
-import JobSetupHeader from '../components/dashboard/JobSetupHeader';
+import { Plus, Pause, Play, Trash2, X, Building2, Calendar, Check, Search, AlertTriangle, LayoutGrid, List } from 'lucide-react';
 
 const mockAgencies = [
  { id: 1, name: 'TechTalent Partners', status: 'Active', assignedDate: 'Aug 10, 2026' },
@@ -19,13 +18,16 @@ const availableAgencies = [
  'Quantum Recruiters'
 ];
 
-export default function JobSetupAgenciesPage() {
- const location = useLocation();
- const navigate = useNavigate();
- const jobData = location.state?.jobData;
+export default function SettingsAgencies({ setSettingsActiveNav }) {
+ const navigate = () => {};
+ const location = { state: null };
+ 
+ 
+ const jobData = ({} /* mock */).jobData;
 
  const [agencies, setAgencies] = useState(mockAgencies);
  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+ const [viewMode, setViewMode] = useState('cards');
  
  // Add Agency Modal State
  const [selectedAgency, setSelectedAgency] = useState('');
@@ -74,13 +76,14 @@ export default function JobSetupAgenciesPage() {
  
  {/* Header section */}
  <div className="relative z-10 w-full mb-2">
- <JobSetupHeader 
- title="Agencies" 
- subtitle="Manage external recruitment agencies assigned to this job." 
- />
+ 
  </div>
 
- <div className="flex justify-end mb-6">
+ <div className="flex justify-end gap-3 mb-6">
+ <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center">
+ <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
+ <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
+ </div>
  <button 
  onClick={() => setIsAddModalOpen(true)}
  className="px-5 py-2.5 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
@@ -102,7 +105,7 @@ export default function JobSetupAgenciesPage() {
  <Plus size={16} /> Assign an Agency
  </button>
  </div>
- ) : (
+ ) : viewMode === 'cards' ? (
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
  {agencies.map(agency => (
  <div key={agency.id} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col transition-all hover:shadow-md hover:-translate-y-1">
@@ -167,12 +170,74 @@ export default function JobSetupAgenciesPage() {
  </div>
  ))}
  </div>
+ ) : (
+ <div className="overflow-x-auto">
+ <table className="w-full text-left border-collapse">
+ <thead>
+ <tr className="bg-gray-50 dark:bg-gray-800/50">
+ <th className="p-4 text-xs font-bold text-gray-500 rounded-l-xl">Agency Name</th>
+ <th className="p-4 text-xs font-bold text-gray-500 ">Assigned Date</th>
+ <th className="p-4 text-xs font-bold text-gray-500 ">Status</th>
+ <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>
+ </tr>
+ </thead>
+ <tbody>
+ {agencies.map(agency => (
+ <tr key={agency.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+ <td className="p-4">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 shrink-0 bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] rounded-xl flex items-center justify-center">
+ <Building2 size={20} />
+ </div>
+ <span className="text-sm font-bold text-[#212b36] dark:text-white">{agency.name}</span>
+ </div>
+ </td>
+ <td className="p-4">
+ <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{agency.assignedDate}</span>
+ </td>
+ <td className="p-4">
+ <span className={`inline-flex px-2.5 py-1 text-xs font-bold rounded-md items-center gap-1.5 ${
+ agency.status === 'Active' 
+ ? 'bg-[#00A76F]/10 text-[#00A76F]' 
+ : 'bg-[#FF5630]/10 text-[#FF5630]'
+ }`}>
+ <span className={`w-1.5 h-1.5 rounded-full ${agency.status === 'Active' ? 'bg-[#00A76F]' : 'bg-[#FF5630]'}`}></span>
+ {agency.status}
+ </span>
+ </td>
+ <td className="p-4">
+ <div className="flex items-center justify-center gap-2">
+ <button 
+ onClick={() => setConfirmAlert({ 
+ action: agency.status === 'Active' ? 'pause' : 'resume', 
+ agencyId: agency.id, 
+ agencyName: agency.name 
+ })}
+ className="p-2 text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer"
+ title={agency.status === 'Active' ? "Pause Agency" : "Resume Agency"}
+ >
+ {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
+ </button>
+ <button 
+ onClick={() => setConfirmAlert({ action: 'remove', agencyId: agency.id, agencyName: agency.name })}
+ className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-[#FF5630]/10 rounded-lg transition-colors cursor-pointer"
+ title="Remove Agency"
+ >
+ <Trash2 size={18} />
+ </button>
+ </div>
+ </td>
+ </tr>
+ ))}
+ </tbody>
+ </table>
+ </div>
  )}
  </div>
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-12">
  <button 
- onClick={() => navigate('/dashboard/job-setup/ranking-rules', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Ranking Rules')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Ranking Rules
@@ -185,7 +250,7 @@ export default function JobSetupAgenciesPage() {
  Save and Exit
  </button>
  <button 
- onClick={() => navigate('/dashboard/job-setup/notifications', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Notifications')}
  className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
  Save and Continue to 'Notifications'

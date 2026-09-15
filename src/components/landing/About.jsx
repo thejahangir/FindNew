@@ -16,7 +16,7 @@ export default function About() {
  
  {/* Left Text Content */}
  <div className="lg:w-1/2">
- <h2 className="text-sm font-bold text-brand-blue uppercase mb-3">About FindNew</h2>
+ <h2 className="text-sm font-bold text-brand-blue mb-3">About FindNew</h2>
  <h3 className="text-3xl md:text-4xl font-bold text-brand-dark mb-6 leading-tight">
  Recruitment is broken. <br /> We're fixing it with AI.
  </h3>

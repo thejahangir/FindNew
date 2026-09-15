@@ -147,34 +147,36 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave }) => {
  </div>
  </div>
  
-  {/* Footer Actions */}
-  <div className="p-4 border-t-2 border-gray-200 dark:border-gray-700/50 flex items-center justify-center gap-8 bg-gray-50/50 dark:bg-[#1a222c]/50 rounded-b-2xl mt-auto">
-  <button 
-  onClick={() => onDelete(rule.id)} 
-  title="Delete Rule"
-  className="p-3 text-[#FF5630] hover:bg-[#FF5630]/10 rounded-xl transition-colors cursor-pointer"
-  >
-  <Trash2 size={20} />
-  </button>
-  
-  <div className="w-px h-8 bg-gray-200 dark:bg-gray-700/50"></div>
-  
-  <button 
-  onClick={() => onSave()}
-  title="Save Changes"
-  className="p-3 text-[#00A76F] hover:bg-[#00A76F]/10 rounded-xl transition-colors cursor-pointer"
-  >
-  <CheckCircle2 size={20} />
-  </button>
-  </div>
-  </div>
+ {/* Footer Actions */}
+ <div className="p-4 border-t-2 border-gray-200 dark:border-gray-700/50 flex items-center justify-center gap-8 bg-gray-50/50 dark:bg-[#1a222c]/50 rounded-b-2xl mt-auto">
+ <button 
+ onClick={() => onDelete(rule.id)} 
+ title="Delete Rule"
+ className="p-3 text-[#FF5630] hover:bg-[#FF5630]/10 rounded-xl transition-colors cursor-pointer"
+ >
+ <Trash2 size={20} />
+ </button>
+ 
+ <div className="w-px h-8 bg-gray-200 dark:bg-gray-700/50"></div>
+ 
+ <button 
+ onClick={() => onSave()}
+ title="Save Changes"
+ className="p-3 text-[#00A76F] hover:bg-[#00A76F]/10 rounded-xl transition-colors cursor-pointer"
+ >
+ <CheckCircle2 size={20} />
+ </button>
+ </div>
+ </div>
  );
 };
 
-export default function JobSetupRankingRulesPage() {
- const location = useLocation();
- const navigate = useNavigate();
- const jobData = location.state?.jobData;
+export default function SettingsRankingRules({ setSettingsActiveNav }) {
+ const navigate = () => {};
+ const location = { state: null };
+ 
+ 
+ const jobData = {};
 
  const [rules, setRules] = useState([]);
  const [isGenerated, setIsGenerated] = useState(false);
@@ -251,7 +253,7 @@ export default function JobSetupRankingRulesPage() {
 
  const handleSaveAndContinue = () => {
  if (!isValid) return;
- navigate('/dashboard/job-setup/agencies', { state: { jobData } });
+ setSettingsActiveNav('Agencies');
  };
 
  if (!jobData) {
@@ -271,15 +273,7 @@ export default function JobSetupRankingRulesPage() {
  return (
  <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)] relative">
  <div className="flex-1 space-y-6">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-2 px-2">
- <div>
- <h2 className="text-[20px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
- Ranking Rules
- </h2>
- <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-1">
- Define the skills and their respective weight multipliers to rank candidates.
- </p>
- </div>
+ <div className="flex justify-end gap-4 mb-6 mt-2 px-2">
  
  {isGenerated && (
  <div className="flex items-center gap-3">
@@ -370,7 +364,7 @@ export default function JobSetupRankingRulesPage() {
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
  <button 
- onClick={() => navigate('/dashboard/job-setup/scorecards', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav('Scorecards')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Scorecards

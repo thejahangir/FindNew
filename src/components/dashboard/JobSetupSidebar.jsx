@@ -50,7 +50,7 @@ export default function JobSetupSidebar({ isSidebarCollapsed }) {
 
  <nav className="space-y-1">
  {!isSidebarCollapsed && (
- <h3 className="px-3 text-xs font-bold text-gray-400 uppercase mb-3 mt-4">Job Setup</h3>
+ <h3 className="px-3 text-xs font-bold text-gray-400 mb-3 mt-4">Job Setup</h3>
  )}
  
  <div className="space-y-1">

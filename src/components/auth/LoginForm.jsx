@@ -141,7 +141,7 @@ export default function LoginForm({ setView }) {
  <div className="w-full border-t border-gray-200"></div>
  </div>
  <div className="relative flex justify-center text-sm">
- <span className="px-2 bg-white text-black text-xs font-semibold uppercase ">Quick Login Demo</span>
+ <span className="px-2 bg-white text-black text-xs font-semibold ">Quick Login Demo</span>
  </div>
  </div>
 

@@ -111,7 +111,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  {getInitials(card.name)}
  </div>
  <div className="min-w-0">
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Candidate name</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Candidate name</p>
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white truncate">{card.name}</h3>
  <p className="text-[11px] font-bold text-[#00A76F]">{card.score} match</p>
  </div>
@@ -124,7 +124,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  <div className="flex items-start gap-2.5 mb-3 px-3 py-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50">
  <Building2 size={14} className="text-[#1890FF] mt-0.5 shrink-0" />
  <div className="min-w-0">
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Agency</p>
+ <p className="text-[10px] font-bold text-gray-400 tracking-wider">Agency</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{card.agency}</p>
  <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5 truncate">
  <Mail size={11} className="shrink-0" /> {card.agencyEmail}
@@ -134,7 +134,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
 
  <div>
  <div className="flex items-center justify-between mb-1.5">
- <label className={`text-[10px] font-bold uppercase tracking-wider ${errors[card.id] ? 'text-[#FF5630]' : 'text-gray-400'}`}>Feedback</label>
+ <label className={`text-[10px] font-bold tracking-wider ${errors[card.id] ? 'text-[#FF5630]' : 'text-gray-400'}`}>Feedback</label>
  {cards.length > 1 && (
  <button
  type="button"

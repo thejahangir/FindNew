@@ -3,19 +3,10 @@ import { useLocation, useNavigate, Navigate, Routes, Route } from 'react-router-
 import { LogOut } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import AgencyLayout from '../components/dashboard/AgencyLayout';
-import JobSetupLayout from '../components/dashboard/JobSetupLayout';
 import NotificationsPage from './NotificationsPage';
 import JobDashboardPage from './JobDashboardPage';
 import JobsPage from './JobsPage';
-import JobSetupOverviewPage from './JobSetupOverviewPage';
-import JobSetupDescriptionSkillsPage from './JobSetupDescriptionSkillsPage';
-import JobSetupHiringTeamPage from './JobSetupHiringTeamPage';
-import JobSetupPipelinePage from './JobSetupPipelinePage';
-import JobSetupApplicationsPage from './JobSetupApplicationsPage';
-import JobSetupScorecardsPage from './JobSetupScorecardsPage';
-import JobSetupRankingRulesPage from './JobSetupRankingRulesPage';
-import JobSetupAgenciesPage from './JobSetupAgenciesPage';
-import JobSetupNotificationsPage from './JobSetupNotificationsPage';
+
 import ApprovalsPage from './ApprovalsPage';
 import CandidateProfilePage from './CandidateProfilePage';
 
@@ -41,26 +32,6 @@ export default function DashboardPage() {
  if (userType === 'Corporate') {
  return (
  <Routes>
- {/* Job Setup Flow with Isolated Layout */}
- <Route 
- path="job-setup/*" 
- element={
- <JobSetupLayout>
- <Routes>
- <Route path="overview" element={<JobSetupOverviewPage />} />
- <Route path="description-skills" element={<JobSetupDescriptionSkillsPage />} />
- <Route path="hiring-team" element={<JobSetupHiringTeamPage />} />
- <Route path="pipeline" element={<JobSetupPipelinePage />} />
- <Route path="applications" element={<JobSetupApplicationsPage />} />
- <Route path="scorecards" element={<JobSetupScorecardsPage />} />
- <Route path="ranking-rules" element={<JobSetupRankingRulesPage />} />
- <Route path="agencies" element={<JobSetupAgenciesPage />} />
- <Route path="notifications" element={<JobSetupNotificationsPage />} />
- </Routes>
- </JobSetupLayout>
- } 
- />
- 
  {/* Main Application Flow */}
  <Route 
  path="*" 
