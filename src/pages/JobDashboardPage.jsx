@@ -185,9 +185,6 @@ const SCREENING_CRITERIA = [
 ];
 
 function MiniCheckbox({ checked, indeterminate = false, visible, onChange, label, revealGroup = 'cand' }) {
- const revealCls = revealGroup === 'list'
- ? 'group-hover/list:opacity-100 group-hover/list:scale-100'
- : 'group-hover/cand:opacity-100 group-hover/cand:scale-100';
  return (
  <button
  type="button"
@@ -195,17 +192,17 @@ function MiniCheckbox({ checked, indeterminate = false, visible, onChange, label
  aria-checked={indeterminate ? 'mixed' : checked}
  aria-label={label}
  onClick={(e) => { e.stopPropagation(); onChange(); }}
- className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+ className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer group/mini"
  >
  <span
- className={`flex items-center justify-center w-3.5 h-3.5 rounded-[4px] border-[1.5px] shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-all duration-150 ${
+ className={`flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-all duration-150 ${
  checked || indeterminate
  ? 'bg-[#1890FF] border-[#1890FF] scale-100 opacity-100'
- : `bg-white dark:bg-[#161c24] border-gray-300 dark:border-gray-500 ${visible ? 'opacity-100 scale-100' : `opacity-0 scale-75 ${revealCls}`}`
+ : 'bg-white dark:bg-[#161c24] border-gray-400 dark:border-gray-500 opacity-50 group-hover/mini:opacity-100 group-hover/mini:border-gray-800 dark:group-hover/mini:border-gray-300'
  }`}
  >
- {checked && !indeterminate && <Check size={9} strokeWidth={3.5} className="text-white" />}
- {indeterminate && <span className="block w-1.5 h-[1.5px] rounded-full bg-white" />}
+ {checked && !indeterminate && <Check size={10} strokeWidth={3.5} className="text-white" />}
+ {indeterminate && <span className="block w-2 h-[2px] rounded-full bg-white" />}
  </span>
  </button>
  );
@@ -387,7 +384,7 @@ export default function JobDashboardPage() {
  const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage);
  const currentCandidates = filteredCandidates.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
- const tabs = ['Overview', 'Applications', 'Job Description', 'Pipeline', 'Candidates', 'Interviews', 'Team & Scorecards', 'Job Setup'];
+ const tabs = ['Overview', 'Applications Review', 'Job Description', 'Pipeline', 'Candidates', 'Interviews', 'Team & Scorecards', 'Job Setup'];
 
  const handleMoveCandidate = (candidate, fromStage, toStage) => {
  setPipelineBoard(prev => {
@@ -463,7 +460,7 @@ export default function JobDashboardPage() {
  
  {/* HEADER */}
  <div className="mb-2">
- <button onClick={() => navigate('/dashboard/jobs')} className="text-sm font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit mb-4 cursor-pointer">
+ <button onClick={() => navigate('/dashboard/jobs')} className="text-[13px] font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit mb-4 cursor-pointer">
  <ArrowLeft size={16} /> Back to Job List
  </button>
  <div className="flex items-center justify-between">
@@ -475,7 +472,7 @@ export default function JobDashboardPage() {
  {setupJobData.status}
  </span>
  </div>
- <p className="text-sm text-black dark:text-white mt-1 flex items-center gap-1.5 font-medium">
+ <p className="text-[13px] text-black dark:text-white mt-1 flex items-center gap-1.5 font-medium">
  <MapPin size={16} className="text-[#00A76F]" />
  {setupJobData.location} • {setupJobData.workMode}
  </p>
@@ -508,7 +505,7 @@ export default function JobDashboardPage() {
  key={tab}
  onClick={() => !isDisabled && setActiveTab(tab)}
  disabled={isDisabled}
- className={`pb-3 text-sm font-bold transition-colors whitespace-nowrap relative ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} ${
+ className={`pb-3 text-[13px] font-bold transition-colors whitespace-nowrap relative ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} ${
  activeTab === tab 
  ? 'text-[#1890FF] dark:text-[#1890FF]' 
  : (isDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-black hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white')
@@ -533,7 +530,7 @@ export default function JobDashboardPage() {
  <Users size={24} className="text-[#1890FF]" />
  </div>
  <div>
- <p className="text-sm font-medium text-black dark:text-white mb-1">Total Applications</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Total Applications</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,450</h3>
  </div>
  </div>
@@ -543,7 +540,7 @@ export default function JobDashboardPage() {
  <UserCheck size={24} className="text-[#00A76F]" />
  </div>
  <div>
- <p className="text-sm font-medium text-black dark:text-white mb-1">Active Candidates</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Active Candidates</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">184</h3>
  </div>
  </div>
@@ -553,7 +550,7 @@ export default function JobDashboardPage() {
  <UserX size={24} className="text-[#FF5630]" />
  </div>
  <div>
- <p className="text-sm font-medium text-black dark:text-white mb-1">Rejected</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Rejected</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,266</h3>
  </div>
  </div>
@@ -572,7 +569,7 @@ export default function JobDashboardPage() {
  <Video size={20} className="text-[#1890FF]" />
  Upcoming Interviews
  </h3>
- <button onClick={() => setActiveTab('Interviews')} className="text-sm font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+ <button onClick={() => setActiveTab('Interviews')} className="text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
  View Calendar
  </button>
  </div>
@@ -654,7 +651,7 @@ export default function JobDashboardPage() {
  <activity.icon size={14} />
  </div>
  <div className="pt-1.5">
- <p className="text-sm font-medium text-[#212b36] dark:text-white leading-snug">{activity.action}</p>
+ <p className="text-[13px] font-medium text-[#212b36] dark:text-white leading-snug">{activity.action}</p>
  <p className="text-xs text-[#919eab] mt-0.5">{activity.time}</p>
  </div>
  </div>
@@ -670,7 +667,7 @@ export default function JobDashboardPage() {
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center justify-between mb-6">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white">Pipeline</h3>
- <button onClick={() => setActiveTab('Pipeline')} className="text-sm font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+ <button onClick={() => setActiveTab('Pipeline')} className="text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
  Board
  </button>
  </div>
@@ -701,7 +698,7 @@ export default function JobDashboardPage() {
  {isRefCheck && <CheckSquare size={12} className="text-white" />}
  {isHold && <Clock size={12} className="text-white" />}
  </div>
- <span className="text-sm font-medium text-[#454f5b] dark:text-white group-hover:text-[#1890FF] transition-colors">{item.stage}</span>
+ <span className="text-[13px] font-medium text-[#454f5b] dark:text-white group-hover:text-[#1890FF] transition-colors">{item.stage}</span>
  </div>
  <div className="flex items-center gap-2">
  {item.avgTime && (
@@ -709,7 +706,7 @@ export default function JobDashboardPage() {
  Avg {item.avgTime}
  </span>
  )}
- <span className="text-sm font-bold bg-gray-100 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full text-[#212b36] dark:text-white ">
+ <span className="text-[13px] font-bold bg-gray-100 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full text-[#212b36] dark:text-white ">
  {item.count}
  </span>
  </div>
@@ -727,7 +724,7 @@ export default function JobDashboardPage() {
  Top Recommendations
  </h3>
  </div>
- <p className="text-sm text-black dark:text-white mb-3 leading-relaxed">
+ <p className="text-[13px] text-black dark:text-white mb-3 leading-relaxed">
  AI found past candidates perfectly matching this role.
  </p>
  
@@ -750,7 +747,7 @@ export default function JobDashboardPage() {
  ))}
  </div>
  
- <button className="w-full mt-4 py-1.5 text-sm font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer">
+ <button className="w-full mt-4 py-1.5 text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer">
  View All Matches <ChevronRight size={16} />
  </button>
  </div>
@@ -765,7 +762,7 @@ export default function JobDashboardPage() {
  <div className="bg-white dark:bg-[#161c24] p-8 rounded-2xl border border-gray-100 dark:border-gray-800/50 animate-fade-in text-[#454f5b] dark:text-gray-300">
  <h2 className="text-xl font-bold text-[#212b36] dark:text-white mb-6">Job Description: Senior AI Research Scientist</h2>
  
- <div className="space-y-6 text-sm">
+ <div className="space-y-6 text-[13px]">
  <section>
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-3">About the Role</h3>
  <p className="leading-relaxed">
@@ -832,11 +829,11 @@ export default function JobDashboardPage() {
  {/* Top Section */}
  <div className="flex justify-between items-start">
  <div className="flex items-center gap-2.5">
- <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1890FF]/20 to-[#1890FF]/5 flex items-center justify-center text-[#1890FF] font-bold text-sm ring-2 ring-white dark:ring-[#161c24] shrink-0">
+ <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1890FF]/20 to-[#1890FF]/5 flex items-center justify-center text-[#1890FF] font-bold text-[13px] ring-2 ring-white dark:ring-[#161c24] shrink-0">
  {card.name.split(' ').map(n => n[0]).join('')}
  </div>
  <div>
- <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors leading-tight">{card.name}</h4>
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors leading-tight">{card.name}</h4>
  <p className="text-[10px] font-semibold text-black dark:text-gray-400 mt-0.5">{card.role}</p>
  </div>
  </div>
@@ -934,13 +931,13 @@ export default function JobDashboardPage() {
  value={searchQuery}
  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
  placeholder="Search candidates by name or stage..." 
- className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white" 
+ className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-none rounded-lg text-[13px] focus:ring-2 focus:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white" 
  />
  </div>
  </div>
  
  <div className="flex-1 overflow-x-auto">
- <table className="w-full text-left text-sm text-black dark:text-gray-400">
+ <table className="w-full text-left text-[13px] text-black dark:text-gray-400">
  <thead className="text-xs bg-gray-50 dark:bg-gray-800/50 text-black font-bold">
  <tr>
  <th className="px-6 py-4">Name</th>
@@ -985,7 +982,7 @@ export default function JobDashboardPage() {
  {/* Pagination */}
  {totalPages > 1 && (
  <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-white dark:bg-[#161c24]">
- <span className="text-sm text-gray-500 font-medium">
+ <span className="text-[13px] text-gray-500 font-medium">
  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredCandidates.length)} of {filteredCandidates.length}
  </span>
  <div className="flex items-center gap-1">
@@ -1001,7 +998,7 @@ export default function JobDashboardPage() {
  <button
  key={i}
  onClick={() => setCurrentPage(i + 1)}
- className={`w-7 h-7 flex items-center justify-center rounded-md text-sm font-bold cursor-pointer transition-colors ${
+ className={`w-7 h-7 flex items-center justify-center rounded-md text-[13px] font-bold cursor-pointer transition-colors ${
  currentPage === i + 1 
  ? 'bg-[#1890FF] text-white' 
  : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -1024,7 +1021,7 @@ export default function JobDashboardPage() {
  </div>
  )}
  {/* APPLICATIONS TAB - Immersive Redesign */}
- {activeTab === 'Applications' && (
+ {activeTab === 'Applications Review' && (
  <div className="flex flex-col h-[800px] bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden animate-fade-in">
  {/* Top Toolbar / Smart Metrics Ribbon */}
  <div className="flex flex-wrap lg:flex-nowrap items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] gap-4">
@@ -1039,18 +1036,18 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <div className="text-xs font-bold text-[#00A76F]/80">Top Talent (8.5+)</div>
- <div className="text-sm font-black text-[#00A76F]">{candidateList.filter(c => parseScore(c.score) >= 8.5).length}</div>
+ <div className="text-[13px] font-black text-[#00A76F]">{candidateList.filter(c => parseScore(c.score) >= 8.5).length}</div>
  </div>
  </div>
  
  {/* Total Apps */}
- <div className="ml-auto flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700/50 shrink-0 ">
+ <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700/50 shrink-0 ">
  <div className="w-8 h-8 rounded-lg bg-[#212b36]/10 dark:bg-white/10 flex items-center justify-center">
  <Users size={16} className="text-[#212b36] dark:text-white" />
  </div>
  <div>
  <div className="text-xs font-bold text-gray-500 dark:text-gray-400">Total Candidate</div>
- <div className="text-sm font-black text-[#212b36] dark:text-white">{candidateList.length}</div>
+ <div className="text-[13px] font-black text-[#212b36] dark:text-white">{candidateList.length}</div>
  </div>
  </div>
 
@@ -1061,7 +1058,24 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <div className="text-xs font-bold text-[#1890FF]/80">Needs Review (Applied)</div>
- <div className="text-sm font-black text-[#1890FF]">{candidateList.filter(c => c.stage === 'Applied').length}</div>
+ <div className="text-[13px] font-black text-[#1890FF]">{candidateList.filter(c => c.stage === 'Applied').length}</div>
+ </div>
+ </div>
+
+ {/* Active Pipeline */}
+ <div className="ml-auto flex items-center gap-3 px-4 py-2.5 bg-[#212b36]/5 dark:bg-white/5 rounded-xl border border-[#212b36]/15 dark:border-white/15 shrink-0 max-w-[350px]">
+ <div className="w-8 h-8 rounded-lg bg-[#212b36]/10 dark:bg-white/10 flex items-center justify-center shrink-0">
+ <Calendar size={16} className="text-[#212b36] dark:text-white" />
+ </div>
+ <div className="flex items-center gap-3 flex-1">
+ <div>
+ <div className="text-xs font-bold text-[#212b36]/80 dark:text-gray-400 whitespace-nowrap">Active Pipeline</div>
+ <div className="text-[13px] font-black text-[#212b36] dark:text-white">{candidateList.filter(c => ['Screening', 'Technical Interview', 'Culture Fit', 'Reference Check'].includes(c.stage)).length}</div>
+ </div>
+ <div className="w-px h-6 bg-[#212b36]/10 dark:bg-white/10 shrink-0"></div>
+ <p className="text-[10px] font-medium text-[#212b36]/60 dark:text-gray-400 flex-1 leading-tight line-clamp-2">
+ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+ </p>
  </div>
  </div>
  
@@ -1083,19 +1097,20 @@ export default function JobDashboardPage() {
  
  <div className="relative h-[38px]">
  {/* Search Textbox */}
- <div className={`absolute inset-0 transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
+ <div className="absolute inset-0 transition-all duration-300">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
  <input
  type="text"
  value={appSearchQuery}
  onChange={(e) => { setAppSearchQuery(e.target.value); setCurrentPageApp(1); }}
  placeholder="Search by name, stage, or agency..."
- className="w-full h-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-transparent rounded-lg text-sm focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
+ className="w-full h-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-transparent rounded-lg text-[13px] focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
  />
+ </div>
  </div>
 
  {/* Stage Change Block (replaces search when bulk selected) */}
- <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex flex-col justify-center px-3 rounded-lg transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
+ <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex flex-col justify-center px-4 rounded-xl transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <span className="text-[12px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">{selectedAppCandidates.length} Selected</span>
@@ -1125,7 +1140,6 @@ export default function JobDashboardPage() {
  )}
  <div className="w-px h-4 bg-white/30"></div>
  <button onClick={() => setSelectedAppCandidates([])} className="text-white/70 hover:text-white transition-colors cursor-pointer p-0.5"><X size={16} /></button>
- </div>
  </div>
  </div>
  </div>
@@ -1217,16 +1231,27 @@ export default function JobDashboardPage() {
  />
  </div>
  </div>
- <div className="flex-1 min-w-0 flex justify-between items-center pr-2">
- <span className="text-[10px] font-bold text-gray-400 tracking-wider">Name & Stage</span>
- <span className="text-[10px] font-bold text-gray-400 tracking-wider">Rating</span>
+ <div className="flex-1 min-w-0 flex items-center pr-2">
+ <span 
+ className="text-[11px] font-bold text-gray-500 hover:text-[#212b36] dark:hover:text-white cursor-pointer transition-colors"
+ onClick={(e) => {
+ e.stopPropagation();
+ if (selectedAppCandidates.length === currentAppCandidates.length) {
+ setSelectedAppCandidates([]);
+ } else {
+ setSelectedAppCandidates(currentAppCandidates.map(c => c.id));
+ }
+ }}
+ >
+ Select All
+ </span>
  </div>
  </div>
  )}
  {currentAppCandidates.length === 0 ? (
  <div className="px-3 py-10 text-center">
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white">No applicants found</p>
- <p className="text-[12px] text-gray-500 mt-1">
+ <p className="text-[13px] font-bold tracking-wider text-[#212b36] dark:text-white">No applicants found</p>
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-1">
  {appSearchQuery.trim() ? `No matches for “${appSearchQuery.trim()}”` : 'No applicants in this list yet.'}
  </p>
  </div>
@@ -1239,13 +1264,10 @@ export default function JobDashboardPage() {
  onClick={() => setSelectedAppCandidate(cand)}
  className={`group/cand p-3 rounded-xl cursor-pointer transition-all border flex gap-3 ${selectedAppCandidate?.id === cand.id ? 'bg-[#1890FF]/5 border-[#1890FF]/30' : 'border-gray-200 dark:border-gray-700/50 hover:border-gray-300'}`}
  >
- <div className={`relative w-8 h-8 shrink-0 rounded-full flex items-center justify-center mt-0.5 transition-all duration-150 ${isChecked ? 'bg-[#1890FF]/15 ring-2 ring-[#1890FF]/30' : 'bg-[#1890FF]/10 dark:bg-[#1890FF]/15'}`}>
- <span className={`text-[10px] font-bold tracking-wide text-[#1890FF] transition-opacity duration-150 ${isChecked || showChecks ? 'opacity-0' : 'group-hover/cand:opacity-0'}`}>
- {cand.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
- </span>
+ <div className={`relative w-8 h-8 shrink-0 flex items-center justify-center mt-0.5 transition-all duration-150`}>
  <MiniCheckbox
  checked={isChecked}
- visible={isChecked || showChecks}
+ visible={true}
  onChange={() => toggleAppCandidateSelect(cand.id)}
  label={isChecked ? `Deselect ${cand.name}` : `Select ${cand.name}`}
  />
@@ -1262,7 +1284,7 @@ export default function JobDashboardPage() {
  navigate(`/dashboard/candidates/${cand.id}`, {
  state: {
  candidate: cand,
- from: { name: 'Applications', path: '/dashboard/agencies', tab: 'Applications' }
+ from: { name: 'Applications Review', path: '/dashboard/agencies', tab: 'Applications Review' }
  }
  });
  }}
@@ -1355,7 +1377,7 @@ export default function JobDashboardPage() {
  <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-800">
  <div>
  <h4 className="text-[16px] font-bold text-[#212b36] dark:text-white mb-1.5">{previewCandidate.name}</h4>
- <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+ <div className="flex items-center gap-1.5 text-[13px] leading-relaxed text-gray-500">
  <Briefcase size={12} className="text-gray-400" />
  <span>Agency: <span className="font-semibold text-[#212b36] dark:text-gray-300">{previewCandidate.agency || 'Direct Application'}</span></span>
  </div>
@@ -1373,7 +1395,7 @@ export default function JobDashboardPage() {
  })()}
 
  <div>
- <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 space-y-2 leading-relaxed">
  <p>Excellent fit for the technical requirements.</p>
  <p>Strong React, Node.js and architecture experience.</p>
@@ -1384,7 +1406,7 @@ export default function JobDashboardPage() {
  </div>
 
  <div>
- <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
  <div className="space-y-4">
  {SCREENING_CRITERIA.map((item) => {
  const tone = getScoreStyles(item.score);
@@ -1394,7 +1416,7 @@ export default function JobDashboardPage() {
  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white">{item.label}</h5>
  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${tone.badge}`}>{item.score}/10</span>
  </div>
- <p className="text-[11px] text-[#454f5b] dark:text-gray-400 leading-relaxed">{item.text}</p>
+ <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400 leading-relaxed">{item.text}</p>
  </div>
  );
  })}
@@ -1402,15 +1424,15 @@ export default function JobDashboardPage() {
  </div>
 
  <div>
- <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
- <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[12px] text-[#454f5b] dark:text-gray-300 leading-relaxed mb-6">
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
+ <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300 leading-relaxed mb-6">
  Minor gaps: limited exposure to enterprise-scale delivery and formal people management.
  </div>
  
  <hr className="border-gray-100 dark:border-gray-800/50 mb-6" />
  
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Feedback to Agency</h4>
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white">Feedback to Agency</h4>
  <button 
  onClick={() => {
  navigator.clipboard.writeText("We reviewed this candidate. While they are a strong fit technically, there are minor gaps in enterprise-scale delivery. We've decided to proceed to the next stage but will focus on this during the interview.");
@@ -1422,7 +1444,7 @@ export default function JobDashboardPage() {
  <Copy size={12} /> Copy Text
  </button>
  </div>
- <div className="bg-[#1890FF]/5 border border-[#1890FF]/20 rounded-xl p-4 text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">
+ <div className="bg-[#1890FF]/5 border border-[#1890FF]/20 rounded-xl p-4 text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">
 
  We reviewed this candidate. While they are a strong fit technically, there are minor gaps in enterprise-scale delivery. We've decided to proceed to the next stage but will focus on this during the interview.<br/><br/>
 
@@ -1449,7 +1471,7 @@ export default function JobDashboardPage() {
  <div className="absolute inset-0 bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-sm z-50 flex items-center justify-center">
  <div className="text-center">
  <div className="w-12 h-12 border-4 border-[#1890FF] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
- <p className="text-sm font-bold text-[#212b36] dark:text-white">Uploading new applicant resume...</p>
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white">Uploading new applicant resume...</p>
  </div>
  </div>
  )}
@@ -1463,10 +1485,10 @@ export default function JobDashboardPage() {
  <div className="flex items-center gap-2 min-w-0">
  <FileText size={16} className="text-[#1890FF] shrink-0" />
  <div className="min-w-0">
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
+ <p className="text-[13px] font-bold tracking-wider text-[#212b36] dark:text-white truncate">
  {selectedAppCandidate.name.replace(/\s+/g, '_')}_Resume.pdf
  </p>
- <p className="text-[11px] text-gray-400">PDF resume</p>
+ <p className="text-[13px] leading-relaxed text-gray-400">PDF resume</p>
  </div>
  </div>
  <div className="flex items-center gap-1 shrink-0">
@@ -1503,7 +1525,7 @@ export default function JobDashboardPage() {
  <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
  <Users size={32} className="text-gray-400" />
  </div>
- <p className="font-medium text-sm">Select a candidate to view their resume</p>
+ <p className="font-medium text-[13px]">Select a candidate to view their resume</p>
  </div>
  )}
  </div>
@@ -1518,7 +1540,7 @@ export default function JobDashboardPage() {
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 animate-fade-in">
  <div className="flex items-center justify-between mb-6">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white">Upcoming Interviews for this Role</h3>
- <button onClick={() => setIsScheduleModalOpen(true)} className="text-sm font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 px-4 py-2 rounded-lg transition-colors cursor-pointer ">
+ <button onClick={() => setIsScheduleModalOpen(true)} className="text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 px-4 py-2 rounded-lg transition-colors cursor-pointer ">
  Schedule Interview
  </button>
  </div>
@@ -1531,7 +1553,7 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <div className="flex items-center gap-2">
- <h4 className="text-[15px] font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
+ <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
  {interview.score || 90}% Match
  </span>
@@ -1543,7 +1565,7 @@ export default function JobDashboardPage() {
  {interview.status || 'Pending'}
  </span>
  </div>
- <p className="text-sm font-medium text-[#212b36] dark:text-gray-300 mt-1">{interview.type}</p>
+ <p className="text-[13px] font-medium text-[#212b36] dark:text-gray-300 mt-1">{interview.type}</p>
  <p className="text-xs text-black dark:text-gray-400 flex items-center gap-2 mt-1.5">
  <Calendar size={13} className="text-[#1890FF]/70 shrink-0" /> {interview.time} ({interview.duration || '45 mins'}) <span className="mx-1">•</span> 
  <Video size={13} className="text-[#1890FF]/70 shrink-0" /> {interview.platform || 'Zoom'} <span className="mx-1">•</span>
@@ -1561,7 +1583,7 @@ export default function JobDashboardPage() {
  </div>
  </div>
  ))}
- <div className="text-center py-8 text-black text-sm">No more upcoming interviews this week.</div>
+ <div className="text-center py-8 text-black text-[13px]">No more upcoming interviews this week.</div>
  </div>
  </div>
  )}
@@ -1572,7 +1594,7 @@ export default function JobDashboardPage() {
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center justify-between mb-6">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white">Hiring Team</h3>
- <button onClick={() => setIsInviteModalOpen(true)} className="text-sm font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+ <button onClick={() => setIsInviteModalOpen(true)} className="text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
  <Plus size={16} /> Add Member
  </button>
  </div>
@@ -1580,10 +1602,10 @@ export default function JobDashboardPage() {
  {hiringTeam.map(member => (
  <div key={member.id} className="flex items-center justify-between p-3 border border-gray-100 dark:border-gray-800/50 rounded-xl">
  <div className="flex items-center gap-3">
- <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.color}`}>
+ <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold ${member.color}`}>
  {member.initials}
  </div>
- <span className="font-medium text-sm text-[#212b36] dark:text-white">{member.name}</span>
+ <span className="font-medium text-[13px] text-[#212b36] dark:text-white">{member.name}</span>
  </div>
  <button className="text-gray-400 hover:text-red-500 cursor-pointer p-1"><X size={16} /></button>
  </div>
@@ -1644,7 +1666,7 @@ export default function JobDashboardPage() {
  <div className="grid grid-cols-2 gap-5">
  <div>
  <label className="block text-xs font-bold text-gray-500 mb-2">Interview Type</label>
- <select value={scheduleData.type} onChange={e => setScheduleData({...scheduleData, type: e.target.value})} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-sm dark:text-white cursor-pointer">
+ <select value={scheduleData.type} onChange={e => setScheduleData({...scheduleData, type: e.target.value})} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-[13px] dark:text-white cursor-pointer">
  <option>Technical Interview</option>
  <option>Culture Fit</option>
  <option>HR Round</option>
@@ -1667,18 +1689,18 @@ export default function JobDashboardPage() {
  <div className="grid grid-cols-2 gap-5">
  <div>
  <label className={`block text-xs font-bold mb-2 ${scheduleErrors.date ? 'text-[#FF5630]' : 'text-gray-500'}`}>Date</label>
- <input type="date" value={scheduleData.date} onChange={e => { setScheduleData({...scheduleData, date: e.target.value}); if (scheduleErrors.date) setScheduleErrors({...scheduleErrors, date: null}); }} className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border rounded-xl focus:outline-none focus:ring-2 text-sm dark:text-white cursor-pointer transition-colors ${scheduleErrors.date ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10 focus:ring-[#FF5630]/20' : 'border-gray-200 dark:border-gray-700/50 focus:ring-[#1890FF]/20'}`} />
+ <input type="date" value={scheduleData.date} onChange={e => { setScheduleData({...scheduleData, date: e.target.value}); if (scheduleErrors.date) setScheduleErrors({...scheduleErrors, date: null}); }} className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border rounded-xl focus:outline-none focus:ring-2 text-[13px] dark:text-white cursor-pointer transition-colors ${scheduleErrors.date ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10 focus:ring-[#FF5630]/20' : 'border-gray-200 dark:border-gray-700/50 focus:ring-[#1890FF]/20'}`} />
  <div className="min-h-[16px] mt-1"><p className="text-[#FF5630] text-xs animate-fade-in">{scheduleErrors.date}</p></div>
  </div>
  <div>
  <label className={`block text-xs font-bold mb-2 ${scheduleErrors.time ? 'text-[#FF5630]' : 'text-gray-500'}`}>Time</label>
- <input type="time" value={scheduleData.time} onChange={e => { setScheduleData({...scheduleData, time: e.target.value}); if (scheduleErrors.time) setScheduleErrors({...scheduleErrors, time: null}); }} className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border rounded-xl focus:outline-none focus:ring-2 text-sm dark:text-white cursor-pointer transition-colors ${scheduleErrors.time ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10 focus:ring-[#FF5630]/20' : 'border-gray-200 dark:border-gray-700/50 focus:ring-[#1890FF]/20'}`} />
+ <input type="time" value={scheduleData.time} onChange={e => { setScheduleData({...scheduleData, time: e.target.value}); if (scheduleErrors.time) setScheduleErrors({...scheduleErrors, time: null}); }} className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border rounded-xl focus:outline-none focus:ring-2 text-[13px] dark:text-white cursor-pointer transition-colors ${scheduleErrors.time ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10 focus:ring-[#FF5630]/20' : 'border-gray-200 dark:border-gray-700/50 focus:ring-[#1890FF]/20'}`} />
  <div className="min-h-[16px] mt-1"><p className="text-[#FF5630] text-xs animate-fade-in">{scheduleErrors.time}</p></div>
  </div>
  </div>
  <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800/50">
- <button type="button" onClick={() => { setIsScheduleModalOpen(false); setScheduleErrors({}); }} className="px-5 py-2.5 text-sm font-bold text-black bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer">Cancel</button>
- <button type="submit" className="px-5 py-2.5 text-sm font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors shadow-md shadow-[#1890FF]/20 cursor-pointer">Send Invite</button>
+ <button type="button" onClick={() => { setIsScheduleModalOpen(false); setScheduleErrors({}); }} className="px-5 py-2.5 text-[13px] font-bold text-black bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer">Cancel</button>
+ <button type="submit" className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors shadow-md shadow-[#1890FF]/20 cursor-pointer">Send Invite</button>
  </div>
  </form>
  </div>
@@ -1697,11 +1719,11 @@ export default function JobDashboardPage() {
  </div>
  <div className="p-5 space-y-4">
  <div>
- <label className="block text-sm font-medium text-[#212b36] dark:text-white mb-1.5">Email Address</label>
- <input type="email" placeholder="colleague@company.com" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] text-sm transition-all" />
+ <label className="block text-[13px] font-medium text-[#212b36] dark:text-white mb-1.5">Email Address</label>
+ <input type="email" placeholder="colleague@company.com" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] text-[13px] transition-all" />
  </div>
  <div>
- <label className="block text-sm font-medium text-[#212b36] dark:text-white mb-1.5">Role / Purpose</label>
+ <label className="block text-[13px] font-medium text-[#212b36] dark:text-white mb-1.5">Role / Purpose</label>
  <SearchableSelect 
  options={roleOptions}
  value={inviteRole}
@@ -1710,16 +1732,16 @@ export default function JobDashboardPage() {
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-[#212b36] dark:text-white mb-1.5">Personal Message (Optional)</label>
- <textarea rows="3" placeholder="Please join this job to help interview candidates..." className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] text-sm transition-all resize-none"></textarea>
+ <label className="block text-[13px] font-medium text-[#212b36] dark:text-white mb-1.5">Personal Message (Optional)</label>
+ <textarea rows="3" placeholder="Please join this job to help interview candidates..." className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] text-[13px] transition-all resize-none"></textarea>
  </div>
  </div>
  
  <div className="flex items-center justify-end gap-3 p-5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#161c24]">
- <button onClick={() => setIsInviteModalOpen(false)} className="px-4 py-2 text-sm font-bold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-pointer">
+ <button onClick={() => setIsInviteModalOpen(false)} className="px-4 py-2 text-[13px] font-bold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-pointer">
  Cancel
  </button>
- <button onClick={handleSendInvite} className="px-4 py-2 text-sm font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-lg transition-colors cursor-pointer">
+ <button onClick={handleSendInvite} className="px-4 py-2 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-lg transition-colors cursor-pointer">
  Send Invite
  </button>
  </div>
@@ -1733,7 +1755,7 @@ export default function JobDashboardPage() {
  <div className="w-6 h-6 bg-[#00A76F]/20 text-[#00A76F] rounded-full flex items-center justify-center shrink-0">
  ✓
  </div>
- <div className="font-medium text-sm">
+ <div className="font-medium text-[13px]">
  Invitation sent successfully!
  </div>
  </div>
@@ -1755,7 +1777,7 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <h3 className="text-lg font-bold dark:text-white">{selectedCandidate.name}</h3>
- <p className="text-sm font-medium text-gray-500">{selectedCandidate.role}</p>
+ <p className="text-[13px] font-medium text-gray-500">{selectedCandidate.role}</p>
  </div>
  <div className="ml-auto text-center bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-xl">
  <div className={`text-xl font-black ${selectedCandidate.score >= 90 ? 'text-[#00A76F]' : 'text-[#FFC107]'}`}>{selectedCandidate.score}%</div>
@@ -1767,7 +1789,7 @@ export default function JobDashboardPage() {
  <div className="space-y-6">
  <div>
  <h4 className="text-xs font-bold text-gray-400 mb-3">AI Insights</h4>
- <div className="bg-[#1890FF]/5 border border-[#1890FF]/20 rounded-xl p-4 text-sm text-[#212b36] dark:text-gray-300 leading-relaxed ">
+ <div className="bg-[#1890FF]/5 border border-[#1890FF]/20 rounded-xl p-4 text-[13px] text-[#212b36] dark:text-gray-300 leading-relaxed ">
  <p className="flex gap-2.5 mb-2.5"><CheckCircle size={16} className="text-[#00A76F] mt-0.5 shrink-0" /> <span><strong>Strong fit:</strong> Extensive experience in <span className="font-semibold">{selectedCandidate.skills[0]}</span> and <span className="font-semibold">{selectedCandidate.skills[1]}</span>.</span></p>
  <p className="flex gap-2.5"><AlertCircle size={16} className="text-[#FFC107] mt-0.5 shrink-0" /> <span><strong>Note:</strong> Notice period is <span className="font-semibold">{selectedCandidate.noticePeriod}</span>. Evaluate timeline constraints.</span></p>
  </div>
@@ -1778,19 +1800,19 @@ export default function JobDashboardPage() {
  <div className="grid grid-cols-2 gap-3">
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[10px] font-semibold text-gray-400 mb-1">Company</div>
- <div className="text-sm font-bold text-[#212b36] dark:text-white">{selectedCandidate.company}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.company}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[10px] font-semibold text-gray-400 mb-1">Experience</div>
- <div className="text-sm font-bold text-[#212b36] dark:text-white">{selectedCandidate.experience}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.experience}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[10px] font-semibold text-gray-400 mb-1">Location</div>
- <div className="text-sm font-bold text-[#212b36] dark:text-white">{selectedCandidate.location}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.location}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[10px] font-semibold text-gray-400 mb-1">Applied</div>
- <div className="text-sm font-bold text-[#212b36] dark:text-white">{selectedCandidate.time}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.time}</div>
  </div>
  </div>
  </div>
@@ -1801,7 +1823,7 @@ export default function JobDashboardPage() {
  <div className="w-12 h-12 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center group-hover:scale-105 transition-transform">
  <FileText size={24} className="text-[#1890FF]" />
  </div>
- <p className="text-sm font-medium text-[#212b36] dark:text-gray-300">resume_{selectedCandidate.name.split(' ')[0].toLowerCase()}.pdf</p>
+ <p className="text-[13px] font-medium text-[#212b36] dark:text-gray-300">resume_{selectedCandidate.name.split(' ')[0].toLowerCase()}.pdf</p>
  <span className="text-[11px] font-bold text-[#1890FF]">View Full Document</span>
  </div>
  </div>
@@ -1811,8 +1833,8 @@ export default function JobDashboardPage() {
  <button onClick={() => {
  setPipelineBoard(prev => prev.map(c => ({...c, candidates: c.candidates.filter(cand => cand.id !== selectedCandidate.id)})));
  setSelectedCandidate(null);
- }} className="flex-1 py-2 bg-[#FF5630]/10 text-[#FF5630] text-sm font-bold rounded-lg hover:bg-[#FF5630]/20 transition-colors cursor-pointer">Reject</button>
- <button onClick={() => setSelectedCandidate(null)} className="flex-1 py-2 bg-[#1890FF] text-white text-sm font-bold rounded-lg hover:bg-[#1890FF]/90 shadow-md shadow-[#1890FF]/20 transition-all cursor-pointer">Advance Candidate</button>
+ }} className="flex-1 py-2 bg-[#FF5630]/10 text-[#FF5630] text-[13px] font-bold rounded-lg hover:bg-[#FF5630]/20 transition-colors cursor-pointer">Reject</button>
+ <button onClick={() => setSelectedCandidate(null)} className="flex-1 py-2 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 shadow-md shadow-[#1890FF]/20 transition-all cursor-pointer">Advance Candidate</button>
  </div>
  </div>
  </div>
@@ -1841,7 +1863,7 @@ export default function JobDashboardPage() {
  <div
  key={subItem.name}
  onClick={() => setSettingsActiveNav(subItem.name)}
- className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
+ className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-colors cursor-pointer ${
  isSubActive
  ? 'bg-[#00A76F]/10 text-[#00A76F] font-bold'
  : 'text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-[#212b36] dark:hover:text-white'
@@ -1897,7 +1919,7 @@ export default function JobDashboardPage() {
  type="text" 
  value={setupJobData.title}
  onChange={(e) => setSetupJobData(prev => ({...prev, title: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-sm font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
  placeholder="e.g. Senior Product Designer"
  />
  </div>
@@ -1908,7 +1930,7 @@ export default function JobDashboardPage() {
  type="text" 
  value={setupJobData.department}
  onChange={(e) => setSetupJobData(prev => ({...prev, department: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
  placeholder="e.g. Design"
  />
  </div>
@@ -1918,7 +1940,7 @@ export default function JobDashboardPage() {
  type="text" 
  value={setupJobData.requisitionRef}
  onChange={(e) => setSetupJobData(prev => ({...prev, requisitionRef: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
  placeholder="e.g. REQ-2024-001"
  />
  </div>
@@ -1950,7 +1972,7 @@ export default function JobDashboardPage() {
  min="1"
  value={setupJobData.headcount}
  onChange={(e) => setSetupJobData(prev => ({...prev, headcount: e.target.value}))}
- className="w-20 h-10 border-y border-x-0 border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#161c24] text-center text-sm font-bold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/30 text-[#212b36] dark:text-white z-10"
+ className="w-20 h-10 border-y border-x-0 border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#161c24] text-center text-[13px] font-bold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/30 text-[#212b36] dark:text-white z-10"
  />
  <button 
  onClick={() => setSetupJobData(prev => ({...prev, headcount: Number(prev.headcount) + 1}))}
@@ -2000,7 +2022,7 @@ export default function JobDashboardPage() {
  type="text" 
  value={setupJobData.location}
  onChange={(e) => setSetupJobData(prev => ({...prev, location: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
  placeholder="e.g. San Francisco, CA"
  />
  </div>
@@ -2050,7 +2072,7 @@ export default function JobDashboardPage() {
  rows="5"
  value={setupJobData.internalNotes}
  onChange={(e) => setSetupJobData(prev => ({...prev, internalNotes: e.target.value}))}
- className="w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-sm focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400 "
+ className="w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[13px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400 "
  placeholder="Add any private notes, recruiter context, or approval chain details here. This will not be visible to candidates..."
  ></textarea>
  </div>
@@ -2112,11 +2134,11 @@ export default function JobDashboardPage() {
  <div className="flex flex-col md:flex-row gap-4">
  <div className="w-full md:w-1/3">
  <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-wider mb-1">Rule Name</label>
- <input type="text" defaultValue={item.label} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all" />
+ <input type="text" defaultValue={item.label} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all" />
  </div>
  <div className="w-full md:w-2/3">
  <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-wider mb-1">Rule Description</label>
- <textarea rows="2" defaultValue={item.text} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all resize-none custom-scrollbar"></textarea>
+ <textarea rows="2" defaultValue={item.text} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all resize-none custom-scrollbar"></textarea>
  </div>
  </div>
  </div>
@@ -2124,10 +2146,10 @@ export default function JobDashboardPage() {
  </div>
  
  <div className="flex gap-4 mt-5 pt-4 border-t border-gray-100 dark:border-gray-800/50">
- <button onClick={() => setIsEditRankingModalOpen(false)} className="flex-1 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-white rounded-xl font-bold text-sm transition-colors cursor-pointer">
+ <button onClick={() => setIsEditRankingModalOpen(false)} className="flex-1 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer">
  Cancel
  </button>
- <button onClick={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }} className="flex-1 px-5 py-2.5 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl font-bold text-sm transition-colors cursor-pointer shadow-[#1890FF]/20">
+ <button onClick={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }} className="flex-1 px-5 py-2.5 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer shadow-[#1890FF]/20">
  Save Rules
  </button>
  </div>
@@ -2141,7 +2163,7 @@ export default function JobDashboardPage() {
  <Check size={16} strokeWidth={3} className="text-white dark:text-gray-900" />
  </div>
  <div>
- <p className="text-sm font-bold">Feedback Copied!</p>
+ <p className="text-[13px] font-bold">Feedback Copied!</p>
  <p className="text-xs opacity-80">Ready to paste in your email.</p>
  </div>
  </div>

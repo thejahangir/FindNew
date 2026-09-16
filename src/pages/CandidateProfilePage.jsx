@@ -4,7 +4,7 @@ import {
  ArrowLeft, Briefcase, MapPin, Clock, FileText, MessageSquare,
  Mail, Copy, ArrowRightLeft, GitBranch, MoreVertical, ChevronDown, Send,
  ChevronsRight, ChevronsLeft, Calendar, User, Star, Sparkles, UserPlus,
- CheckCircle, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu
+ CheckCircle, Check, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu
 } from 'lucide-react';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
 
@@ -469,27 +469,25 @@ export default function CandidateProfilePage() {
  <div className="p-6 space-y-5 relative">
  <button
  onClick={() => navigate(from.path, { state: { tab: from.tab || 'Applications', selectedCandidateId: candidate.id } })}
- className="text-sm font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit cursor-pointer"
+ className="text-[13px] font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit cursor-pointer"
  >
  <ArrowLeft size={16} /> Back to Applications
  </button>
 
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 flex flex-col lg:flex-row lg:items-center gap-4">
  <div className="flex items-center gap-4 flex-1 min-w-0">
- <div className="w-14 h-14 rounded-full bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center text-lg font-bold shrink-0">
- {getInitials(candidate.name)}
- </div>
  <div className="min-w-0">
- <div className="flex flex-wrap items-center gap-2">
- <h1 className="text-xl font-bold text-[#212b36] dark:text-white truncate">{candidate.name}</h1>
- <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F]">{candidate.score} match</span>
- <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#1890FF]/10 text-[#1890FF]">{profileStage}</span>
+ <div className="flex flex-wrap items-baseline gap-3">
+ <h1 className="text-3xl font-black text-[#212b36] dark:text-white truncate tracking-tight leading-none">{candidate.name}</h1>
+ <span className="text-[13px] font-medium text-gray-500">{candidate.pronouns || 'He/Him'}</span>
+ {candidate.agency && (
+ <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F] ml-1">Agency: {candidate.agency}</span>
+ )}
  </div>
- <p className="text-[13px] text-gray-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+ <p className="text-[13px] text-gray-500 mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
  <span className="flex items-center gap-1"><Briefcase size={13} /> Senior AI Research Scientist</span>
  <span className="flex items-center gap-1"><MapPin size={13} /> Bangalore</span>
  <span className="flex items-center gap-1"><Clock size={13} /> Applied {candidate.date}</span>
- {candidate.agency && <span>Sourced by {candidate.agency}</span>}
  </p>
  <p className="text-[12px] text-gray-400 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
  <span className="flex items-center gap-1.5"><Mail size={13} /> {candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
@@ -499,21 +497,22 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="flex items-center gap-1.5 shrink-0 relative">
- <button type="button" title="Follow Candidate" onClick={() => showToast('You are now following this candidate')} className={iconBtn}>
- <Bookmark size={16} />
+ <div className="flex flex-wrap items-center gap-2 shrink-0 relative mt-4 lg:mt-0">
+  
+ <button onClick={() => showToast('Followed')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[12px] font-bold text-[#212b36] dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm group cursor-pointer">
+ <Bookmark size={14} className="text-gray-400 group-hover:text-[#1890FF] transition-colors" />
+ <span>Follow</span>
  </button>
- <button type="button" title="Interview Prep Kit" onClick={() => showToast('Interview Prep Kit opened')} className={iconBtn}>
- <BookOpen size={16} />
+ 
+ <button onClick={() => showToast('Prep Kit')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[12px] font-bold text-[#212b36] dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm group cursor-pointer">
+ <BookOpen size={14} className="text-gray-400 group-hover:text-[#00A76F] transition-colors" />
+ <span>Prep Kit</span>
  </button>
- <button type="button" title="Schedule Interview" onClick={() => showToast('Schedule Interview modal opened')} className={iconBtn}>
- <Calendar size={16} />
- </button>
-
 
  <div className="relative">
- <button type="button" title="Transfer to other requirement" onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'transfer' ? null : 'transfer'); }} className={iconBtn}>
- <ArrowRightLeft size={16} />
+ <button onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'transfer' ? null : 'transfer'); }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[12px] font-bold text-[#212b36] dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm group cursor-pointer">
+ <ArrowRightLeft size={14} className="text-gray-400 group-hover:text-[#FF5630] transition-colors" />
+ <span>Transfer</span>
  </button>
  {openMenu === 'transfer' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
@@ -526,9 +525,11 @@ export default function CandidateProfilePage() {
  </div>
  )}
  </div>
+
  <div className="relative">
- <button type="button" title="Move stage" onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'move' ? null : 'move'); }} className={iconBtn}>
- <GitBranch size={16} />
+ <button onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'move' ? null : 'move'); }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#1890FF]/30 bg-[#1890FF]/5 text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 transition-all shadow-sm cursor-pointer">
+ <GitBranch size={14} />
+ <span>Move Stage</span>
  </button>
  {openMenu === 'move' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
@@ -541,8 +542,14 @@ export default function CandidateProfilePage() {
  </div>
  )}
  </div>
+
+ <button onClick={() => showToast('Schedule Interview')} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1890FF] text-white text-[12px] font-bold hover:bg-[#1890FF]/90 transition-all shadow-md shadow-[#1890FF]/20 cursor-pointer">
+ <Calendar size={14} />
+ <span>Schedule</span>
+ </button>
+
  <div className="relative">
- <button type="button" title="More actions" onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'kebab' ? null : 'kebab'); }} className={iconBtn}>
+ <button onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === 'kebab' ? null : 'kebab'); }} className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-gray-500 hover:border-gray-300 transition-all shadow-sm cursor-pointer">
  <MoreVertical size={16} />
  </button>
  {openMenu === 'kebab' && (
@@ -576,6 +583,7 @@ export default function CandidateProfilePage() {
  </div>
  )}
  </div>
+
  </div>
  </div>
 
@@ -583,125 +591,156 @@ export default function CandidateProfilePage() {
 <div className="flex flex-col xl:flex-row gap-5 items-start">
  
 <div className="w-[380px] shrink-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 flex flex-col gap-4">
- <h2 className="text-[14px] font-bold text-[#212b36] dark:text-white tracking-wider mb-2">Application Details</h2>
+ <div className="flex items-center justify-between mb-2">
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white tracking-wider">Application Details</h2>
+ <button onClick={() => showToast('Downloading Resume...')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[11px] font-bold text-[#212b36] dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm group cursor-pointer">
+ <FileText size={12} className="text-gray-400 group-hover:text-[#1890FF] transition-colors" />
+ <span>Resume</span>
+ </button>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
  <div className="col-span-2">
  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Name</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300 truncate">{candidate.name}</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300 truncate">{candidate.name}</p>
  </div>
  <div className="col-span-2">
  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
- <p className="text-[11px] font-semibold text-[#1890FF] break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#1890FF] break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
  </div>
  <div>
  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">+91 98765 43210</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">+91 98765 43210</p>
  </div>
  <div>
  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Location</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.location || 'Bangalore, KA'}</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">{candidate.location || 'Bangalore, KA'}</p>
  </div>
  <div className="col-span-2">
  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Time Zone</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">IST (UTC +5:30)</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IST (UTC +5:30)</p>
  </div>
  </div>
  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
- <div className="grid grid-cols-2 gap-y-3 gap-x-2">
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Exp</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
- </div>
- <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
- </div>
- </div>
- </div>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
+  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
+  </div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Experience</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
+  </div>
+  <div className="col-span-2">
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
+  </div>
+  <div className="col-span-2">
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Title</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</p>
+  </div>
+  </div>
+  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Application Info</h3>
- <div className="grid grid-cols-2 gap-y-3 gap-x-2">
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Applied Date</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Aug 24, 2026</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Stage</p>
- <p className="text-[11px] font-semibold text-[#1890FF]">{profileStage}</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Source</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.agency ? 'Agency' : 'Direct'}</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Referred By</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">{candidate.agency || 'N/A'}</p>
- </div>
- </div>
- </div>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
+  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1.5">Primary Skills</p>
+  <div className="flex flex-wrap gap-1.5">
+  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">React</span>
+  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">Node.js</span>
+  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">AWS</span>
+  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">System Design</span>
+  </div>
+  </div>
+  </div>
+  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Logistics</h3>
- <div className="grid grid-cols-2 gap-y-3 gap-x-2">
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
- </div>
- </div>
- </div>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
+  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
+  </div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Available From</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Oct 01, 2026</p>
+  </div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
+  </div>
+  <div></div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
+  </div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
+  </div>
+  </div>
+  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-[12px] font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Agency / Referrer Details</h3>
- <div className="grid grid-cols-2 gap-y-3 gap-x-2">
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Agency Name</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">TechTalent Partners</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Recruiter</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Sarah Jenkins</p>
- </div>
- <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Recruiter Email</p>
- <p className="text-[11px] font-semibold text-[#1890FF] break-all">sarah.j@techtalentpartners.com</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Referral Status</p>
- <p className="text-[11px] font-semibold text-[#00A76F]">Verified</p>
- </div>
- <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Submitted CV</p>
- <p className="text-[11px] font-semibold text-[#1890FF] flex items-center gap-1 cursor-pointer hover:underline"><FileText size={10} /> View PDF</p>
- </div>
- <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Candidate Notes</p>
- <p className="text-[11px] font-semibold text-[#212b36] dark:text-gray-300">Candidate is highly motivated for AI roles. Available for interview next week.</p>
- </div>
- </div>
- </div>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
+  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1.5">Career Timeline</p>
+  <div className="flex flex-col gap-3">
+  <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+  <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-[#1890FF]"></span>
+  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">Senior Staff Engineer</p>
+  <p className="text-[11px] text-gray-500">Google India • 2020 - Present</p>
+  </div>
+  <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+  <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">SDE II</p>
+  <p className="text-[11px] text-gray-500">Amazon • 2017 - 2020</p>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
+  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Degree</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">B.Tech in Computer Science</p>
+  </div>
+  <div>
+  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Institution</p>
+  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IIT Bombay (2013-2017)</p>
+  </div>
+  </div>
+  </div>
+
+ <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Profiles</h3>
+  <div className="flex flex-col gap-2">
+  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+  linkedin.com/in/{candidate.name.toLowerCase().replace(/\s+/g, '')}
+  </a>
+  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+  <svg className="w-3.5 h-3.5 fill-current text-black dark:text-white" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+  github.com/{candidate.name.toLowerCase().replace(/\s+/g, '')}
+  </a>
+  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+  <svg className="w-3.5 h-3.5 fill-current text-gray-500 dark:text-gray-400" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.849 19h-1.604l-2.094-5.783v5.783h-1.536v-8.898h2.091l1.83 5.093 1.831-5.093h2.091v8.898h-1.535v-5.783l-2.074 5.783zm7.849-5.116h-4v1.547h4v1.464h-4v2.105h-1.535v-8.898h5.535v1.464h-4v2.318h4v-8.898h1.535v8.898h-1.535z"/></svg>
+  {candidate.name.toLowerCase().replace(/\s+/g, '')}.dev
+  </a>
+  </div>
+  </div>
 </div>
 
  
@@ -712,7 +751,7 @@ export default function CandidateProfilePage() {
  <button
  key={tab}
  onClick={() => setActiveTab(tab)}
- className={`pb-3 text-sm font-bold relative cursor-pointer transition-colors ${
+ className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors ${
  activeTab === tab ? 'text-[#1890FF]' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-white'
  }`}
  >
@@ -728,7 +767,7 @@ export default function CandidateProfilePage() {
  
   {/* Executive Summary */}
   <div>
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-3 tracking-wider">Executive Summary</h3>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 tracking-wider">Executive Summary</h3>
   <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">
   Highly motivated and experienced AI Research Scientist with over 5 years of experience in developing state-of-the-art machine learning models. Proven track record in natural language processing and generative AI, with multiple publications in top-tier conferences. Passionate about applying AI to solve complex real-world problems.
   </p>
@@ -738,52 +777,90 @@ export default function CandidateProfilePage() {
 
   {/* Progress & Status */}
   <div>
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><GitBranch size={16} className="text-[#1890FF]" /> Current Progress</h3>
-  <div className="bg-gray-50/50 dark:bg-gray-800/30 p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col md:flex-row gap-6 items-center">
-  <div className="flex-1 w-full">
-  <div className="flex justify-between items-center mb-2">
-  <span className="text-[13px] font-bold text-[#212b36] dark:text-white">Interview · Hiring Manager</span>
-  <span className="text-[12px] font-bold text-[#1890FF]">Round 3 of 4</span>
+  <div className="flex items-center justify-between mb-4">
+    <h3 className="text-sm font-bold text-[#212b36] dark:text-white tracking-wider flex items-center gap-2"><GitBranch size={16} className="text-[#1890FF]" /> Current Progress</h3>
+    <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95">
+      <Calendar size={12} /> Schedule Interview
+    </button>
   </div>
-  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-  <div className="bg-[#1890FF] h-2 rounded-full" style={{ width: '75%' }}></div>
+  
+  <div className="bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/50 rounded-xl p-6 overflow-x-auto">
+  <div className="min-w-[600px] flex items-center justify-between relative px-4">
+  
+  {/* Background Track */}
+  <div className="absolute top-4 left-8 right-8 h-[2px] bg-gray-200 dark:bg-gray-700 -z-0"></div>
+  
+  {/* Active Progress Track (up to HM Interview) */}
+  <div className="absolute top-4 left-8 w-[60%] h-[2px] bg-[#00A76F] -z-0"></div>
+
+  {/* Steps */}
+  {[
+  { label: 'Applied', status: 'completed' },
+  { label: 'AI Screening', status: 'completed' },
+  { label: 'AI Interview', status: 'completed' },
+  { label: 'HM Interview', status: 'active' },
+  { label: 'Ref Check', status: 'pending' },
+  { label: 'Offer', status: 'pending' },
+  ].map((step, i) => (
+  <div key={i} className="flex flex-col items-center gap-3 z-10 w-24">
+  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all shadow-sm
+  ${step.status === 'completed' ? 'bg-[#00A76F] border-[#00A76F] text-white' : 
+  step.status === 'active' ? 'bg-white dark:bg-[#161c24] border-[#1890FF] text-[#1890FF] ring-4 ring-[#1890FF]/20' : 
+  'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600'}
+  `}>
+  {step.status === 'completed' ? <Check size={14} strokeWidth={3} /> : <span className="text-[11px] font-bold">{i + 1}</span>}
   </div>
-  <p className="text-[11px] text-gray-500 mt-2">Next up: Reference Check</p>
+  <span className={`text-[11px] font-bold text-center ${
+  step.status === 'completed' ? 'text-[#212b36] dark:text-gray-300' :
+  step.status === 'active' ? 'text-[#1890FF]' :
+  'text-gray-400'
+  }`}>{step.label}</span>
+  </div>
+  ))}
+  
   </div>
   </div>
   </div>
 
   {/* Feedback Summaries */}
   <div>
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Star size={16} className="text-[#FFC107]" /> Feedback Summaries</h3>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Star size={16} className="text-[#FFC107]" /> Feedback Summaries</h3>
   <div className="grid grid-cols-1 space-y-4">
-  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
-  <div className="flex justify-between items-start">
-  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><Bot size={14} /> AI Screening</div>
-  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">9.8/10</span>
+  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 flex gap-4 items-start transition-all hover:bg-[#00A76F]/10">
+  <div className="w-11 h-11 shrink-0 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+  9.8
   </div>
-  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate strongly matches the technical requirements. Excellent overlap in React, Node, and AWS architecture. Note: slight gap in people management experience.</p>
+  <div className="flex-1 space-y-1.5">
+  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[11px] uppercase tracking-wider"><Bot size={14} /> AI Screening</div>
+  <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate strongly matches the technical requirements. Excellent overlap in React, Node, and AWS architecture. Note: slight gap in people management experience.</p>
   </div>
-  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
-  <div className="flex justify-between items-start">
-  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><Cpu size={14} /> AI Interview</div>
-  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">8.5/10</span>
   </div>
-  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate communicated clearly. AI agent noted strong problem-solving skills but hesitated slightly on complex behavioral questions.</p>
+
+  <div className="p-4 rounded-xl border border-[#FFAB00]/20 bg-[#FFAB00]/5 flex gap-4 items-start transition-all hover:bg-[#FFAB00]/10">
+  <div className="w-11 h-11 shrink-0 rounded-full bg-[#FFAB00] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+  6.5
   </div>
-  <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 space-y-2">
-  <div className="flex justify-between items-start">
-  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[13px]"><User size={14} /> Human Interviews</div>
-  <span className="text-[11px] font-bold bg-[#00A76F] text-white px-2 py-0.5 rounded">9.0/10</span>
+  <div className="flex-1 space-y-1.5">
+  <div className="flex items-center gap-2 text-[#FFAB00] font-bold text-[11px] uppercase tracking-wider"><Cpu size={14} /> AI Interview</div>
+  <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate communicated clearly. AI agent noted acceptable problem-solving skills but hesitated slightly on complex behavioral questions.</p>
   </div>
-  <p className="text-[12px] text-[#212b36] dark:text-gray-300 leading-relaxed">Round 1 (Tech) and Round 2 (Design) cleared. Cleared live coding easily. Good system design sense but needs probe on research ownership in next round.</p>
+  </div>
+
+  <div className="p-4 rounded-xl border border-[#FF5630]/20 bg-[#FF5630]/5 flex gap-4 items-start transition-all hover:bg-[#FF5630]/10">
+  <div className="w-11 h-11 shrink-0 rounded-full bg-[#FF5630] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+  4.2
+  </div>
+  <div className="flex-1 space-y-1.5">
+  <div className="flex items-center gap-2 text-[#FF5630] font-bold text-[11px] uppercase tracking-wider"><User size={14} /> Human Interviews</div>
+  <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Struggled in Round 1 (Tech) and Round 2 (Design). Failed to clear live coding easily. Lacks fundamental system design sense.</p>
+  </div>
   </div>
   </div>
   </div>
 
   {/* Reminders */}
   <div>
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Bell size={16} className="text-[#FF5630]" /> Upcoming Reminders</h3>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Bell size={16} className="text-[#FF5630]" /> Upcoming Reminders</h3>
   <div className="space-y-3">
   <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
   <div className="flex items-center gap-3">
@@ -792,7 +869,7 @@ export default function CandidateProfilePage() {
   </div>
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">HM Interview with Amit</h4>
-  <p className="text-[11px] text-gray-500">Scheduled for today, 4:00 PM</p>
+  <p className="text-[13px] leading-relaxed text-gray-500">Scheduled for today, 4:00 PM</p>
   </div>
   </div>
   <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Amit</span>
@@ -805,7 +882,7 @@ export default function CandidateProfilePage() {
   </div>
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Collect Scorecard (System Design)</h4>
-  <p className="text-[11px] text-[#FF5630]">Overdue by 2 hours</p>
+  <p className="text-[13px] leading-relaxed text-[#FF5630]">Overdue by 2 hours</p>
   </div>
   </div>
   <span className="text-[11px] font-bold bg-[#FF5630]/10 text-[#FF5630] px-3 py-1 rounded">Owner: Amit</span>
@@ -818,7 +895,7 @@ export default function CandidateProfilePage() {
   </div>
   <div>
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Review Background Check</h4>
-  <p className="text-[11px] text-gray-500">Due tomorrow, 10:00 AM</p>
+  <p className="text-[13px] leading-relaxed text-gray-500">Due tomorrow, 10:00 AM</p>
   </div>
   </div>
   <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Priya</span>
@@ -834,7 +911,7 @@ export default function CandidateProfilePage() {
  <div className="flex items-center justify-between mb-5">
  <div>
  <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Hiring journey</h2>
- <p className="text-[12px] text-gray-500 mt-0.5">Completed stages can be opened for dates, duration, and decision notes.</p>
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">Completed stages can be opened for dates, duration, and decision notes.</p>
  </div>
  <span className="text-[11px] font-bold text-[#1890FF] bg-[#1890FF]/10 px-2 py-1 rounded-md">Round 3 in progress</span>
  </div>
@@ -870,7 +947,7 @@ export default function CandidateProfilePage() {
  <h3 className={`text-[13px] font-bold ${isUpcoming ? 'text-gray-400' : 'text-[#212b36] dark:text-white'}`}>{stage.name}</h3>
  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${styles.badge}`}>{styles.label}</span>
  </div>
- <p className="text-[11px] text-gray-500 mt-1 flex flex-wrap gap-x-3">
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-1 flex flex-wrap gap-x-3">
  {stage.entered ? (
  <>
  <span className="inline-flex items-center gap-1"><Calendar size={11} /> {stage.entered}{stage.exited ? ` – ${stage.exited}` : ' – present'}</span>
@@ -917,7 +994,7 @@ export default function CandidateProfilePage() {
  </div>
  <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed">{stage.summary}</p>
  {stage.notes && (
- <div className="text-[12px] text-gray-500 bg-white dark:bg-[#161c24] rounded-lg px-3 py-2 border border-gray-100 dark:border-gray-800/50">
+ <div className="text-[13px] leading-relaxed text-gray-500 bg-white dark:bg-[#161c24] rounded-lg px-3 py-2 border border-gray-100 dark:border-gray-800/50">
  <span className="font-bold text-[#212b36] dark:text-white">HM note · </span>{stage.notes}
  </div>
  )}
@@ -933,38 +1010,42 @@ export default function CandidateProfilePage() {
  </div>
  )}
  {activeTab === 'Scorecards' && (
- <div className="space-y-6 animate-fade-in">
-  {/* Summary Cards */}
+  <div className="space-y-6 animate-fade-in">
+   {/* Summary Cards */}
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
+  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-200 shadow-sm dark:border-gray-700/80 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
   <div className="flex justify-between items-start">
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><Bot size={14} className="text-[#00A76F]" /> AI Screening</h3>
+  <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase tracking-wider"><Bot size={14} className="text-[#00A76F]" /> AI Screening</h3>
   <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.8/10</span>
   </div>
-  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Excellent alignment on technical stack. Profile demonstrates high agency.</p>
+  <p className="text-[13px] leading-relaxed text-gray-500 leading-relaxed mt-1">Excellent alignment on technical stack. Profile demonstrates high agency.</p>
   </div>
   
-  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
+  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-200 shadow-sm dark:border-gray-700/80 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
   <div className="flex justify-between items-start">
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><Cpu size={14} className="text-[#00A76F]" /> AI Interview</h3>
+  <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase tracking-wider"><Cpu size={14} className="text-[#00A76F]" /> AI Interview</h3>
   <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">8.5/10</span>
   </div>
-  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.</p>
+  <p className="text-[13px] leading-relaxed text-gray-500 leading-relaxed mt-1">Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.</p>
   </div>
 
-  <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-100 dark:border-gray-800/50 flex flex-col gap-2 hover:border-[#1890FF]/30 transition-colors">
-  <div className="flex justify-between items-start">
-  <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2"><User size={14} className="text-[#00A76F]" /> Human Interviews</h3>
-  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.0/10</span>
-  </div>
-  <p className="text-[12px] text-gray-500 leading-relaxed mt-1">Strong technical performance and cultural fit. Highly recommended by the panel.</p>
+  <div className="bg-gray-50/50 dark:bg-[#161c24]/30 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/80 flex flex-col items-center justify-center text-center gap-1.5 hover:bg-gray-100/50 dark:hover:bg-gray-800/30 transition-colors group min-h-[120px] h-full">
+  <h3 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
+  <User size={14} /> Human Interviews
+  </h3>
+  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-200/40 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full mb-1">
+  Yet to be done
+  </span>
+  <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 mt-1">
+    <Calendar size={12} /> Schedule Now
+  </button>
   </div>
   </div>
 
   {/* Expandable Scorecards */}
   <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden">
   <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/20">
-  <h2 className="text-[14px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+  <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2 tracking-wider">
   <FileText size={16} className="text-[#1890FF]" /> Interview Scorecards
   </h2>
   <button 
@@ -990,7 +1071,7 @@ export default function CandidateProfilePage() {
   </div>
   <div className="text-left">
   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
-  <p className="text-[11px] text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+  <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
   </div>
   </div>
   <div className="flex items-center gap-6">
@@ -1087,37 +1168,56 @@ export default function CandidateProfilePage() {
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 mb-6">
  <div className="mb-4">
  <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Stage Transitions</h2>
- <p className="text-[12px] text-gray-500 mt-0.5">Time spent and outcomes for each step of the pipeline.</p>
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">Time spent and outcomes for each step of the pipeline.</p>
  </div>
- <div className="space-y-3">
+ <div className="overflow-x-auto border border-gray-100 dark:border-gray-800/50 rounded-xl">
+ <table className="w-full text-left border-collapse">
+ <thead className="bg-gray-50/50 dark:bg-gray-800/20">
+ <tr className="border-b border-gray-100 dark:border-gray-800/50">
+ <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Stage</th>
+ <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date Entered</th>
+ <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Days Spent</th>
+ <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Decision Maker</th>
+ <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Outcome</th>
+ </tr>
+ </thead>
+ <tbody className="divide-y divide-gray-50 dark:divide-gray-800/30">
  {STAGE_HISTORY.map((stage) => (
- <div key={stage.id} className="p-4 rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-800/20 hover:border-[#1890FF]/30 transition-colors">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
- <div className="flex-1">
- <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-1.5">{stage.name}</h3>
- <p className="text-[11px] text-gray-500 flex flex-wrap items-center gap-x-2">
- <span>Entered: <span className="font-semibold text-[#212b36] dark:text-gray-300">{stage.entered}</span></span>
- <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
- <span>Exited: <span className="font-semibold text-[#212b36] dark:text-gray-300">{stage.exited || <span className="italic font-normal">present</span>}</span></span>
- </p>
+ <tr key={stage.id} className="hover:bg-[#1890FF]/5 transition-colors group">
+ <td className="py-3 px-4">
+ <span className="text-[12px] font-bold text-[#212b36] dark:text-white">{stage.name}</span>
+ </td>
+ <td className="py-3 px-4">
+ <span className="text-[13px] leading-relaxed text-gray-500 whitespace-nowrap">{stage.entered || '-'}</span>
+ </td>
+ <td className="py-3 px-4">
+ <span className={`text-[12px] font-bold ${stage.days > 3 ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-gray-300'}`}>
+ {stage.days != null ? `${stage.days} ${stage.days === 1 ? 'day' : 'days'}` : '-'}
+ </span>
+ </td>
+ <td className="py-3 px-4">
+ <div className="flex items-center gap-2">
+ {stage.owner && (
+ <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[8px] font-bold text-gray-600 dark:text-gray-300 shrink-0">
+ {stage.owner.charAt(0)}
  </div>
- <div className="flex items-center gap-4 sm:justify-end">
- <div className="text-right hidden sm:block">
- <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{stage.days} {stage.days === 1 ? 'day' : 'days'}</p>
- <p className="text-[10px] text-gray-500 uppercase tracking-wide">Time in stage</p>
+ )}
+ <span className="text-[12px] text-gray-600 dark:text-gray-400">{stage.owner || 'Unassigned'}</span>
  </div>
- <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
- <span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 ${
+ </td>
+ <td className="py-3 px-4">
+ <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap ${
  stage.outcome.includes('Advance') || stage.outcome.includes('Moved') ? 'bg-[#00A76F]/10 text-[#00A76F]' :
  stage.outcome.includes('progress') || stage.outcome.includes('Kept') ? 'bg-[#1890FF]/10 text-[#1890FF]' :
- 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+ 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
  }`}>
  {stage.outcome}
  </span>
- </div>
- </div>
- </div>
+ </td>
+ </tr>
  ))}
+ </tbody>
+ </table>
  </div>
  </div>
 
@@ -1125,7 +1225,7 @@ export default function CandidateProfilePage() {
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
  <div>
  <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Activity on this profile</h2>
- <p className="text-[12px] text-gray-500 mt-0.5">Stage moves, interviews, agency emails, and hiring-team notes — newest first.</p>
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">Stage moves, interviews, agency emails, and hiring-team notes — newest first.</p>
  </div>
  <span className="text-[11px] font-bold text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-md w-fit">{activityFeed.length} events</span>
  </div>
@@ -1148,7 +1248,7 @@ export default function CandidateProfilePage() {
  </div>
 
  {activityFeed.length === 0 ? (
- <p className="text-sm text-gray-500 py-8 text-center">No activity in this filter yet.</p>
+ <p className="text-[13px] text-gray-500 py-8 text-center">No activity in this filter yet.</p>
  ) : (
  <div className="space-y-6">
  {Object.entries(activityGroups).map(([date, items]) => (
@@ -1167,7 +1267,7 @@ export default function CandidateProfilePage() {
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0">
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white leading-snug">{item.title}</p>
- <p className="text-[11px] text-gray-500 mt-0.5">{item.actor} · {item.role}</p>
+ <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{item.actor} · {item.role}</p>
  </div>
  <span className="text-[11px] text-gray-400 shrink-0">{item.time}</span>
  </div>
@@ -1193,20 +1293,19 @@ export default function CandidateProfilePage() {
  <button
  type="button"
  onClick={() => setIsChatCollapsed(false)}
- className="flex self-start items-center gap-1.5 pl-2 pr-3 py-2 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl shadow-sm text-[#1890FF] hover:bg-[#1890FF]/5 transition-colors cursor-pointer shrink-0"
+ className="fixed bottom-6 right-6 z-[100] flex items-center justify-center w-14 h-14 bg-[#1890FF] text-white rounded-full shadow-2xl hover:bg-[#1890FF]/90 transition-all hover:scale-105 cursor-pointer"
  aria-label="Expand team chat"
  >
- <ChevronsLeft size={16} />
- <MessageSquare size={16} />
+ <MessageSquare size={24} />
  </button>
  ) : (
  <div className="w-full xl:w-[340px] shrink-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 flex flex-col overflow-hidden min-h-[640px]">
  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
  <div>
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Hiring team</h3>
- <p className="text-[11px] text-gray-500">Private to this requisition</p>
+ <p className="text-[13px] leading-relaxed text-gray-500">Private to this requisition</p>
  </div>
- <button type="button" onClick={() => setIsChatCollapsed(true)} className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer" aria-label="Collapse team chat">
+ <button type="button" onClick={() => setIsChatCollapsed(true)} className="p-1.5 text-[#1890FF] bg-[#1890FF]/10 hover:bg-[#1890FF]/20 rounded-lg cursor-pointer transition-colors" aria-label="Collapse team chat">
  <ChevronsRight size={16} />
  </button>
  </div>
@@ -1229,7 +1328,7 @@ export default function CandidateProfilePage() {
  onChange={(e) => setChatInput(e.target.value)}
  onKeyDown={(e) => { if (e.key === 'Enter') sendChat(); }}
  placeholder="Message the hiring team..."
- className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm text-[#212b36] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20"
+ className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-[13px] text-[#212b36] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20"
  />
  <button type="button" onClick={sendChat} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg cursor-pointer">
  <Send size={16} />
@@ -1241,7 +1340,7 @@ export default function CandidateProfilePage() {
 </div>
 
 {toast && (
- <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+ <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3 rounded-xl shadow-lg text-[13px] font-medium">
  {toast}
  </div>
  )}
