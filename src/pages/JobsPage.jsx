@@ -535,24 +535,27 @@ export default function JobsPage() {
  setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
  setIsChatbotCollapsed(false);
  }}
- className={`hidden xl:flex absolute right-0 top-4 z-40 items-center gap-1.5 pl-2 pr-3 py-2 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-l-xl shadow-sm text-[#1890FF] hover:bg-[#1890FF]/5 cursor-pointer ${
+ className={`hidden xl:flex fixed right-0 top-[316px] bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-l-xl text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
  isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
- } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
+ } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
  aria-label="Expand FindNew AI"
  >
- <ChevronsLeft size={16} />
- <img src={findNewIco} alt="" className="w-4 h-4 object-contain" />
+ <ChevronsLeft size={18} className="shrink-0" />
+ <img src={findNewIco} alt="" className="w-6 h-6 object-contain shrink-0" />
+ <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
+ FindNew AI Assistant
+ </span>
  </button>
 
  <div
  style={{
  width: chatbotWidth,
- transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
- transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1)'
+ transform: isChatbotCollapsed ? 'translateX(calc(100% + 56px))' : 'translateX(0)',
+ transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
  }}
- className={`absolute right-0 top-0 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+ className={`fixed right-[56px] top-[316px] bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-tl-2xl rounded-tr-2xl xl:rounded-tr-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
  chatbotWidth > DEFAULT_CHATBOT_WIDTH && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
- } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'pointer-events-none' : ''}`}
+ } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
  >
  <div
  onMouseDown={(e) => {

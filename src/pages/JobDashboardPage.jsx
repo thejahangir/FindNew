@@ -251,6 +251,8 @@ export default function JobDashboardPage() {
  const [currentPageApp, setCurrentPageApp] = useState(1);
  const [openStageMenuId, setOpenStageMenuId] = useState(null);
  const [isBulkStageMenuOpen, setIsBulkStageMenuOpen] = useState(false);
+ const [isConfirmRejectModalOpen, setIsConfirmRejectModalOpen] = useState(false);
+ const [isSilentRejectConfirmOpen, setIsSilentRejectConfirmOpen] = useState(false);
  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
  const [rejectCards, setRejectCards] = useState([]);
  const [appSearchQuery, setAppSearchQuery] = useState('');
@@ -260,14 +262,30 @@ export default function JobDashboardPage() {
  const [isSortByOpen, setIsSortByOpen] = useState(false);
 
  useEffect(() => {
- const handleGlobalClick = () => {
- setIsFilterStageOpen(false);
- setIsSortByOpen(false);
- setIsBulkStageMenuOpen(false);
- setOpenStageMenuId(null);
- };
- window.addEventListener('click', handleGlobalClick);
- return () => window.removeEventListener('click', handleGlobalClick);
+  const handleGlobalClick = () => {
+  setIsFilterStageOpen(false);
+  setIsSortByOpen(false);
+  setIsBulkStageMenuOpen(false);
+  setOpenStageMenuId(null);
+  };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+      setSelectedAppCandidates([]);
+      setIsBulkStageMenuOpen(false);
+      setOpenStageMenuId(null);
+    }
+  };
+
+  window.addEventListener('click', handleGlobalClick);
+  window.addEventListener('keydown', handleKeyDown, true);
+  window.addEventListener('keyup', handleKeyDown, true);
+  
+  return () => {
+    window.removeEventListener('click', handleGlobalClick);
+    window.removeEventListener('keydown', handleKeyDown, true);
+    window.removeEventListener('keyup', handleKeyDown, true);
+  };
  }, []);
 
  const itemsPerPageApp = 5;
@@ -310,7 +328,7 @@ export default function JobDashboardPage() {
  const openRejectModal = (ids) => {
  const uniqueIds = [...new Set(ids)];
  setRejectCards(candidateList.filter(c => uniqueIds.includes(c.id)));
- setIsRejectModalOpen(true);
+ setIsConfirmRejectModalOpen(true);
  setOpenStageMenuId(null);
  setIsBulkStageMenuOpen(false);
  };
@@ -1086,7 +1104,7 @@ export default function JobDashboardPage() {
 
  <div className="flex flex-1 overflow-hidden relative">
  {/* Left Panel: Candidates List */}
- <div className="w-[320px] lg:w-[380px] border-r border-gray-100 dark:border-gray-800/50 flex flex-col bg-gray-50/30 dark:bg-[#161c24] shrink-0 relative p-3 gap-3">
+ <div className="w-[25%] min-w-[280px] border-r border-gray-100 dark:border-gray-800/50 flex flex-col bg-gray-50/30 dark:bg-[#161c24] relative p-3 gap-3">
  
  <div className="flex items-center justify-between px-1 shrink-0">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Application List</h3>
@@ -1110,17 +1128,22 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Stage Change Block (replaces search when bulk selected) */}
- <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex flex-col justify-center px-4 rounded-xl transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-2">
- <span className="text-[12px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">{selectedAppCandidates.length} Selected</span>
+ <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex items-center px-4 rounded-xl transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
+ <button onClick={() => setSelectedAppCandidates([])} className="absolute top-1 right-1 text-white/70 hover:text-white transition-colors cursor-pointer p-0.5 z-10"><X size={12} /></button>
+ <div className="flex items-center justify-center w-full relative gap-8">
+ <div className="flex items-center gap-1.5">
+ <span className="text-[12px] font-medium text-white/90">Move</span>
+ <span className="w-28 text-[12px] font-bold text-white border border-white/30 bg-white/10 px-3 py-1.5 rounded-md flex items-center justify-center">{selectedAppCandidates.length} Selected</span>
  </div>
- <div className="flex items-center gap-3 relative">
+ <div className="flex items-center gap-1.5">
+ <span className="text-[12px] font-medium text-white/90">To</span>
+ <div className="relative">
  <button
  onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
- className="text-[12px] font-bold text-white hover:text-white/80 flex items-center gap-1 transition-colors cursor-pointer"
+ className="w-28 text-[12px] font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-md flex items-center justify-between transition-colors cursor-pointer"
  >
- Stage <ChevronDown size={14} />
+ <span>Stage</span>
+ <ChevronDown size={14} />
  </button>
  {isBulkStageMenuOpen && (
  <div
@@ -1138,8 +1161,7 @@ export default function JobDashboardPage() {
  ))}
  </div>
  )}
- <div className="w-px h-4 bg-white/30"></div>
- <button onClick={() => setSelectedAppCandidates([])} className="text-white/70 hover:text-white transition-colors cursor-pointer p-0.5"><X size={16} /></button>
+ </div>
  </div>
  </div>
  </div>
@@ -1359,7 +1381,7 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Middle Panel: AI Screening Results */}
- <div className="flex-1 flex flex-col bg-gray-50/50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-800/50 relative min-w-0">
+ <div className="w-[30%] min-w-[300px] flex flex-col bg-gray-50/50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-800/50 relative min-w-0">
  <div className="p-3 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex items-center justify-between">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white px-1">AI Review Comments</h3>
  <button onClick={() => setIsEditRankingModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-2 py-1 rounded transition-colors cursor-pointer">
@@ -1466,7 +1488,7 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Right Panel: Smart Profile (Resume) */}
- <div className="ml-4 w-[550px] xl:w-[650px] border-l border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-black/20 flex flex-col shrink-0 min-h-0 relative">
+ <div className="flex-1 min-w-[400px] border-l border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-black/20 flex flex-col min-h-0 relative">
  {isUploadingResume && (
  <div className="absolute inset-0 bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-sm z-50 flex items-center justify-center">
  <div className="text-center">
@@ -1635,7 +1657,113 @@ export default function JobDashboardPage() {
  </div>
  )}
 
- {/* Reject & notify agencies */}
+  {/* Confirm Rejection Modal */}
+  {isConfirmRejectModalOpen && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+    <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/50">
+        <h2 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+          <UserX size={20} className="text-[#FF5630]" /> Confirm Rejection
+        </h2>
+        <button onClick={() => setIsConfirmRejectModalOpen(false)} className="text-gray-400 dark:text-white hover:text-gray-600 transition-colors cursor-pointer">
+          <X size={20} />
+        </button>
+      </div>
+      <div className="p-5 space-y-4">
+        <p className="text-[13px] font-medium text-[#454f5b] dark:text-gray-300 leading-relaxed">
+          You are about to reject <strong>{rejectCards.length}</strong> {rejectCards.length === 1 ? 'candidate' : 'candidates'}:
+        </p>
+        <div className="flex flex-wrap gap-2 pt-1 pb-1 max-h-36 overflow-y-auto custom-scrollbar">
+          {rejectCards.map(c => {
+            const isAgency = !!c.agency;
+            return (
+              <div key={c.id} className={`flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border transition-all ${isAgency ? 'bg-[#1890FF]/5 border-[#1890FF]/20' : 'bg-gray-50 dark:bg-gray-800/30 border-gray-100 dark:border-gray-700/50'}`}>
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0 ${isAgency ? 'bg-[#1890FF]/15 text-[#1890FF]' : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-300'}`}>
+                  {c.name.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                </div>
+                <div className="text-[11px] font-bold text-[#212b36] dark:text-white leading-tight">{c.name}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="bg-[#FFC107]/10 border border-[#FFC107]/20 p-3.5 rounded-xl flex items-start gap-3 mt-4">
+          <AlertCircle size={16} className="text-[#FFC107] shrink-0 mt-0.5" />
+          <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed">
+            As a Hiring Manager, maintaining a good relationship with our agency partners is key. Would you like to notify the associated agencies with constructive feedback?
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-3 p-5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-black/20">
+        <button 
+          onClick={() => {
+            setIsConfirmRejectModalOpen(false);
+          }} 
+          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-black dark:text-white bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button 
+          onClick={() => {
+            setIsConfirmRejectModalOpen(false);
+            setIsSilentRejectConfirmOpen(true);
+          }} 
+          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-[#FF5630] bg-[#FF5630]/10 hover:bg-[#FF5630]/20 rounded-xl transition-colors cursor-pointer"
+        >
+          No, Just Reject
+        </button>
+        <button 
+          onClick={() => {
+            setIsConfirmRejectModalOpen(false);
+            setIsRejectModalOpen(true);
+          }} 
+          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors shadow-md shadow-[#1890FF]/20 cursor-pointer flex items-center justify-center gap-2"
+        >
+          <Mail size={16} /> Yes, Notify Agency
+        </button>
+      </div>
+    </div>
+  </div>
+  )}
+
+  {/* Silent Reject Confirmation Alert */}
+  {isSilentRejectConfirmOpen && (
+  <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in">
+    <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800 text-center">
+      <div className="p-6">
+        <div className="w-12 h-12 rounded-full bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center mx-auto mb-4">
+          <AlertCircle size={24} />
+        </div>
+        <h2 className="text-lg font-bold text-[#212b36] dark:text-white mb-2">Reject Without Notifying?</h2>
+        <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed mb-6">
+          Are you absolutely sure you want to silently reject these candidates? Agency partners won't receive any feedback.
+        </p>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsSilentRejectConfirmOpen(false)}
+            className="flex-1 py-2.5 text-[13px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={() => {
+              setIsSilentRejectConfirmOpen(false);
+              const ids = rejectCards.map(card => card.id);
+              setCandidateList(prev => prev.map(c => ids.includes(c.id) ? { ...c, stage: 'Reject' } : c));
+              setSelectedAppCandidate(prev => prev && ids.includes(prev.id) ? { ...prev, stage: 'Reject' } : prev);
+              setSelectedAppCandidates(prev => prev.filter(id => !ids.includes(id)));
+              setRejectCards([]);
+            }} 
+            className="flex-1 py-2.5 text-[13px] font-bold text-white bg-[#FF5630] hover:bg-[#FF5630]/90 rounded-xl transition-colors cursor-pointer shadow-md shadow-[#FF5630]/20"
+          >
+            Yes, Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  )}
+
+  {/* Reject & notify agencies */}
  <RejectAgencyModal
  open={isRejectModalOpen}
  candidates={rejectCards}
@@ -2112,8 +2240,8 @@ export default function JobDashboardPage() {
 
  {isEditRankingModalOpen && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-3xl shadow-2xl max-w-2xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[90vh] overflow-y-auto custom-scrollbar">
- <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[75vh] flex flex-col overflow-hidden">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50 shrink-0">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 bg-[#1890FF]/10 text-[#1890FF] rounded-xl flex items-center justify-center">
  <Settings2 size={20} />
@@ -2128,30 +2256,13 @@ export default function JobDashboardPage() {
  </button>
  </div>
  
- <div className="space-y-3">
- {SCREENING_CRITERIA.map((item, idx) => (
- <div key={idx} className="bg-gray-50/50 dark:bg-gray-800/20 p-3 rounded-xl border border-gray-100 dark:border-gray-700/50">
- <div className="flex flex-col md:flex-row gap-4">
- <div className="w-full md:w-1/3">
- <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1">Rule Name</label>
- <input type="text" defaultValue={item.label} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all" />
- </div>
- <div className="w-full md:w-2/3">
- <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1">Rule Description</label>
- <textarea rows="2" defaultValue={item.text} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all resize-none custom-scrollbar"></textarea>
- </div>
- </div>
- </div>
- ))}
- </div>
- 
- <div className="flex gap-4 mt-5 pt-4 border-t border-gray-100 dark:border-gray-800/50">
- <button onClick={() => setIsEditRankingModalOpen(false)} className="flex-1 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer">
- Cancel
- </button>
- <button onClick={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }} className="flex-1 px-5 py-2.5 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer shadow-[#1890FF]/20">
- Save Rules
- </button>
+ <div className="w-full flex-1 overflow-hidden flex flex-col mb-2">
+  <SettingsRankingRules 
+    hideFooter={true} 
+    setSettingsActiveNav={() => {}} 
+    onCancel={() => setIsEditRankingModalOpen(false)}
+    onSave={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }}
+  />
  </div>
  </div>
  </div>

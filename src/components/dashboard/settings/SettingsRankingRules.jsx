@@ -20,7 +20,7 @@ const ToggleSwitch = ({ checked, onChange }) => (
  </div>
 );
 
-function SortableRuleItem({ rule, isSelected, onSelect }) {
+function SortableRuleItem({ rule, isSelected, onSelect, isModal }) {
  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: rule.id });
  
  const style = {
@@ -44,7 +44,7 @@ function SortableRuleItem({ rule, isSelected, onSelect }) {
  </div>
  
  <div className="flex-1 min-w-0">
- <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white'}`}>
+ <h4 className={`${isModal ? 'text-[13px] font-semibold' : 'text-sm font-bold'} truncate ${isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white'}`}>
  {rule.skill || 'New Rule'}
  </h4>
  <div className="flex items-center gap-3 mt-1.5">
@@ -56,41 +56,41 @@ function SortableRuleItem({ rule, isSelected, onSelect }) {
  </div>
 
  <div className="shrink-0 flex items-center gap-3 pr-2">
- <span className="text-lg font-black" style={{ color: rule.color || '#1890FF' }}>{weightValue.toFixed(1)}</span>
+ <span className={`${isModal ? 'text-[15px] font-bold' : 'text-lg font-black'}`} style={{ color: rule.color || '#1890FF' }}>{weightValue.toFixed(1)}</span>
  </div>
  </div>
  );
 }
 
-const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave }) => {
+const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  if (!rule) return null;
 
  return (
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-lg flex flex-col h-full sticky top-6 animate-fade-in">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50">
- <h3 className="text-xl font-bold text-[#212b36] dark:text-white">Rule Configuration</h3>
- <p className="text-sm text-gray-500 mt-1">Adjust criteria weight and details.</p>
+ <h3 className={`${isModal ? 'text-base font-semibold' : 'text-xl font-bold'} text-[#212b36] dark:text-white`}>Rule Configuration</h3>
+ <p className={`${isModal ? 'text-xs' : 'text-sm'} text-gray-500 mt-1`}>Adjust criteria weight and details.</p>
  </div>
 
- <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+ <div className="p-6 space-y-4 flex-1 overflow-y-auto">
  <div className="flex flex-col xl:flex-row gap-6">
  <div className="space-y-2 flex-1">
  <div className="flex items-center h-5">
- <label className="text-xs font-bold text-gray-500 ">Skill / Criteria Name</label>
+ <label className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-gray-500`}>Skill / Criteria Name</label>
  </div>
  <input
  type="text"
  value={rule.skill}
  onChange={(e) => onUpdate(rule.id, 'skill', e.target.value)}
- className="w-full h-[46px] px-4 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all"
+ className={`w-full h-[46px] px-4 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px] font-semibold' : 'text-sm font-bold'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all`}
  placeholder="e.g. Python Proficiency"
  />
  </div>
 
  <div className="space-y-2 w-full xl:w-[340px] shrink-0">
  <div className="flex items-center justify-between h-5">
- <label className="text-xs font-bold text-gray-500 ">Weight Multiplier (0.0 to 2.0)</label>
- <span className="text-xs font-bold text-[#1890FF]">{(Number(rule.weight) || 0).toFixed(1)}x</span>
+ <label className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-gray-500`}>Weight Multiplier (0.0 to 2.0)</label>
+ <span className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-[#1890FF]`}>{(Number(rule.weight) || 0).toFixed(1)}x</span>
  </div>
  <div className="flex items-center gap-3 bg-gray-50 dark:bg-[#1a222c] px-4 h-[46px] rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[11px] font-bold text-gray-400">0.0</div>
@@ -122,28 +122,26 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave }) => {
  </div>
 
  <div className="space-y-2">
- <label className="text-xs font-bold text-gray-500 ">Evaluation Guidelines (Description)</label>
+ <label className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-gray-500`}>Evaluation Guidelines (Description)</label>
  <textarea
  value={rule.description}
  onChange={(e) => onUpdate(rule.id, 'description', e.target.value)}
- className="w-full min-h-[120px] px-4 py-3 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none resize-none transition-all"
+ className={`w-full min-h-[120px] px-4 py-3 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px]' : 'text-sm'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none resize-none transition-all`}
  placeholder="How should the AI evaluate this skill?"
  />
  </div>
 
- <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="flex items-center gap-3">
  <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
  <Zap size={16} />
  </div>
  <div>
- <p className="text-sm font-bold text-[#212b36] dark:text-white">Knockout Rule</p>
+ <p className={`text-sm ${isModal ? 'font-semibold' : 'font-bold'} text-[#212b36] dark:text-white`}>Knockout Rule</p>
  <p className="text-xs text-gray-500">Auto-reject if score is 0 on this criteria</p>
  </div>
  </div>
  <ToggleSwitch checked={rule.isKnockout || false} onChange={(val) => onUpdate(rule.id, 'isKnockout', val)} />
- </div>
  </div>
  </div>
  
@@ -171,7 +169,7 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave }) => {
  );
 };
 
-export default function SettingsRankingRules({ setSettingsActiveNav }) {
+export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter = false, onCancel, onSave }) {
  const navigate = () => {};
  const location = { state: null };
  
@@ -271,10 +269,10 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  const selectedRule = rules.find(r => r.id === selectedRuleId) || (rules.length > 0 ? rules[0] : null);
 
  return (
- <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)] relative">
- <div className="flex-1 space-y-6">
- <div className="flex justify-end gap-4 mb-6 mt-2 px-2">
- 
+ <div className={`${!hideFooter ? 'p-6 space-y-6 min-h-[calc(100vh-100px)]' : 'p-1 h-full overflow-hidden'} animate-fade-in flex flex-col relative`}>
+ <div className={`flex-1 flex flex-col ${!hideFooter ? 'space-y-4' : 'space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2'}`}>
+ {!hideFooter && (
+ <div className="flex justify-end gap-4 mb-2 px-2">
  {isGenerated && (
  <div className="flex items-center gap-3">
  <button 
@@ -287,6 +285,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  </div>
  )}
  </div>
+ )}
 
  <div className="relative flex-1 flex flex-col">
  {isGenerating && (
@@ -331,6 +330,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  rule={rule} 
  isSelected={selectedRuleId === rule.id}
  onSelect={setSelectedRuleId}
+ isModal={hideFooter}
  />
  ))}
  </div>
@@ -354,6 +354,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  onUpdate={handleUpdateRule} 
  onDelete={(id) => setDeleteConfirmRuleId(id)}
  onSave={() => setToastMessage('Rule changes saved successfully.')}
+ isModal={hideFooter}
  />
  </div>
 
@@ -362,6 +363,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  </div>
  </div>
 
+ {!hideFooter && (
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
  <button 
  onClick={() => setSettingsActiveNav('Scorecards')}
@@ -392,6 +394,29 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
  </div>
  </div>
  </div>
+ )}
+
+ {hideFooter && onCancel && onSave && (
+ <div className="flex items-center justify-between mt-2 pt-4 border-t border-gray-100 dark:border-gray-800/50 shrink-0">
+ <button onClick={onCancel} className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer">
+ Cancel
+ </button>
+ <div className="flex items-center gap-3">
+ {isGenerated && (
+ <button 
+ onClick={handleGenerate} 
+ className="px-5 py-2.5 bg-blue-50 dark:bg-[#1890FF]/10 text-[#1890FF] hover:bg-blue-100 dark:hover:bg-[#1890FF]/20 rounded-xl text-[13px] font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+ >
+ <Wand2 size={16} />
+ Regenerate from JD
+ </button>
+ )}
+ <button onClick={onSave} className="px-5 py-2.5 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl font-bold text-[13px] transition-colors cursor-pointer shadow-[#1890FF]/20">
+ Save Rules
+ </button>
+ </div>
+ </div>
+ )}
 
 
  {/* Delete Confirmation Modal */}
