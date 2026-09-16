@@ -27,7 +27,7 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
  <Lock size={14} className={isConfidential ? 'text-amber-500' : 'text-gray-400'} />
  Job Confidentiality
  </span>
- <span className="text-[10px] text-gray-400 ">{isConfidential ? 'Restricted Access' : 'Public to Hiring Team'}</span>
+ <span className="text-[11px] text-gray-400 ">{isConfidential ? 'Restricted Access' : 'Public to Hiring Team'}</span>
  </div>
  
  <div className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out shadow-inner ${isConfidential ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'}`}>

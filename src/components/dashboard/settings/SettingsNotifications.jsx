@@ -394,7 +394,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  {tempConfigData.map((item, idx) => (
  <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 flex items-start gap-4">
  <div className="flex-1 space-y-2">
- <label className="block text-xs font-bold text-gray-500 tracking-wider">Stage</label>
+ <label className="block text-xs font-bold text-gray-500 ">Stage</label>
  <input 
  type="text" 
  value={item.stage} 
@@ -405,7 +405,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  }}
  className="w-full px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-[#1890FF] text-sm text-[#212b36] dark:text-white"
  />
- <label className="block text-xs font-bold text-gray-500 tracking-wider mt-2">Recipients (comma separated)</label>
+ <label className="block text-xs font-bold text-gray-500 mt-2">Recipients (comma separated)</label>
  <input 
  type="text" 
  value={item.recipients.join(', ')} 

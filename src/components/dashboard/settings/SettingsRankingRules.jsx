@@ -115,7 +115,7 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave }) => {
  onChange={(e) => onUpdate(rule.id, 'weight', Number(e.target.value))}
  className="w-full px-2 h-7 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-center text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all pr-4"
  />
- <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 pointer-events-none">x</span>
+ <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-gray-400 pointer-events-none">x</span>
  </div>
  </div>
  </div>

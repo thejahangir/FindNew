@@ -121,11 +121,11 @@ const StageDetailsPanel = ({ stage, isEditing, onUpdateStage }) => {
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-lg flex flex-col h-full sticky top-6 animate-fade-in">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3 mb-2">
- <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${getStageColor(stage.systemStage)}`}>
+ <div className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${getStageColor(stage.systemStage)}`}>
  {stage.systemStage}
  </div>
  {stage.isTerminal && (
- <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+ <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
  Terminal Stage
  </span>
  )}
@@ -308,7 +308,7 @@ const ReadOnlyStageItem = ({ stage, index, totalStages, getStageColor, isSelecte
  {stage.systemStage}
  </span>
  {isTerminal && (
- <span className="text-[10px] font-bold text-[#FF5630] ">
+ <span className="text-[11px] font-bold text-[#FF5630] ">
  Terminal
  </span>
  )}

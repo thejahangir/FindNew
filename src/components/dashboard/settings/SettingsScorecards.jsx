@@ -242,7 +242,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  <div className="flex items-center gap-2 font-bold text-[#212b36] dark:text-white text-sm">
  <ChevronDown size={16} className="text-gray-400" />
  {category.name}
- <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-[10px] text-gray-600 dark:text-gray-300">
+ <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-[11px] text-gray-600 dark:text-gray-300">
  {category.attributes.length} items
  </span>
  </div>
@@ -519,7 +519,7 @@ function RoundCard({ round, allAttributes, onRemove, onToggleAttribute }) {
 
  {isOpen && (
  <div className="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-[#212b36] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-30 max-h-60 overflow-y-auto">
- <div className="p-2 text-xs font-bold text-gray-500 tracking-wider sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 z-10">
+ <div className="p-2 text-xs font-bold text-gray-500 sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 z-10">
  Available Attributes
  </div>
  {allAttributes.length > 0 ? (

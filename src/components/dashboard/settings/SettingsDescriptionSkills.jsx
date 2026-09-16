@@ -211,20 +211,20 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  <Plus size={12} />
  </button>
  </div>
- <span className="text-[10px] font-bold text-gray-500">Years</span>
+ <span className="text-[11px] font-bold text-gray-500">Years</span>
  </div>
  
  <div className="flex bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-md p-0.5">
  <button 
  onClick={() => handleSkillChange(index, 'required', true)}
- className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${skill.required ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
+ className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${skill.required ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
  >
  {skill.required ? <CheckCircle2 size={12} className="text-[#1890FF] fill-[#1890FF]/10" /> : <Circle size={12} />}
  Must Have
  </button>
  <button 
  onClick={() => handleSkillChange(index, 'required', false)}
- className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${!skill.required ? 'bg-white dark:bg-[#161c24] text-[#8e33ff] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
+ className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${!skill.required ? 'bg-white dark:bg-[#161c24] text-[#8e33ff] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
  >
  {!skill.required ? <CheckCircle2 size={12} className="text-[#8e33ff] fill-[#8e33ff]/10" /> : <Circle size={12} />}
  Nice to Have

@@ -530,7 +530,7 @@ export default function JobDashboardPage() {
  <Users size={24} className="text-[#1890FF]" />
  </div>
  <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Total Applications</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Total Applications</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,450</h3>
  </div>
  </div>
@@ -540,7 +540,7 @@ export default function JobDashboardPage() {
  <UserCheck size={24} className="text-[#00A76F]" />
  </div>
  <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Active Candidates</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Active Candidates</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">184</h3>
  </div>
  </div>
@@ -550,7 +550,7 @@ export default function JobDashboardPage() {
  <UserX size={24} className="text-[#FF5630]" />
  </div>
  <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">Rejected</p>
+ <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Rejected</p>
  <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,266</h3>
  </div>
  </div>
@@ -581,14 +581,14 @@ export default function JobDashboardPage() {
  <div>
  <div className="flex items-center gap-2">
  <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
- <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
+ <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
  {interview.score || 90}% Match
  </span>
  </div>
  <p className="text-xs text-black dark:text-gray-400 mt-0.5">{interview.role}</p>
  </div>
  <span className="bg-[#1890FF]/10 text-[#1890FF] text-[11px] font-bold px-2 py-1 rounded-md text-right">
- {interview.time}<br/><span className="text-[10px] opacity-90">{interview.platform || 'Zoom'}</span>
+ {interview.time}<br/><span className="text-[11px] opacity-90">{interview.platform || 'Zoom'}</span>
  </span>
  </div>
  <div className="flex items-center gap-2 mt-4 text-xs font-medium text-black dark:text-gray-400">
@@ -702,7 +702,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="flex items-center gap-2">
  {item.avgTime && (
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.warning ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800/50 text-black dark:text-white '}`} title="Average time in stage">
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded ${item.warning ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800/50 text-black dark:text-white '}`} title="Average time in stage">
  Avg {item.avgTime}
  </span>
  )}
@@ -733,7 +733,7 @@ export default function JobDashboardPage() {
  <div key={candidate.id} className="border border-gray-100 dark:border-gray-800/50 p-3 rounded-xl hover:border-[#1890FF]/30 hover: transition-all cursor-pointer group">
  <div className="flex justify-between items-center mb-1">
  <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{candidate.name}</h4>
- <span className="text-[10px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded-full">
+ <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded-full">
  {candidate.match} Match
  </span>
  </div>
@@ -813,7 +813,7 @@ export default function JobDashboardPage() {
  <div className="flex items-center justify-between mb-4">
  <h3 className="text-sm font-bold text-black dark:text-gray-400">
  {stageName} 
- <span className="text-[10px] font-black bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-[#212b36] dark:text-white px-2 py-0.5 rounded-full ml-2 ">
+ <span className="text-[11px] font-black bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-[#212b36] dark:text-white px-2 py-0.5 rounded-full ml-2 ">
  {stageCount}
  </span>
  </h3>
@@ -833,20 +833,20 @@ export default function JobDashboardPage() {
  {card.name.split(' ').map(n => n[0]).join('')}
  </div>
  <div>
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors leading-tight">{card.name}</h4>
- <p className="text-[10px] font-semibold text-black dark:text-gray-400 mt-0.5">{card.role}</p>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors leading-tight">{card.name}</h4>
+ <p className="text-[11px] font-semibold text-black dark:text-gray-400 mt-0.5">{card.role}</p>
  </div>
  </div>
  <div className="flex flex-col items-end">
- <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${card.score >= 90 ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-[#FFC107]/10 text-[#FFC107]'}`}>
+ <span className={`text-[11px] font-black px-1.5 py-0.5 rounded ${card.score >= 90 ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-[#FFC107]/10 text-[#FFC107]'}`}>
  {card.score}%
  </span>
- <span className="text-[9px] font-medium text-gray-400 mt-1 flex items-center gap-0.5"><Clock size={9} /> {card.time}</span>
+ <span className="text-[11px] font-medium text-gray-400 mt-1 flex items-center gap-0.5"><Clock size={9} /> {card.time}</span>
  </div>
  </div>
 
  {/* Info grid */}
- <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[10px] font-medium bg-gray-50/50 dark:bg-gray-800/20 p-2.5 rounded-xl border border-gray-100/50 dark:border-gray-700/30">
+ <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[11px] font-medium bg-gray-50/50 dark:bg-gray-800/20 p-2.5 rounded-xl border border-gray-100/50 dark:border-gray-700/30">
  <div className="flex items-center gap-1.5 text-[#454f5b] dark:text-gray-300">
  <Briefcase size={11} className="text-[#1890FF]/70 shrink-0" />
  <span className="truncate">{card.company} • {card.experience}</span>
@@ -864,7 +864,7 @@ export default function JobDashboardPage() {
  {/* Skills Tags */}
  <div className="flex flex-wrap gap-1">
  {card.skills.map(skill => (
- <span key={skill} className="text-[9px] font-bold bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-black dark:text-gray-400">
+ <span key={skill} className="text-[11px] font-bold bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-black dark:text-gray-400">
  {skill}
  </span>
  ))}
@@ -885,7 +885,7 @@ export default function JobDashboardPage() {
  <button 
  key={stage.title} 
  onClick={(e) => { e.stopPropagation(); handleMoveCandidate(card, col.title, stage.title); }}
- className="w-full text-left px-4 py-1.5 text-[10px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+ className="w-full text-left px-4 py-1.5 text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  To {stage.title.split(' ').slice(0, -1).join(' ')}
  </button>
@@ -893,7 +893,7 @@ export default function JobDashboardPage() {
  <div className="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
  <button 
  onClick={(e) => { e.stopPropagation(); handleMoveCandidate(card, col.title, 'Reject'); }}
- className="w-full text-left px-4 py-1.5 text-[10px] font-bold text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
+ className="w-full text-left px-4 py-1.5 text-[11px] font-bold text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
  >
  Reject Candidate
  </button>
@@ -956,7 +956,7 @@ export default function JobDashboardPage() {
  <span className="bg-[#1890FF]/10 text-[#1890FF] px-2.5 py-1 rounded-md text-xs font-bold">{cand.stage}</span>
  </td>
  <td className="px-6 py-4">
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
  </td>
  <td className="px-6 py-4 font-medium">{cand.date}</td>
  <td className="px-6 py-4 text-right">
@@ -1022,7 +1022,7 @@ export default function JobDashboardPage() {
  )}
  {/* APPLICATIONS TAB - Immersive Redesign */}
  {activeTab === 'Applications Review' && (
- <div className="flex flex-col h-[800px] bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden animate-fade-in">
+ <div className="flex flex-col h-[1000px] bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden animate-fade-in">
  {/* Top Toolbar / Smart Metrics Ribbon */}
  <div className="flex flex-wrap lg:flex-nowrap items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] gap-4">
  {/* Stats Group */}
@@ -1073,7 +1073,7 @@ export default function JobDashboardPage() {
  <div className="text-[13px] font-black text-[#212b36] dark:text-white">{candidateList.filter(c => ['Screening', 'Technical Interview', 'Culture Fit', 'Reference Check'].includes(c.stage)).length}</div>
  </div>
  <div className="w-px h-6 bg-[#212b36]/10 dark:bg-white/10 shrink-0"></div>
- <p className="text-[10px] font-medium text-[#212b36]/60 dark:text-gray-400 flex-1 leading-tight line-clamp-2">
+ <p className="text-[11px] font-medium text-[#212b36]/60 dark:text-gray-400 flex-1 leading-tight line-clamp-2">
  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
  </p>
  </div>
@@ -1145,7 +1145,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="flex items-center gap-2">
  <div className="flex-1 flex flex-col gap-1 relative">
- <span className="text-[10px] font-bold text-gray-400 tracking-wider">Filter Stage</span>
+ <span className="text-[11px] font-bold text-gray-400 ">Filter Stage</span>
  <div 
  onClick={(e) => { e.stopPropagation(); setIsFilterStageOpen(!isFilterStageOpen); setIsSortByOpen(false); }}
  className="w-full flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg p-1.5 focus-within:ring-2 focus-within:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all"
@@ -1172,7 +1172,7 @@ export default function JobDashboardPage() {
  )}
  </div>
  <div className="flex-1 flex flex-col gap-1 relative">
- <span className="text-[10px] font-bold text-gray-400 tracking-wider">Sort By</span>
+ <span className="text-[11px] font-bold text-gray-400 ">Sort By</span>
  <div 
  onClick={(e) => { e.stopPropagation(); setIsSortByOpen(!isSortByOpen); setIsFilterStageOpen(false); }}
  className="w-full flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg p-1.5 focus-within:ring-2 focus-within:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all"
@@ -1250,7 +1250,7 @@ export default function JobDashboardPage() {
  )}
  {currentAppCandidates.length === 0 ? (
  <div className="px-3 py-10 text-center">
- <p className="text-[13px] font-bold tracking-wider text-[#212b36] dark:text-white">No applicants found</p>
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white">No applicants found</p>
  <p className="text-[13px] leading-relaxed text-gray-500 mt-1">
  {appSearchQuery.trim() ? `No matches for “${appSearchQuery.trim()}”` : 'No applicants in this list yet.'}
  </p>
@@ -1293,15 +1293,15 @@ export default function JobDashboardPage() {
  <ArrowUpRight size={14} />
  </button>
  </div>
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${getScoreStyles(cand.score).badge}`}>{cand.score}</span>
  </div>
  <div className="flex justify-between items-center mt-2 relative">
  <div className="relative">
  <button 
  onClick={(e) => { e.stopPropagation(); setOpenStageMenuId(openStageMenuId === cand.id ? null : cand.id); }}
- className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer ${cand.stage === 'Reject' ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-gray-300'}`}
+ className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer ${cand.stage === 'Reject' ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-gray-300'}`}
  >
- {cand.stage} <ChevronDown size={10} />
+ {cand.stage} <ChevronDown size={11} />
  </button>
  {openStageMenuId === cand.id && (
  <div
@@ -1314,7 +1314,7 @@ export default function JobDashboardPage() {
  <button 
  key={stage} 
  onClick={(e) => { e.stopPropagation(); handleCandidateStageChange(cand.id, stage); }}
- className={`w-full text-left px-3 py-1.5 text-[10px] font-bold flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+ className={`w-full text-left px-3 py-1.5 text-[11px] font-bold flex items-center justify-between gap-2 transition-colors cursor-pointer ${
  isSelected
  ? stage === 'Reject' ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-[#1890FF]/10 text-[#1890FF]'
  : stage === 'Reject' ? 'text-[#FF5630] hover:bg-gray-50 dark:hover:bg-gray-800' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -1328,7 +1328,7 @@ export default function JobDashboardPage() {
  </div>
  )}
  </div>
- <span className="text-[10px] text-gray-400">{cand.date}</span>
+ <span className="text-[11px] text-gray-400">{cand.date}</span>
  </div>
  </div>
  </div>
@@ -1384,10 +1384,10 @@ export default function JobDashboardPage() {
  </div>
  
  <div className="text-right">
- <p className="text-[9px] font-bold tracking-wider text-gray-400 mb-0.5">AI Match</p>
+ <p className="text-[11px] font-bold text-gray-400 mb-0.5">AI Match</p>
  <div className="flex items-end justify-end gap-0.5">
  <span className={`text-[19px] font-semibold leading-none ${scoreTone.text}`}>{scoreValue}</span>
- <span className="text-[10px] font-medium text-gray-400 pb-[3px]">/10</span>
+ <span className="text-[11px] font-medium text-gray-400 pb-[3px]">/10</span>
  </div>
  </div>
  </div>
@@ -1395,7 +1395,7 @@ export default function JobDashboardPage() {
  })()}
 
  <div>
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 space-y-2 leading-relaxed">
  <p>Excellent fit for the technical requirements.</p>
  <p>Strong React, Node.js and architecture experience.</p>
@@ -1406,7 +1406,7 @@ export default function JobDashboardPage() {
  </div>
 
  <div>
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
  <div className="space-y-4">
  {SCREENING_CRITERIA.map((item) => {
  const tone = getScoreStyles(item.score);
@@ -1414,7 +1414,7 @@ export default function JobDashboardPage() {
  <div key={item.label} className="flex flex-col gap-1">
  <div className="flex items-center justify-between">
  <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white">{item.label}</h5>
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${tone.badge}`}>{item.score}/10</span>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${tone.badge}`}>{item.score}/10</span>
  </div>
  <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400 leading-relaxed">{item.text}</p>
  </div>
@@ -1424,7 +1424,7 @@ export default function JobDashboardPage() {
  </div>
 
  <div>
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-3">Gap Analysis</h4>
  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300 leading-relaxed mb-6">
  Minor gaps: limited exposure to enterprise-scale delivery and formal people management.
  </div>
@@ -1432,7 +1432,7 @@ export default function JobDashboardPage() {
  <hr className="border-gray-100 dark:border-gray-800/50 mb-6" />
  
  <div className="flex items-center justify-between mb-3">
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white">Feedback to Agency</h4>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white">Feedback to Agency</h4>
  <button 
  onClick={() => {
  navigator.clipboard.writeText("We reviewed this candidate. While they are a strong fit technically, there are minor gaps in enterprise-scale delivery. We've decided to proceed to the next stage but will focus on this during the interview.");
@@ -1485,7 +1485,7 @@ export default function JobDashboardPage() {
  <div className="flex items-center gap-2 min-w-0">
  <FileText size={16} className="text-[#1890FF] shrink-0" />
  <div className="min-w-0">
- <p className="text-[13px] font-bold tracking-wider text-[#212b36] dark:text-white truncate">
+ <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
  {selectedAppCandidate.name.replace(/\s+/g, '_')}_Resume.pdf
  </p>
  <p className="text-[13px] leading-relaxed text-gray-400">PDF resume</p>
@@ -1553,11 +1553,11 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <div className="flex items-center gap-2">
- <h4 className="text-sm font-bold tracking-wider text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
- <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
+ <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
  {interview.score || 90}% Match
  </span>
- <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+ <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
  (interview.status || 'Pending') === 'Accepted' ? 'bg-[#1890FF]/20 text-[#1890FF] dark:text-[#60a5fa]' : 
  ((interview.status === 'Declined') ? 'bg-[#FF5630]/20 text-[#FF5630] dark:text-[#FF5630]' : 
  'bg-gray-100 dark:bg-gray-800 text-black dark:text-gray-400 border border-gray-200 dark:border-gray-700')
@@ -1781,7 +1781,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="ml-auto text-center bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-xl">
  <div className={`text-xl font-black ${selectedCandidate.score >= 90 ? 'text-[#00A76F]' : 'text-[#FFC107]'}`}>{selectedCandidate.score}%</div>
- <div className="text-[9px] text-gray-400 font-bold mt-0.5">AI Match</div>
+ <div className="text-[11px] text-gray-400 font-bold mt-0.5">AI Match</div>
  </div>
  </div>
 
@@ -1799,19 +1799,19 @@ export default function JobDashboardPage() {
  <h4 className="text-xs font-bold text-gray-400 mb-3">Experience & Details</h4>
  <div className="grid grid-cols-2 gap-3">
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
- <div className="text-[10px] font-semibold text-gray-400 mb-1">Company</div>
+ <div className="text-[11px] font-semibold text-gray-400 mb-1">Company</div>
  <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.company}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
- <div className="text-[10px] font-semibold text-gray-400 mb-1">Experience</div>
+ <div className="text-[11px] font-semibold text-gray-400 mb-1">Experience</div>
  <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.experience}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
- <div className="text-[10px] font-semibold text-gray-400 mb-1">Location</div>
+ <div className="text-[11px] font-semibold text-gray-400 mb-1">Location</div>
  <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.location}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
- <div className="text-[10px] font-semibold text-gray-400 mb-1">Applied</div>
+ <div className="text-[11px] font-semibold text-gray-400 mb-1">Applied</div>
  <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.time}</div>
  </div>
  </div>
@@ -1845,7 +1845,7 @@ export default function JobDashboardPage() {
  <div className="flex min-h-[600px] bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 mt-4">
  {/* Sidebar */}
  <div className="w-64 border-r border-gray-100 dark:border-gray-800/50 bg-gray-50/30 dark:bg-[#161c24]/50 py-6 shrink-0">
- <h3 className="text-xs font-bold text-gray-400 tracking-wider mb-4 px-6">Job Setup</h3>
+ <h3 className="text-xs font-bold text-gray-400 mb-4 px-6">Job Setup</h3>
  <div className="space-y-1 px-3">
  {[
  { name: 'Overview', icon: FileText },
@@ -1904,7 +1904,7 @@ export default function JobDashboardPage() {
  <div className="space-y-5">
  <div>
  <div className="flex items-center justify-between mb-2">
- <label className="block text-xs font-bold text-gray-500 tracking-wider">Job Title</label>
+ <label className="block text-xs font-bold text-gray-500 ">Job Title</label>
  <div className="flex items-center gap-3">
  <span className="bg-[#00A76F]/10 text-[#00A76F] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5">
  <span className="w-1.5 h-1.5 rounded-full bg-[#00A76F]"></span>
@@ -1925,7 +1925,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Department</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Department</label>
  <input 
  type="text" 
  value={setupJobData.department}
@@ -1935,7 +1935,7 @@ export default function JobDashboardPage() {
  />
  </div>
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Requisition Ref</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Requisition Ref</label>
  <input 
  type="text" 
  value={setupJobData.requisitionRef}
@@ -1959,7 +1959,7 @@ export default function JobDashboardPage() {
 
  <div className="space-y-6">
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Headcount Required</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Headcount Required</label>
  <div className="flex items-center">
  <button 
  onClick={() => setSetupJobData(prev => ({...prev, headcount: Math.max(1, Number(prev.headcount) - 1)}))}
@@ -1984,9 +1984,9 @@ export default function JobDashboardPage() {
  </div>
 
  <div className="pt-2">
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-4 flex justify-between">
+ <label className="block text-xs font-bold text-gray-500 mb-4 flex justify-between">
  <span>Approved Salary Range</span>
- <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[10px] font-bold">{setupJobData.currency}</span>
+ <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[11px] font-bold">{setupJobData.currency}</span>
  </label>
  <div className="w-full pb-4">
  <DualRangeSlider 
@@ -2017,7 +2017,7 @@ export default function JobDashboardPage() {
 
  <div className="space-y-5">
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Location</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Location</label>
  <input 
  type="text" 
  value={setupJobData.location}
@@ -2028,7 +2028,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Employment Type</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Employment Type</label>
  <SearchableSelect 
  options={[
  { label: 'Full-time', value: 'Full-time' },
@@ -2042,7 +2042,7 @@ export default function JobDashboardPage() {
  />
  </div>
  <div>
- <label className="block text-xs font-bold text-gray-500 tracking-wider mb-2">Work Mode</label>
+ <label className="block text-xs font-bold text-gray-500 mb-2">Work Mode</label>
  <SearchableSelect 
  options={[
  { label: 'On-site', value: 'On-site' },
@@ -2133,11 +2133,11 @@ export default function JobDashboardPage() {
  <div key={idx} className="bg-gray-50/50 dark:bg-gray-800/20 p-3 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="flex flex-col md:flex-row gap-4">
  <div className="w-full md:w-1/3">
- <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-wider mb-1">Rule Name</label>
+ <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1">Rule Name</label>
  <input type="text" defaultValue={item.label} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all" />
  </div>
  <div className="w-full md:w-2/3">
- <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-wider mb-1">Rule Description</label>
+ <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1">Rule Description</label>
  <textarea rows="2" defaultValue={item.text} className="w-full px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] transition-all resize-none custom-scrollbar"></textarea>
  </div>
  </div>

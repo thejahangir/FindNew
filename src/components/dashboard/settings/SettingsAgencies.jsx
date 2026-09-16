@@ -150,7 +150,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  >
  {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
  {/* Tooltip */}
- <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+ <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
  {agency.status === 'Active' ? "Pause" : "Resume"}
  </span>
  </button>
@@ -162,7 +162,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  >
  <Trash2 size={18} />
  {/* Tooltip */}
- <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+ <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
  Remove
  </span>
  </button>

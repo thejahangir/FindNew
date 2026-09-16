@@ -49,7 +49,7 @@ export default function SearchableSelect({
  <span className={`${size === 'xs' ? 'text-[11px]' : 'text-sm'} ${selectedOption ? 'text-[#212b36] dark:text-white font-medium' : 'text-gray-400 dark:text-gray-400'}`}>
  {selectedOption ? selectedOption.label : placeholder}
  </span>
- <span className={`text-gray-400 font-bold px-1 ${size === 'xs' ? 'text-[9px]' : 'text-xs'}`}>{isOpen ? '▲' : '▼'}</span>
+ <span className={`text-gray-400 font-bold px-1 ${size === 'xs' ? 'text-[11px]' : 'text-xs'}`}>{isOpen ? '▲' : '▼'}</span>
  </div>
 
  {/* Dropdown Menu */}

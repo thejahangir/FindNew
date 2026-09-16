@@ -516,7 +516,7 @@ export default function CandidateProfilePage() {
  </button>
  {openMenu === 'transfer' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
- <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 tracking-wider">Transfer to</p>
+ <p className="px-3 py-1.5 text-[11px] font-bold text-gray-400 ">Transfer to</p>
  {TRANSFER_JOBS.map(job => (
  <button key={job} type="button" onClick={() => { setOpenMenu(null); showToast(`Transfer queued to ${job}`); }} className="w-full text-left px-3 py-2 text-[13px] font-bold text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
  {job}
@@ -533,7 +533,7 @@ export default function CandidateProfilePage() {
  </button>
  {openMenu === 'move' && (
  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-1 z-50" onClick={(e) => e.stopPropagation()}>
- <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 tracking-wider">Move stage</p>
+ <p className="px-3 py-1.5 text-[11px] font-bold text-gray-400 ">Move stage</p>
  {MOVE_STAGES.map(stage => (
  <button key={stage} type="button" onClick={() => { setOpenMenu(null); showToast(`Stage move: ${stage}`); }} className={`w-full text-left px-3 py-2 text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${stage === 'To Be Rejected' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}>
  {stage}
@@ -592,7 +592,7 @@ export default function CandidateProfilePage() {
  
 <div className="w-[380px] shrink-0 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 flex flex-col gap-4">
  <div className="flex items-center justify-between mb-2">
- <h2 className="text-sm font-bold text-[#212b36] dark:text-white tracking-wider">Application Details</h2>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white ">Application Details</h2>
  <button onClick={() => showToast('Downloading Resume...')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[11px] font-bold text-[#212b36] dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm group cursor-pointer">
  <FileText size={12} className="text-gray-400 group-hover:text-[#1890FF] transition-colors" />
  <span>Resume</span>
@@ -600,109 +600,109 @@ export default function CandidateProfilePage() {
  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
  <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Name</p>
+ <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Name</p>
  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300 truncate">{candidate.name}</p>
  </div>
  <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
+ <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
  <p className="text-[13px] leading-relaxed font-semibold text-[#1890FF] break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
  </div>
  <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
+ <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">+91 98765 43210</p>
  </div>
  <div>
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Location</p>
+ <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Location</p>
  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">{candidate.location || 'Bangalore, KA'}</p>
  </div>
  <div className="col-span-2">
- <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Time Zone</p>
+ <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Time Zone</p>
  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IST (UTC +5:30)</p>
  </div>
  </div>
  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
   <div className="grid grid-cols-2 gap-y-3 gap-x-2">
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
   </div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Experience</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Experience</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
   </div>
   <div className="col-span-2">
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
   </div>
   <div className="col-span-2">
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current Title</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current Title</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</p>
   </div>
   </div>
   </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
   <div className="grid grid-cols-1 gap-y-3 gap-x-2">
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1.5">Primary Skills</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-1.5">Primary Skills</p>
   <div className="flex flex-wrap gap-1.5">
-  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">React</span>
-  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">Node.js</span>
-  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">AWS</span>
-  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">System Design</span>
+ <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">React</span>
+ <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">Node.js</span>
+ <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">AWS</span>
+ <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">System Design</span>
   </div>
   </div>
   </div>
   </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
   <div className="grid grid-cols-2 gap-y-3 gap-x-2">
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
   </div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Available From</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Oct 01, 2026</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Available From</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Oct 01, 2026</p>
   </div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
   </div>
   <div></div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
   </div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
   </div>
   </div>
   </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
   <div className="grid grid-cols-1 gap-y-3 gap-x-2">
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1.5">Career Timeline</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-1.5">Career Timeline</p>
   <div className="flex flex-col gap-3">
   <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
   <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-[#1890FF]"></span>
-  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">Senior Staff Engineer</p>
+ <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">Senior Staff Engineer</p>
   <p className="text-[11px] text-gray-500">Google India • 2020 - Present</p>
   </div>
   <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
   <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">SDE II</p>
+ <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">SDE II</p>
   <p className="text-[11px] text-gray-500">Amazon • 2017 - 2020</p>
   </div>
   </div>
@@ -711,31 +711,31 @@ export default function CandidateProfilePage() {
   </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
   <div className="grid grid-cols-1 gap-y-3 gap-x-2">
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Degree</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">B.Tech in Computer Science</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Degree</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">B.Tech in Computer Science</p>
   </div>
   <div>
-  <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">Institution</p>
-  <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IIT Bombay (2013-2017)</p>
+  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Institution</p>
+ <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IIT Bombay (2013-2017)</p>
   </div>
   </div>
   </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 tracking-wider pb-2 border-b border-gray-200 dark:border-gray-700/50">Profiles</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Profiles</h3>
   <div className="flex flex-col gap-2">
-  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+ <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
   <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
   linkedin.com/in/{candidate.name.toLowerCase().replace(/\s+/g, '')}
   </a>
-  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+ <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
   <svg className="w-3.5 h-3.5 fill-current text-black dark:text-white" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
   github.com/{candidate.name.toLowerCase().replace(/\s+/g, '')}
   </a>
-  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
+ <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
   <svg className="w-3.5 h-3.5 fill-current text-gray-500 dark:text-gray-400" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.849 19h-1.604l-2.094-5.783v5.783h-1.536v-8.898h2.091l1.83 5.093 1.831-5.093h2.091v8.898h-1.535v-5.783l-2.074 5.783zm7.849-5.116h-4v1.547h4v1.464h-4v2.105h-1.535v-8.898h5.535v1.464h-4v2.318h4v-8.898h1.535v8.898h-1.535z"/></svg>
   {candidate.name.toLowerCase().replace(/\s+/g, '')}.dev
   </a>
@@ -767,7 +767,7 @@ export default function CandidateProfilePage() {
  
   {/* Executive Summary */}
   <div>
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 tracking-wider">Executive Summary</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 ">Executive Summary</h3>
   <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">
   Highly motivated and experienced AI Research Scientist with over 5 years of experience in developing state-of-the-art machine learning models. Proven track record in natural language processing and generative AI, with multiple publications in top-tier conferences. Passionate about applying AI to solve complex real-world problems.
   </p>
@@ -778,45 +778,59 @@ export default function CandidateProfilePage() {
   {/* Progress & Status */}
   <div>
   <div className="flex items-center justify-between mb-4">
-    <h3 className="text-sm font-bold text-[#212b36] dark:text-white tracking-wider flex items-center gap-2"><GitBranch size={16} className="text-[#1890FF]" /> Current Progress</h3>
-    <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95">
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2"><GitBranch size={16} className="text-[#1890FF]" /> Current Progress</h3>
+ <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95">
       <Calendar size={12} /> Schedule Interview
     </button>
   </div>
   
-  <div className="bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/50 rounded-xl p-6 overflow-x-auto">
-  <div className="min-w-[600px] flex items-center justify-between relative px-4">
+  <div className="bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-2xl p-6 shadow-sm flex flex-col relative overflow-hidden">
   
-  {/* Background Track */}
-  <div className="absolute top-4 left-8 right-8 h-[2px] bg-gray-200 dark:bg-gray-700 -z-0"></div>
+  {/* Hybrid Timeline */}
+  <div className="flex items-center justify-center gap-8 w-full pb-4 pt-2">
   
-  {/* Active Progress Track (up to HM Interview) */}
-  <div className="absolute top-4 left-8 w-[60%] h-[2px] bg-[#00A76F] -z-0"></div>
-
-  {/* Steps */}
+  {/* Completed Stages (Avatar Group) */}
+  <div className="flex -space-x-3 hover:space-x-1 transition-all duration-300">
   {[
   { label: 'Applied', status: 'completed' },
   { label: 'AI Screening', status: 'completed' },
   { label: 'AI Interview', status: 'completed' },
-  { label: 'HM Interview', status: 'active' },
-  { label: 'Ref Check', status: 'pending' },
-  { label: 'Offer', status: 'pending' },
   ].map((step, i) => (
-  <div key={i} className="flex flex-col items-center gap-3 z-10 w-24">
-  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all shadow-sm
-  ${step.status === 'completed' ? 'bg-[#00A76F] border-[#00A76F] text-white' : 
-  step.status === 'active' ? 'bg-white dark:bg-[#161c24] border-[#1890FF] text-[#1890FF] ring-4 ring-[#1890FF]/20' : 
-  'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600'}
-  `}>
-  {step.status === 'completed' ? <Check size={14} strokeWidth={3} /> : <span className="text-[11px] font-bold">{i + 1}</span>}
+  <div key={i} className="w-10 h-10 rounded-full bg-[#00A76F] border-[3px] border-white dark:border-[#161c24] flex items-center justify-center text-white shadow-sm hover:-translate-y-1 transition-transform cursor-pointer relative group/avatar z-[1]">
+  <Check size={16} strokeWidth={3} />
+  {/* Tooltip */}
+ <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 opacity-0 group-hover/avatar:opacity-100 transition-opacity bg-gray-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-md whitespace-nowrap pointer-events-none z-50 shadow-lg">
+  {step.label}
   </div>
-  <span className={`text-[11px] font-bold text-center ${
-  step.status === 'completed' ? 'text-[#212b36] dark:text-gray-300' :
-  step.status === 'active' ? 'text-[#1890FF]' :
-  'text-gray-400'
-  }`}>{step.label}</span>
   </div>
   ))}
+  </div>
+
+  {/* Active Stage (Prominent Pill) */}
+  <div className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#1890FF] to-[#0c66c2] text-white shadow-[0_6px_16px_rgba(24,144,255,0.35)] transform hover:scale-105 transition-transform cursor-default relative overflow-hidden group/active mx-2">
+  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/active:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+  <div className="w-6 h-6 rounded-full bg-white text-[#1890FF] flex items-center justify-center shadow-sm relative">
+  <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-20"></span>
+ <span className="text-[12px] font-black">4</span>
+  </div>
+ <span className="text-[14px] font-black pr-2">HM Interview</span>
+  </div>
+
+  {/* Pending Stages (Avatar Group) */}
+  <div className="flex -space-x-3 hover:space-x-1 transition-all duration-300 flex-row-reverse space-x-reverse">
+  {[
+  { label: 'Offer', status: 'pending', id: 6 },
+  { label: 'Ref Check', status: 'pending', id: 5 },
+  ].map((step, i) => (
+  <div key={i} className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border-[3px] border-white dark:border-[#161c24] flex items-center justify-center text-gray-400 dark:text-gray-500 shadow-sm hover:-translate-y-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all cursor-pointer relative group/avatar z-[1]" style={{ zIndex: 5 - i }}>
+ <span className="text-[11px] font-bold">{step.id}</span>
+  {/* Tooltip */}
+ <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 opacity-0 group-hover/avatar:opacity-100 transition-opacity bg-gray-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-md whitespace-nowrap pointer-events-none z-50 shadow-lg">
+  {step.label}
+  </div>
+  </div>
+  ))}
+  </div>
   
   </div>
   </div>
@@ -824,34 +838,34 @@ export default function CandidateProfilePage() {
 
   {/* Feedback Summaries */}
   <div>
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Star size={16} className="text-[#FFC107]" /> Feedback Summaries</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 flex items-center gap-2"><Star size={16} className="text-[#FFC107]" /> Feedback Summaries</h3>
   <div className="grid grid-cols-1 space-y-4">
   <div className="p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 flex gap-4 items-start transition-all hover:bg-[#00A76F]/10">
-  <div className="w-11 h-11 shrink-0 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+ <div className="w-11 h-11 shrink-0 rounded-full bg-[#00A76F] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
   9.8
   </div>
   <div className="flex-1 space-y-1.5">
-  <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[11px] uppercase tracking-wider"><Bot size={14} /> AI Screening</div>
+ <div className="flex items-center gap-2 text-[#00A76F] font-bold text-[11px] uppercase "><Bot size={14} /> AI Screening</div>
   <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate strongly matches the technical requirements. Excellent overlap in React, Node, and AWS architecture. Note: slight gap in people management experience.</p>
   </div>
   </div>
 
   <div className="p-4 rounded-xl border border-[#FFAB00]/20 bg-[#FFAB00]/5 flex gap-4 items-start transition-all hover:bg-[#FFAB00]/10">
-  <div className="w-11 h-11 shrink-0 rounded-full bg-[#FFAB00] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+ <div className="w-11 h-11 shrink-0 rounded-full bg-[#FFAB00] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
   6.5
   </div>
   <div className="flex-1 space-y-1.5">
-  <div className="flex items-center gap-2 text-[#FFAB00] font-bold text-[11px] uppercase tracking-wider"><Cpu size={14} /> AI Interview</div>
+ <div className="flex items-center gap-2 text-[#FFAB00] font-bold text-[11px] uppercase "><Cpu size={14} /> AI Interview</div>
   <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Candidate communicated clearly. AI agent noted acceptable problem-solving skills but hesitated slightly on complex behavioral questions.</p>
   </div>
   </div>
 
   <div className="p-4 rounded-xl border border-[#FF5630]/20 bg-[#FF5630]/5 flex gap-4 items-start transition-all hover:bg-[#FF5630]/10">
-  <div className="w-11 h-11 shrink-0 rounded-full bg-[#FF5630] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
+ <div className="w-11 h-11 shrink-0 rounded-full bg-[#FF5630] text-white flex items-center justify-center font-black text-[14px] shadow-sm mt-0.5">
   4.2
   </div>
   <div className="flex-1 space-y-1.5">
-  <div className="flex items-center gap-2 text-[#FF5630] font-bold text-[11px] uppercase tracking-wider"><User size={14} /> Human Interviews</div>
+ <div className="flex items-center gap-2 text-[#FF5630] font-bold text-[11px] uppercase "><User size={14} /> Human Interviews</div>
   <p className="text-[13px] leading-relaxed text-[#212b36] dark:text-gray-300 leading-relaxed">Struggled in Round 1 (Tech) and Round 2 (Design). Failed to clear live coding easily. Lacks fundamental system design sense.</p>
   </div>
   </div>
@@ -860,7 +874,7 @@ export default function CandidateProfilePage() {
 
   {/* Reminders */}
   <div>
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 tracking-wider flex items-center gap-2"><Bell size={16} className="text-[#FF5630]" /> Upcoming Reminders</h3>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-4 flex items-center gap-2"><Bell size={16} className="text-[#FF5630]" /> Upcoming Reminders</h3>
   <div className="space-y-3">
   <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
   <div className="flex items-center gap-3">
@@ -868,11 +882,11 @@ export default function CandidateProfilePage() {
   <Video size={16} />
   </div>
   <div>
-  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">HM Interview with Amit</h4>
+ <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">HM Interview with Amit</h4>
   <p className="text-[13px] leading-relaxed text-gray-500">Scheduled for today, 4:00 PM</p>
   </div>
   </div>
-  <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Amit</span>
+ <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Amit</span>
   </div>
   
   <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
@@ -881,11 +895,11 @@ export default function CandidateProfilePage() {
   <MessageSquare size={16} />
   </div>
   <div>
-  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Collect Scorecard (System Design)</h4>
+ <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Collect Scorecard (System Design)</h4>
   <p className="text-[13px] leading-relaxed text-[#FF5630]">Overdue by 2 hours</p>
   </div>
   </div>
-  <span className="text-[11px] font-bold bg-[#FF5630]/10 text-[#FF5630] px-3 py-1 rounded">Owner: Amit</span>
+ <span className="text-[11px] font-bold bg-[#FF5630]/10 text-[#FF5630] px-3 py-1 rounded">Owner: Amit</span>
   </div>
 
   <div className="flex items-center justify-between p-3 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50 rounded-xl hover:border-[#1890FF]/30 transition-colors">
@@ -894,11 +908,11 @@ export default function CandidateProfilePage() {
   <FileText size={16} />
   </div>
   <div>
-  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Review Background Check</h4>
+ <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">Review Background Check</h4>
   <p className="text-[13px] leading-relaxed text-gray-500">Due tomorrow, 10:00 AM</p>
   </div>
   </div>
-  <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Priya</span>
+ <span className="text-[11px] font-bold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded text-[#212b36] dark:text-white">Owner: Priya</span>
   </div>
   </div>
   </div>
@@ -945,7 +959,7 @@ export default function CandidateProfilePage() {
  <div className="min-w-0">
  <div className="flex flex-wrap items-center gap-2">
  <h3 className={`text-[13px] font-bold ${isUpcoming ? 'text-gray-400' : 'text-[#212b36] dark:text-white'}`}>{stage.name}</h3>
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${styles.badge}`}>{styles.label}</span>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded ${styles.badge}`}>{styles.label}</span>
  </div>
  <p className="text-[13px] leading-relaxed text-gray-500 mt-1 flex flex-wrap gap-x-3">
  {stage.entered ? (
@@ -976,19 +990,19 @@ export default function CandidateProfilePage() {
  <div className="rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/70 dark:bg-gray-800/30 p-4 space-y-3">
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
  <div>
- <p className="text-[10px] font-bold text-gray-400 tracking-wider">Entered</p>
+ <p className="text-[11px] font-bold text-gray-400 ">Entered</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.entered}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 tracking-wider">Exited</p>
+ <p className="text-[11px] font-bold text-gray-400 ">Exited</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.exited || '—'}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 tracking-wider">Time in stage</p>
+ <p className="text-[11px] font-bold text-gray-400 ">Time in stage</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.days} {stage.days === 1 ? 'day' : 'days'}</p>
  </div>
  <div>
- <p className="text-[10px] font-bold text-gray-400 tracking-wider">Decision</p>
+ <p className="text-[11px] font-bold text-gray-400 ">Decision</p>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white mt-0.5">{stage.outcome}</p>
  </div>
  </div>
@@ -1015,28 +1029,28 @@ export default function CandidateProfilePage() {
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-200 shadow-sm dark:border-gray-700/80 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
   <div className="flex justify-between items-start">
-  <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase tracking-wider"><Bot size={14} className="text-[#00A76F]" /> AI Screening</h3>
-  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.8/10</span>
+ <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase "><Bot size={14} className="text-[#00A76F]" /> AI Screening</h3>
+ <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.8/10</span>
   </div>
   <p className="text-[13px] leading-relaxed text-gray-500 leading-relaxed mt-1">Excellent alignment on technical stack. Profile demonstrates high agency.</p>
   </div>
   
   <div className="bg-white dark:bg-[#161c24] p-5 rounded-xl border border-gray-200 shadow-sm dark:border-gray-700/80 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
   <div className="flex justify-between items-start">
-  <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase tracking-wider"><Cpu size={14} className="text-[#00A76F]" /> AI Interview</h3>
-  <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">8.5/10</span>
+ <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase "><Cpu size={14} className="text-[#00A76F]" /> AI Interview</h3>
+ <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">8.5/10</span>
   </div>
   <p className="text-[13px] leading-relaxed text-gray-500 leading-relaxed mt-1">Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.</p>
   </div>
 
   <div className="bg-gray-50/50 dark:bg-[#161c24]/30 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/80 flex flex-col items-center justify-center text-center gap-1.5 hover:bg-gray-100/50 dark:hover:bg-gray-800/30 transition-colors group min-h-[120px] h-full">
-  <h3 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5 uppercase tracking-wider">
+ <h3 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5 uppercase ">
   <User size={14} /> Human Interviews
   </h3>
-  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-200/40 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full mb-1">
+ <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-gray-200/40 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full mb-1">
   Yet to be done
   </span>
-  <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 mt-1">
+ <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 mt-1">
     <Calendar size={12} /> Schedule Now
   </button>
   </div>
@@ -1045,12 +1059,12 @@ export default function CandidateProfilePage() {
   {/* Expandable Scorecards */}
   <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden">
   <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/20">
-  <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2 tracking-wider">
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2 ">
   <FileText size={16} className="text-[#1890FF]" /> Interview Scorecards
   </h2>
   <button 
   onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
-  className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+ className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
   >
   {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
   </button>
@@ -1066,18 +1080,18 @@ export default function CandidateProfilePage() {
   className="w-full flex items-center justify-between p-5 cursor-pointer"
   >
   <div className="flex items-center gap-4">
-  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+ <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
   {getInitials(scorecard.interviewer)}
   </div>
   <div className="text-left">
-  <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
+ <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
   <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
   </div>
   </div>
   <div className="flex items-center gap-6">
   <div className="text-right hidden sm:block">
-  <div className="text-[14px] font-bold text-[#00A76F]">{scorecard.score}</div>
-  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Overall</div>
+ <div className="text-[14px] font-bold text-[#00A76F]">{scorecard.score}</div>
+ <div className="text-[11px] font-bold text-gray-400 uppercase ">Overall</div>
   </div>
   <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
   </div>
@@ -1089,13 +1103,13 @@ export default function CandidateProfilePage() {
   {/* Left Col: Takeaways & Notes */}
   <div className="xl:col-span-2 space-y-5">
   <div>
-  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Key Takeaways</h5>
+ <h5 className="text-[11px] font-bold text-gray-400 uppercase mb-2">Key Takeaways</h5>
   <p className="text-[13px] text-[#212b36] dark:text-gray-300 leading-relaxed bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800/50 shadow-sm">
   {scorecard.takeaways}
   </p>
   </div>
   <div>
-  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Public Notes</h5>
+ <h5 className="text-[11px] font-bold text-gray-400 uppercase mb-2">Public Notes</h5>
   <p className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed pl-1">
   {scorecard.notes}
   </p>
@@ -1105,12 +1119,12 @@ export default function CandidateProfilePage() {
   {/* Right Col: Metrics */}
   <div className="space-y-5">
   <div>
-  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Weighting</h5>
+ <h5 className="text-[11px] font-bold text-gray-400 uppercase mb-3">Weighting</h5>
   <div className="space-y-4">
   <div>
   <div className="flex justify-between text-[12px] mb-1.5">
-  <span className="text-[#212b36] dark:text-gray-300 font-bold">Hard Skills</span>
-  <span className={`font-bold ${scorecard.hardSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.hardSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.hardSkills).toFixed(1)}/10.0</span>
+ <span className="text-[#212b36] dark:text-gray-300 font-bold">Hard Skills</span>
+ <span className={`font-bold ${scorecard.hardSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.hardSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.hardSkills).toFixed(1)}/10.0</span>
   </div>
   <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
   <div className={`h-2 rounded-full ${scorecard.hardSkills >= 8.0 ? 'bg-[#00A76F]' : scorecard.hardSkills >= 5.0 ? 'bg-[#FFC107]' : 'bg-[#FF5630]'}`} style={{ width: `${(scorecard.hardSkills / 10) * 100}%` }}></div>
@@ -1118,8 +1132,8 @@ export default function CandidateProfilePage() {
   </div>
   <div>
   <div className="flex justify-between text-[12px] mb-1.5">
-  <span className="text-[#212b36] dark:text-gray-300 font-bold">Soft Skills</span>
-  <span className={`font-bold ${scorecard.softSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.softSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.softSkills).toFixed(1)}/10.0</span>
+ <span className="text-[#212b36] dark:text-gray-300 font-bold">Soft Skills</span>
+ <span className={`font-bold ${scorecard.softSkills >= 8.0 ? 'text-[#00A76F]' : scorecard.softSkills >= 5.0 ? 'text-[#FFC107]' : 'text-[#FF5630]'}`}>{Number(scorecard.softSkills).toFixed(1)}/10.0</span>
   </div>
   <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
   <div className={`h-2 rounded-full ${scorecard.softSkills >= 8.0 ? 'bg-[#00A76F]' : scorecard.softSkills >= 5.0 ? 'bg-[#FFC107]' : 'bg-[#FF5630]'}`} style={{ width: `${(scorecard.softSkills / 10) * 100}%` }}></div>
@@ -1129,7 +1143,7 @@ export default function CandidateProfilePage() {
   </div>
 
   <div>
-  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Attributes</h5>
+ <h5 className="text-[11px] font-bold text-gray-400 uppercase mb-3">Attributes</h5>
   <div className="flex flex-wrap gap-2">
   {scorecard.attributes.map((attr, idx) => {
   let emoji = '➖';
@@ -1137,7 +1151,7 @@ export default function CandidateProfilePage() {
   else if (attr.rating === 'negative') emoji = '👎';
   
   return (
-  <span key={idx} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+ <span key={idx} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
   attr.rating === 'positive' 
   ? 'bg-[#00A76F]/10 text-[#00A76F] border-[#00A76F]/20'
   : attr.rating === 'negative'
@@ -1174,11 +1188,11 @@ export default function CandidateProfilePage() {
  <table className="w-full text-left border-collapse">
  <thead className="bg-gray-50/50 dark:bg-gray-800/20">
  <tr className="border-b border-gray-100 dark:border-gray-800/50">
- <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Stage</th>
- <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date Entered</th>
- <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Days Spent</th>
- <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Decision Maker</th>
- <th className="py-3 px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Outcome</th>
+ <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Stage</th>
+ <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Date Entered</th>
+ <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Days Spent</th>
+ <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Decision Maker</th>
+ <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Outcome</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-gray-50 dark:divide-gray-800/30">
@@ -1206,7 +1220,7 @@ export default function CandidateProfilePage() {
  </div>
  </td>
  <td className="py-3 px-4">
- <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap ${
+ <span className={`inline-flex px-2 py-0.5 rounded text-[11px] font-bold whitespace-nowrap ${
  stage.outcome.includes('Advance') || stage.outcome.includes('Moved') ? 'bg-[#00A76F]/10 text-[#00A76F]' :
  stage.outcome.includes('progress') || stage.outcome.includes('Kept') ? 'bg-[#1890FF]/10 text-[#1890FF]' :
  'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
@@ -1253,7 +1267,7 @@ export default function CandidateProfilePage() {
  <div className="space-y-6">
  {Object.entries(activityGroups).map(([date, items]) => (
  <div key={date}>
- <p className="text-[11px] font-bold text-gray-400 tracking-wider mb-3">{date}</p>
+ <p className="text-[11px] font-bold text-gray-400 mb-3">{date}</p>
  <div className="relative space-y-4">
  <div className="absolute top-2 bottom-2 left-[15px] w-px bg-gray-100 dark:bg-gray-800/50" />
  {items.map(item => {
@@ -1313,10 +1327,10 @@ export default function CandidateProfilePage() {
  {messages.map(msg => (
  <div key={msg.id} className={`flex flex-col ${msg.role === 'Hiring Manager' ? 'items-end' : 'items-start'}`}>
  <div className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 ${msg.role === 'Hiring Manager' ? 'bg-[#1890FF] text-white rounded-tr-sm' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white rounded-tl-sm'}`}>
- <p className={`text-[10px] font-bold mb-1 ${msg.role === 'Hiring Manager' ? 'text-white/80' : 'text-gray-500'}`}>{msg.name} · {msg.role}</p>
+ <p className={`text-[11px] font-bold mb-1 ${msg.role === 'Hiring Manager' ? 'text-white/80' : 'text-gray-500'}`}>{msg.name} · {msg.role}</p>
  <p className="text-[13px] leading-relaxed">{msg.text}</p>
  </div>
- <span className="text-[10px] text-gray-400 mt-1 px-1">{msg.time}</span>
+ <span className="text-[11px] text-gray-400 mt-1 px-1">{msg.time}</span>
  </div>
  ))}
  </div>

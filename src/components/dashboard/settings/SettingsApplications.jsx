@@ -99,7 +99,7 @@ const SortableCandidateCard = ({ candidate, onMoveStage }) => {
  </div>
  </div>
  <div className="flex flex-col items-end gap-1">
- <span className="text-[9px] font-semibold text-[#FF5630]">
+ <span className="text-[11px] font-semibold text-[#FF5630]">
  {candidate.score || 85}% Match
  </span>
  </div>
@@ -186,12 +186,12 @@ const PipelineSwimlane = ({ stage, candidates, onMoveStage, onOpenHiddenCandidat
  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" title={`There are ${hiddenCount} more candidates with lower match scores.`}>
  <div className="flex -space-x-1.5">
  {sortedCandidates.slice(4, 7).map((hc, idx) => (
- <div key={hc.id} className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center font-bold text-[9px] shadow-sm ring-2 ring-white dark:ring-[#161c24] relative" style={{ zIndex: 10 - idx }}>
+ <div key={hc.id} className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center font-bold text-[11px] shadow-sm ring-2 ring-white dark:ring-[#161c24] relative" style={{ zIndex: 10 - idx }}>
  {hc.avatar}
  </div>
  ))}
  </div>
- <span className="text-[10px] font-bold text-[#1890FF] bg-[#1890FF]/10 border border-[#1890FF]/20 px-1.5 py-0.5 rounded-full">+{hiddenCount}</span>
+ <span className="text-[11px] font-bold text-[#1890FF] bg-[#1890FF]/10 border border-[#1890FF]/20 px-1.5 py-0.5 rounded-full">+{hiddenCount}</span>
  </div>
  )}
  </div>
