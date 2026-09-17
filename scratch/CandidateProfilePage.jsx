@@ -284,7 +284,7 @@ const buildActivityFeed = (name) => [
  date: '2 Mar 2026',
  time: '6:12 PM',
  type: 'Notes',
- actor: 'FindNew AI',
+ actor: 'FindNeo AI',
  role: 'Screening',
  title: 'AI screening completed · 9.8/10 match',
  detail: 'Strong React/Node baseline. Limited AI research publications — probe in interview.',

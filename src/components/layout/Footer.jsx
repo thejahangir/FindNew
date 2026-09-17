@@ -72,7 +72,7 @@ export default function Footer() {
  {/* Bottom Bar */}
  <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
  <p className="text-gray-500 text-sm">
- © {new Date().getFullYear()} FindNew AI. All rights reserved.
+ © {new Date().getFullYear()} FindNeo AI. All rights reserved.
  </p>
  <div className="flex items-center gap-4">
  <a href="#" className="text-gray-500 hover:text-brand-blue transition-colors p-2">

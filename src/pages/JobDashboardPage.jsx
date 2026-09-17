@@ -255,6 +255,8 @@ export default function JobDashboardPage() {
  const [isSilentRejectConfirmOpen, setIsSilentRejectConfirmOpen] = useState(false);
  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
  const [rejectCards, setRejectCards] = useState([]);
+ const [notifyAgency, setNotifyAgency] = useState(true);
+ const [rejectSuccessAlert, setRejectSuccessAlert] = useState(null);
  const [appSearchQuery, setAppSearchQuery] = useState('');
  const [appFilterStage, setAppFilterStage] = useState('All');
  const [appSortBy, setAppSortBy] = useState('Rating');
@@ -598,7 +600,7 @@ export default function JobDashboardPage() {
  <div className="flex items-start justify-between mb-2">
  <div>
  <div className="flex items-center gap-2">
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
+ <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</div>
  <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
  {interview.score || 90}% Match
  </span>
@@ -750,7 +752,7 @@ export default function JobDashboardPage() {
  {rediscoveryCandidates.slice(0, 3).map(candidate => (
  <div key={candidate.id} className="border border-gray-100 dark:border-gray-800/50 p-3 rounded-xl hover:border-[#1890FF]/30 hover: transition-all cursor-pointer group">
  <div className="flex justify-between items-center mb-1">
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{candidate.name}</h4>
+ <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{candidate.name}</div>
  <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded-full">
  {candidate.match} Match
  </span>
@@ -1130,24 +1132,24 @@ export default function JobDashboardPage() {
  {/* Stage Change Block (replaces search when bulk selected) */}
  <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex items-center px-4 rounded-xl transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
  <button onClick={() => setSelectedAppCandidates([])} className="absolute top-1 right-1 text-white/70 hover:text-white transition-colors cursor-pointer p-0.5 z-10"><X size={12} /></button>
- <div className="flex items-center justify-center w-full relative gap-8">
+ <div className="flex items-center justify-center w-full relative gap-3">
  <div className="flex items-center gap-1.5">
- <span className="text-[12px] font-medium text-white/90">Move</span>
- <span className="w-28 text-[12px] font-bold text-white border border-white/30 bg-white/10 px-3 py-1.5 rounded-md flex items-center justify-center">{selectedAppCandidates.length} Selected</span>
+ <span className="text-[11px] font-medium text-white/90">Move</span>
+ <span className="w-24 text-[11px] font-bold text-white border border-white/30 bg-white/10 px-2 py-1.5 rounded-md flex items-center justify-center">{selectedAppCandidates.length} Selected</span>
  </div>
  <div className="flex items-center gap-1.5">
- <span className="text-[12px] font-medium text-white/90">To</span>
+ <span className="text-[11px] font-medium text-white/90">To</span>
  <div className="relative">
  <button
  onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
- className="w-28 text-[12px] font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-md flex items-center justify-between transition-colors cursor-pointer"
+ className="w-28 text-[11px] font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded-md flex items-center justify-between transition-colors cursor-pointer"
  >
  <span>Stage</span>
  <ChevronDown size={14} />
  </button>
  {isBulkStageMenuOpen && (
  <div
- className="absolute top-full right-0 mt-2 w-36 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 z-[100]"
+ className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 z-[100]"
  onClick={(e) => e.stopPropagation()}
  >
  {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => (
@@ -1297,7 +1299,7 @@ export default function JobDashboardPage() {
  <div className="flex-1 min-w-0">
  <div className="flex justify-between items-start mb-1">
  <div className="flex items-center gap-1 min-w-0 flex-1 pr-2">
- <h4 className={`text-[13px] font-bold truncate ${selectedAppCandidate?.id === cand.id ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF]'}`}>{cand.name}</h4>
+ <div className={`text-[13px] font-bold truncate ${selectedAppCandidate?.id === cand.id ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF]'}`}>{cand.name}</div>
  <button
  type="button"
  title="Open full profile"
@@ -1398,7 +1400,7 @@ export default function JobDashboardPage() {
  return (
  <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-800">
  <div>
- <h4 className="text-[16px] font-bold text-[#212b36] dark:text-white mb-1.5">{previewCandidate.name}</h4>
+ <div className="text-[16px] font-bold text-[#212b36] dark:text-white mb-1.5">{previewCandidate.name}</div>
  <div className="flex items-center gap-1.5 text-[13px] leading-relaxed text-gray-500">
  <Briefcase size={12} className="text-gray-400" />
  <span>Agency: <span className="font-semibold text-[#212b36] dark:text-gray-300">{previewCandidate.agency || 'Direct Application'}</span></span>
@@ -1575,7 +1577,7 @@ export default function JobDashboardPage() {
  </div>
  <div>
  <div className="flex items-center gap-2">
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</h4>
+ <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</div>
  <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
  {interview.score || 90}% Match
  </span>
@@ -1689,8 +1691,16 @@ export default function JobDashboardPage() {
         <div className="bg-[#FFC107]/10 border border-[#FFC107]/20 p-3.5 rounded-xl flex items-start gap-3 mt-4">
           <AlertCircle size={16} className="text-[#FFC107] shrink-0 mt-0.5" />
           <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed">
-            As a Hiring Manager, maintaining a good relationship with our agency partners is key. Would you like to notify the associated agencies with constructive feedback?
+            As a Hiring Manager, maintaining a good relationship with our agency partners is key.
           </p>
+        </div>
+        <div className="mt-4 flex items-center gap-2 cursor-pointer" onClick={() => setNotifyAgency(!notifyAgency)}>
+          <div className={`w-4 h-4 flex items-center justify-center rounded border ${notifyAgency ? 'bg-[#1890FF] border-[#1890FF]' : 'bg-white border-gray-300'}`}>
+            {notifyAgency && <Check size={12} className="text-white" />}
+          </div>
+          <span className="text-[13px] font-medium text-[#212b36] dark:text-white select-none">
+            Provide constructive feedback to agency partners
+          </span>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row items-center justify-end gap-3 p-5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-black/20">
@@ -1705,20 +1715,21 @@ export default function JobDashboardPage() {
         <button 
           onClick={() => {
             setIsConfirmRejectModalOpen(false);
-            setIsSilentRejectConfirmOpen(true);
+            if (notifyAgency) {
+              setIsRejectModalOpen(true);
+            } else {
+              const ids = rejectCards.map(card => card.id);
+              setCandidateList(prev => prev.map(c => ids.includes(c.id) ? { ...c, stage: 'Reject' } : c));
+              setSelectedAppCandidate(prev => prev && ids.includes(prev.id) ? { ...prev, stage: 'Reject' } : prev);
+              setSelectedAppCandidates(prev => prev.filter(id => !ids.includes(id)));
+              setRejectSuccessAlert({ count: rejectCards.length });
+              setTimeout(() => setRejectSuccessAlert(null), 3000);
+              setRejectCards([]);
+            }
           }} 
-          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-[#FF5630] bg-[#FF5630]/10 hover:bg-[#FF5630]/20 rounded-xl transition-colors cursor-pointer"
+          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-white bg-[#FF5630] hover:bg-[#FF5630]/90 rounded-xl transition-colors shadow-md shadow-[#FF5630]/20 cursor-pointer flex items-center justify-center gap-2"
         >
-          No, Just Reject
-        </button>
-        <button 
-          onClick={() => {
-            setIsConfirmRejectModalOpen(false);
-            setIsRejectModalOpen(true);
-          }} 
-          className="w-full sm:w-auto px-4 py-2 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors shadow-md shadow-[#1890FF]/20 cursor-pointer flex items-center justify-center gap-2"
-        >
-          <Mail size={16} /> Yes, Notify Agency
+          <UserX size={16} /> Reject
         </button>
       </div>
     </div>
@@ -1761,6 +1772,17 @@ export default function JobDashboardPage() {
       </div>
     </div>
   </div>
+  )}
+
+  {rejectSuccessAlert && (
+    <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 animate-fade-in border border-gray-700">
+      <div className="w-6 h-6 bg-[#00A76F]/20 text-[#00A76F] rounded-full flex items-center justify-center shrink-0">
+        <Check size={14} strokeWidth={3} />
+      </div>
+      <div className="font-medium text-sm">
+        {rejectSuccessAlert.count === 1 ? '1 candidate has been successfully rejected.' : `${rejectSuccessAlert.count} candidates have been successfully rejected.`}
+      </div>
+    </div>
   )}
 
   {/* Reject & notify agencies */}
@@ -1904,7 +1926,7 @@ export default function JobDashboardPage() {
  {selectedCandidate.name.split(' ').map(n => n[0]).join('')}
  </div>
  <div>
- <h3 className="text-lg font-bold dark:text-white">{selectedCandidate.name}</h3>
+ <div className="text-lg font-bold dark:text-white">{selectedCandidate.name}</div>
  <p className="text-[13px] font-medium text-gray-500">{selectedCandidate.role}</p>
  </div>
  <div className="ml-auto text-center bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-xl">

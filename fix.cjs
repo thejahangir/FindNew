@@ -118,7 +118,7 @@ code = code.replace(
   `  />\n` +
   `  <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/20">\n` +
   `  <div className="w-8 h-8 bg-[#1890FF]/10 text-[#1890FF] rounded-lg flex items-center justify-center shrink-0"><BrainCircuit size={18} /></div>\n` +
-  `  <div><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNew AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>\n` +
+  `  <div><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNe0 AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>\n` +
   `  </div>\n` +
   `  <div className="flex-1 p-3 overflow-y-auto space-y-3">\n` +
   `  <div className="flex flex-col gap-1 items-start max-w-[85%]"><div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white">Hi! I can help you analyze your hiring pipeline.</div></div>\n` +

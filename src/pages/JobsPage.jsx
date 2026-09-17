@@ -41,7 +41,7 @@ export default function JobsPage() {
  const itemsPerPage = 5;
 
  const [chatbotWidth, setChatbotWidth] = useState(DEFAULT_CHATBOT_WIDTH);
- const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(false);
+ const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(true);
  const [isChatbotResizing, setIsChatbotResizing] = useState(false);
  const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
  const [selectedJobToView, setSelectedJobToView] = useState(null);
@@ -285,7 +285,7 @@ export default function JobsPage() {
  <Briefcase size={20} />
  </div>
  <div>
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors cursor-pointer">{job.title}</h4>
+  <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors cursor-pointer">{job.title}</div>
  <div className="flex items-center gap-2 mt-1 mb-1">
  <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${getStatusColor(job.status)} inline-flex items-center gap-1`}>
  <span className="w-1 h-1 rounded-full bg-current"></span>
@@ -521,39 +521,31 @@ export default function JobsPage() {
  </div>
  </div>
 
- <div
- className="hidden xl:block shrink-0"
- style={{
- width: isChatbotCollapsed ? 0 : DEFAULT_CHATBOT_WIDTH,
- transition: isChatbotResizing ? 'none' : 'width 300ms cubic-bezier(0.22, 1, 0.36, 1)'
- }}
- />
-
  <button
  type="button"
  onClick={() => {
  setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
  setIsChatbotCollapsed(false);
  }}
- className={`hidden xl:flex fixed right-0 top-[316px] bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-l-xl text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
+ className={`hidden xl:flex fixed right-0 top-16 bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-none text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
  isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
  } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
- aria-label="Expand FindNew AI"
+ aria-label="Expand FindNeo AI"
  >
  <ChevronsLeft size={18} className="shrink-0" />
  <img src={findNewIco} alt="" className="w-6 h-6 object-contain shrink-0" />
  <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
- FindNew AI Assistant
+ FindNeo AI Assistant
  </span>
  </button>
 
  <div
  style={{
  width: chatbotWidth,
- transform: isChatbotCollapsed ? 'translateX(calc(100% + 56px))' : 'translateX(0)',
+ transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
  transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
  }}
- className={`fixed right-[56px] top-[316px] bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-tl-2xl rounded-tr-2xl xl:rounded-tr-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+ className={`fixed right-0 top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
  chatbotWidth > DEFAULT_CHATBOT_WIDTH && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
  } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
  >
@@ -581,7 +573,7 @@ export default function JobsPage() {
  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
  <img src={findNewIco} alt="FindNew AI" className="w-8 h-8 object-contain" />
  </div>
- <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNew AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>
+ <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNeo AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>
  <button
  type="button"
  onClick={() => setIsChatbotCollapsed(true)}

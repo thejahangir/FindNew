@@ -58,7 +58,7 @@ export default function AuthPage() {
 
  {/* Footer/Trust */}
  <div className="relative z-10 text-white/60 text-sm">
- © 2026 FindNew AI. All rights reserved.
+ © 2026 FindNeo AI. All rights reserved.
  </div>
  </div>
 

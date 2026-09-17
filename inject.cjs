@@ -105,7 +105,7 @@ const replacement = `
   <BrainCircuit size={18} />
   </div>
   <div>
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNew AI</h3>
+  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNeo AI</h3>
   <p className="text-[11px] text-gray-500">Always here to help</p>
   </div>
   </div>

@@ -348,6 +348,23 @@ const buildActivityFeed = (name) => [
  tone: 'blue'
  },
  {
+ id: 135,
+ date: '3 Mar 2026',
+ time: '10:06 AM',
+ type: 'Communications',
+ isDetailedEmail: true,
+ emailData: {
+   title: 'Email from Horizon Recruiting - Admin',
+   dateStr: '31 Jul 2026 at 10:06am',
+   from: 'admin@horizon-recruiting.example',
+   to: 'alvin.wong@talentflow.example',
+   cc: 'nina.park@talentflow.example',
+   subject: 'Interview availability - Alvin Wong (Lead Infrastructure Engineer)',
+ },
+ icon: Mail,
+ tone: 'green'
+ },
+ {
  id: 14,
  date: '2 Mar 2026',
  time: '6:12 PM',
@@ -418,7 +435,7 @@ export default function CandidateProfilePage() {
  const [activeTab, setActiveTab] = useState('Overview');
  const [openStages, setOpenStages] = useState(['interview-hm']);
  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
- const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(false);
+ const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(true);
  const [chatbotWidth, setChatbotWidth] = useState(320);
  const [isChatbotResizing, setIsChatbotResizing] = useState(false);
  const [expandedEmails, setExpandedEmails] = useState({});
@@ -633,129 +650,124 @@ export default function CandidateProfilePage() {
  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
- <div className="grid grid-cols-2 gap-y-3 gap-x-2">
- <div className="col-span-2">
- <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Name</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300 truncate">{candidate.name}</p>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
+ <div className="flex flex-col gap-2.5">
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Name</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right break-words">{candidate.name}</p>
  </div>
- <div className="col-span-2">
- <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#1890FF] break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Email</p>
+ <p className="text-[13px] font-semibold text-[#1890FF] text-right break-all">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</p>
  </div>
- <div>
- <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">+91 98765 43210</p>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Phone</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">+91 98765 43210</p>
  </div>
- <div>
- <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Location</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">{candidate.location || 'Bangalore, KA'}</p>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Location</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">{candidate.location || 'Bangalore, KA'}</p>
  </div>
- <div className="col-span-2">
- <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Time Zone</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IST (UTC +5:30)</p>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Time Zone</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">IST (UTC +5:30)</p>
  </div>
  </div>
  </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
-  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Total Experience</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">8 Years</p>
-  </div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Relevant Experience</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">5.5 Years</p>
-  </div>
-  <div className="col-span-2">
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current Company</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Google India</p>
-  </div>
-  <div className="col-span-2">
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current Title</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</p>
-  </div>
-  </div>
-  </div>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
+ <div className="flex flex-col gap-2.5">
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Total Exp.</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">8 Years</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Relevant Exp.</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">5.5 Years</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Current Company</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">Google India</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Current Title</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">Senior Staff Engineer</p>
+ </div>
+ </div>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
-  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-1.5">Primary Skills</p>
-  <div className="flex flex-wrap gap-1.5">
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Primary Skills</p>
+ <div className="flex flex-wrap gap-1.5 justify-end max-w-[200px]">
  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">React</span>
  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">Node.js</span>
  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">AWS</span>
  <span className="px-2 py-0.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-gray-300 rounded text-[11px] font-semibold">System Design</span>
-  </div>
-  </div>
-  </div>
-  </div>
+ </div>
+ </div>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
-  <div className="grid grid-cols-2 gap-y-3 gap-x-2">
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Notice Period</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">30 Days</p>
-  </div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Available From</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Oct 01, 2026</p>
-  </div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Work Mode</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">Hybrid</p>
-  </div>
-  <div></div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Current CTC</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹45,00,000</p>
-  </div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Expected CTC</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">₹60,00,000</p>
-  </div>
-  </div>
-  </div>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
+ <div className="flex flex-col gap-2.5">
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Notice Period</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">30 Days</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Available From</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">Oct 01, 2026</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Work Mode</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">Hybrid</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Current CTC</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">₹45,00,000</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Expected CTC</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">₹60,00,000</p>
+ </div>
+ </div>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
-  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-1.5">Career Timeline</p>
-  <div className="flex flex-col gap-3">
-  <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
-  <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-[#1890FF]"></span>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Timeline</p>
+ <div className="flex flex-col gap-3 w-full max-w-[200px]">
+ <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700 text-left">
+ <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-[#1890FF]"></span>
  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">Senior Staff Engineer</p>
-  <p className="text-[11px] text-gray-500">Google India • 2020 - Present</p>
-  </div>
-  <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700">
-  <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+ <p className="text-[11px] text-gray-500">Google India • 2020 - Present</p>
+ </div>
+ <div className="flex flex-col relative pl-4 border-l-2 border-gray-200 dark:border-gray-700 text-left">
+ <span className="absolute -left-[5px] top-[5px] w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></span>
  <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-300 leading-tight mb-0.5">SDE II</p>
-  <p className="text-[11px] text-gray-500">Amazon • 2017 - 2020</p>
-  </div>
-  </div>
-  </div>
-  </div>
-  </div>
+ <p className="text-[11px] text-gray-500">Amazon • 2017 - 2020</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
-  <div className="grid grid-cols-1 gap-y-3 gap-x-2">
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Degree</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">B.Tech in Computer Science</p>
-  </div>
-  <div>
-  <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Institution</p>
- <p className="text-[13px] leading-relaxed font-semibold text-[#212b36] dark:text-gray-300">IIT Bombay (2013-2017)</p>
-  </div>
-  </div>
-  </div>
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
+ <div className="flex flex-col gap-2.5">
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Degree</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">B.Tech in Computer Science</p>
+ </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Institution</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">IIT Bombay (2013-2017)</p>
+ </div>
+ </div>
+ </div>
 
  <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Profiles</h3>
@@ -1229,7 +1241,7 @@ export default function CandidateProfilePage() {
  </tr>
  </thead>
  <tbody className="divide-y divide-gray-50 dark:divide-gray-800/30">
- {STAGE_HISTORY.map((stage) => (
+ {STAGE_HISTORY.filter(stage => stage.status !== 'upcoming').reverse().map((stage) => (
  <tr key={stage.id} className="hover:bg-[#1890FF]/5 transition-colors group">
  <td className="py-3 px-4">
  <span className="text-[12px] font-bold text-[#212b36] dark:text-white">{stage.name}</span>
@@ -1307,10 +1319,46 @@ export default function CandidateProfilePage() {
  const Icon = item.icon;
  return (
  <div key={item.id} className="relative flex gap-3">
+ {item.isDetailedEmail ? (
+ <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ring-4 ring-white dark:ring-[#161c24] bg-transparent text-[#00A76F] z-[1]">
+ <Icon size={16} />
+ </div>
+ ) : (
  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ring-4 ring-white dark:ring-[#161c24] z-[1] ${TONE_STYLES[item.tone]}`}>
  <Icon size={14} />
  </div>
- <div className="flex-1 min-w-0 rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20 px-3.5 py-3">
+ )}
+ <div className={`flex-1 min-w-0 rounded-xl px-3.5 py-3 ${item.isDetailedEmail ? 'bg-[#f8f9fa] dark:bg-gray-800/10' : 'border border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20'}`}>
+ {item.isDetailedEmail ? (
+ <div className="flex flex-col gap-0.5 text-[13px] text-[#454f5b] dark:text-gray-300">
+ <div className="font-bold text-[#212b36] dark:text-white mb-2">{item.emailData.title} <span className="font-normal text-gray-500">· {item.emailData.dateStr}</span></div>
+ <div className="flex gap-1.5"><span className="font-bold text-[#212b36] dark:text-white">From:</span> <span>{item.emailData.from}</span></div>
+ <div className="flex gap-1.5"><span className="font-bold text-[#212b36] dark:text-white">To:</span> <span>{item.emailData.to}</span></div>
+ <div className="flex gap-1.5"><span className="font-bold text-[#212b36] dark:text-white">CC:</span> <span>{item.emailData.cc}</span></div>
+ <div className="font-bold text-[#212b36] dark:text-white mt-1.5 mb-3">Subject: {item.emailData.subject}</div>
+ <div className="space-y-4 text-[13px]">
+ <p>Hi Alvin,</p>
+ <p>We would like to invite you to an in-person meeting on 7 Aug at 2:00pm.</p>
+ <p>If you are unable to attend at the specified time, please share your availability using the scheduling link provided below.</p>
+ {expandedEmails[item.id] && (
+   <div className="space-y-4 animate-fade-in">
+     <p>Please ensure you bring a valid government-issued ID for building security clearance. The session will consist of a 45-minute architectural discussion followed by a 30-minute behavioral interview.</p>
+     <p>Our office is located at 123 Tech Park Drive, Building B. Parking validation will be provided at the reception.</p>
+     <p>We look forward to meeting you soon!</p>
+     <p>Best regards,<br/>Horizon Recruiting Team</p>
+   </div>
+ )}
+ <button 
+   type="button"
+   onClick={() => setExpandedEmails(prev => ({...prev, [item.id]: !prev[item.id]}))}
+   className="font-bold text-[#00A76F] inline-block hover:underline cursor-pointer"
+ >
+   {expandedEmails[item.id] ? 'Show less' : 'Read more'}
+ </button>
+ </div>
+ </div>
+ ) : (
+ <>
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0">
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white leading-snug">{item.title}</p>
@@ -1320,6 +1368,8 @@ export default function CandidateProfilePage() {
  </div>
  {item.detail && (
  <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed mt-2">{item.detail}</p>
+ )}
+ </>
  )}
  </div>
  </div>
@@ -1344,7 +1394,7 @@ export default function CandidateProfilePage() {
   setIsChatCollapsed(false);
   setChatbotWidth(320);
   }}
-  className={`hidden xl:flex fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-[316px] bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-l-xl text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
+  className={`hidden xl:flex fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 w-8 z-40 flex-col items-center justify-center gap-4 bg-amber-50 dark:bg-amber-900/20 border border-r-0 border-amber-500/20 dark:border-amber-500/30 shadow-sm rounded-none text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer ${
   isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
   } ${isChatCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
   aria-label="Expand team chat"
@@ -1359,10 +1409,10 @@ export default function CandidateProfilePage() {
   <div
   style={{
   width: chatbotWidth,
-  transform: !isChatCollapsed ? 'translateX(0)' : 'translateX(calc(100% + 56px))',
+  transform: !isChatCollapsed ? 'translateX(0)' : 'translateX(100%)',
   transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
   }}
-  className={`fixed right-[56px] top-[316px] bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-tl-2xl rounded-tr-2xl xl:rounded-tr-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+  className={`fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
   chatbotWidth > 320 && !isChatCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
   } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${!isChatCollapsed ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
   >
@@ -1423,14 +1473,6 @@ export default function CandidateProfilePage() {
   </div>
   </div>
 
-  {/* Shared Side Panel Spacer */}
-  <div
-  className="hidden xl:block shrink-0"
-  style={{
-  width: (isChatbotCollapsed && isChatCollapsed) ? 0 : chatbotWidth,
-  transition: isChatbotResizing ? 'none' : 'width 300ms cubic-bezier(0.22, 1, 0.36, 1)'
-  }}
-  />
 
   <button
   type="button"
@@ -1439,7 +1481,7 @@ export default function CandidateProfilePage() {
   setIsChatCollapsed(true);
   setChatbotWidth(320);
   }}
-  className={`hidden xl:flex fixed right-0 top-[316px] bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-l-xl text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
+  className={`hidden xl:flex fixed right-0 top-16 bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-none text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
   isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
   } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
   aria-label="Expand FindNew AI"
@@ -1454,10 +1496,10 @@ export default function CandidateProfilePage() {
   <div
   style={{
   width: chatbotWidth,
-  transform: isChatbotCollapsed ? 'translateX(calc(100% + 56px))' : 'translateX(0)',
+  transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
   transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
   }}
-  className={`fixed right-[56px] top-[316px] bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-tl-2xl rounded-tr-2xl xl:rounded-tr-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+  className={`fixed right-8 top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
   chatbotWidth > 320 && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
   } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
   >

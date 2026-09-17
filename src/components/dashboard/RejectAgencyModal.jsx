@@ -105,36 +105,31 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  key={card.id}
  className={`rounded-xl border p-4 transition-colors ${errors[card.id] ? 'border-[#FF5630] bg-[#FF5630]/5' : 'border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-800/20'}`}
  >
- <div className="flex items-start justify-between gap-3 mb-3">
- <div className="flex items-center gap-3 min-w-0">
- <div className="w-9 h-9 rounded-full bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center text-[11px] font-bold shrink-0">
+ <div className="flex items-start gap-3 mb-4">
+ <div className="w-10 h-10 rounded-full bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">
  {getInitials(card.name)}
  </div>
- <div className="min-w-0">
- <p className="text-[11px] font-bold text-gray-400 ">Candidate name</p>
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white truncate">{card.name}</h3>
- <p className="text-[11px] font-bold text-[#00A76F]">{card.score} match</p>
- </div>
- </div>
- <span className="text-[11px] font-bold text-gray-400 bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 px-2 py-0.5 rounded-md shrink-0">
+ <div className="min-w-0 flex-1">
+ <div className="flex items-start justify-between gap-2 mb-1">
+ <h3 className="text-sm font-extrabold text-[#212b36] dark:text-white truncate uppercase">{card.name}</h3>
+ <span className="text-[10px] font-bold text-gray-400 bg-gray-100/50 dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 px-2 py-0.5 rounded-md shrink-0">
  {index + 1} of {cards.length}
  </span>
  </div>
-
- <div className="flex items-start gap-2.5 mb-3 px-3 py-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/50">
- <Building2 size={14} className="text-[#1890FF] mt-0.5 shrink-0" />
- <div className="min-w-0">
- <p className="text-[11px] font-bold text-gray-400 ">Agency</p>
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{card.agency}</p>
- <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5 truncate">
+ <div className="flex flex-col gap-1 mt-1.5">
+ <p className="text-[12px] font-bold text-[#00A76F] flex items-center gap-1.5 truncate">
+ <Building2 size={13} className="shrink-0" /> {card.agency}
+ </p>
+ <p className="text-[11px] font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1.5 truncate">
  <Mail size={11} className="shrink-0" /> {card.agencyEmail}
  </p>
+ </div>
  </div>
  </div>
 
  <div>
  <div className="flex items-center justify-between mb-1.5">
- <label className={`text-[11px] font-bold ${errors[card.id] ? 'text-[#FF5630]' : 'text-gray-400'}`}>Feedback</label>
+ <label className={`text-[12px] font-extrabold ${errors[card.id] ? 'text-[#FF5630]' : 'text-black dark:text-white'}`}>Feedback</label>
  {cards.length > 1 && (
  <button
  type="button"
@@ -145,7 +140,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  </button>
  )}
  </div>
- <p className="text-[11px] text-gray-400 mb-1.5">Prefilled from AI screening. Edit or add anything you want to send.</p>
+ <p className="text-[12px] font-medium text-gray-500 dark:text-gray-400 mb-2">Prefilled from AI screening. Edit or add anything you want to send.</p>
  <textarea
  rows={5}
  value={card.feedback}
