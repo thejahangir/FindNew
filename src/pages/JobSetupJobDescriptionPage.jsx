@@ -26,6 +26,7 @@ Requirements:
  const [jdText, setJdText] = useState(jobData?.jdText || defaultJd);
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [isAiLoading, setIsAiLoading] = useState(false);
+ const [isEditing, setIsEditing] = useState(jobData?.status !== 'Published');
 
  const handleAiEnhance = () => {
  setIsAiLoading(true);
@@ -68,11 +69,24 @@ Requirements:
  <div className="flex items-center gap-2 text-sm font-bold text-[#212b36] dark:text-white">
  <Edit3 size={16} className="text-[#1890FF]" /> Editor
  </div>
- <button className="flex items-center gap-1.5 text-xs font-bold text-[#00A76F] hover:bg-[#00A76F]/10 px-2 py-1 rounded transition-colors cursor-pointer">
- <Save size={14} /> Auto-saved
+ {isEditing ? (
+ <button 
+ onClick={() => setIsEditing(false)}
+ className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm"
+ >
+ <Save size={14} /> Save
  </button>
+ ) : (
+ <button 
+ onClick={() => setIsEditing(true)}
+ className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm"
+ >
+ <Edit3 size={14} /> Edit
+ </button>
+ )}
  </div>
  <div className="react-quill-container flex-1">
+ {isEditing ? (
  <ReactQuill
  theme="snow"
  value={jdText}
@@ -80,6 +94,12 @@ Requirements:
  className="h-full min-h-[400px]"
  placeholder="Enter job description..."
  />
+ ) : (
+ <div 
+ className="p-6 prose dark:prose-invert max-w-none text-[13px] text-gray-600 dark:text-gray-300"
+ dangerouslySetInnerHTML={{ __html: jdText }}
+ />
+ )}
  </div>
  </div>
 
@@ -102,8 +122,8 @@ Requirements:
  
  <button 
  onClick={handleAiEnhance}
- disabled={isAiLoading}
- className="w-full flex items-start gap-3 p-3 bg-white dark:bg-[#212b36] border border-[#1890FF]/30 rounded-xl hover:border-[#1890FF] hover:shadow-md transition-all text-left cursor-pointer group disabled:opacity-70 disabled:cursor-wait"
+ disabled={isAiLoading || !isEditing}
+ className="w-full flex items-start gap-3 p-3 bg-white dark:bg-[#212b36] border border-[#1890FF]/30 rounded-xl hover:border-[#1890FF] hover:shadow-md transition-all text-left cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
  >
  <div className="mt-0.5 bg-[#1890FF]/10 p-1.5 rounded-lg text-[#1890FF]">
  {isAiLoading ? <div className="w-3.5 h-3.5 border-2 border-[#1890FF] border-t-transparent rounded-full animate-spin" /> : <Sparkles size={14} />}

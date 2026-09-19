@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { 
  UploadCloud, FileText, X, Search, MapPin, 
  Briefcase, Building, Check, UserPlus, Filter, Clock,
- Mail, ExternalLink, Users, Loader2, ChevronLeft, ChevronRight
+ Mail, ExternalLink, Users, Loader2, ChevronLeft, ChevronRight, Edit3, Save
 } from 'lucide-react';
 
 export default function JobSetupKnowledgeBasePage() {
@@ -14,6 +14,7 @@ export default function JobSetupKnowledgeBasePage() {
  const [uploadedFiles, setUploadedFiles] = useState([]);
  const [hasSearched, setHasSearched] = useState(false);
  const [isSearching, setIsSearching] = useState(false);
+ const [isEditing, setIsEditing] = useState(jobData?.status !== 'Published');
  const [currentPage, setCurrentPage] = useState(1);
  const [searchParams, setSearchParams] = useState({
  location: '',
@@ -177,6 +178,17 @@ export default function JobSetupKnowledgeBasePage() {
  Upload documents or search the knowledge base to attach relevant candidates to this job.
  </p>
  </div>
+ <div>
+ {isEditing ? (
+ <button onClick={() => setIsEditing(false)} className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Save size={14} /> Save
+ </button>
+ ) : (
+ <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Edit3 size={14} /> Edit
+ </button>
+ )}
+ </div>
  </div>
 
  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -191,6 +203,7 @@ export default function JobSetupKnowledgeBasePage() {
  Upload Documents
  </h3>
  
+ {isEditing && (
  <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer group">
  <input 
  type="file" 
@@ -205,6 +218,7 @@ export default function JobSetupKnowledgeBasePage() {
  <p className="text-sm font-bold text-[#212b36] dark:text-white">Click or drag files to upload</p>
  <p className="text-xs text-gray-500 mt-1">Supported formats: PDF, DOCX, TXT</p>
  </div>
+ )}
 
  {uploadedFiles.length > 0 && (
  <div className="mt-4 space-y-2">
@@ -217,9 +231,11 @@ export default function JobSetupKnowledgeBasePage() {
  <p className="text-xs text-gray-500">{file.size}</p>
  </div>
  </div>
+ {isEditing && (
  <button onClick={() => removeFile(idx)} className="text-gray-400 hover:text-red-500 transition-colors p-1">
  <X size={16} />
  </button>
+ )}
  </div>
  ))}
  </div>
@@ -233,15 +249,17 @@ export default function JobSetupKnowledgeBasePage() {
  <Filter size={18} className="text-[#8E33FF]" />
  Search Parameters
  </h3>
+ {isEditing && (
  <button 
  onClick={handleClearSearch}
  className="text-[11px] font-bold text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
  >
  Clear All
  </button>
+ )}
  </div>
 
- <div className="space-y-4">
+ <div className={`space-y-4 ${!isEditing ? 'pointer-events-none opacity-60' : ''}`}>
  <div className="space-y-1.5">
  <label className="text-xs font-bold text-gray-500">Location</label>
  <div className="relative">
@@ -316,7 +334,7 @@ export default function JobSetupKnowledgeBasePage() {
  <button 
  onClick={handleSearch}
  className="w-full py-3 mt-2 bg-[#212b36] hover:bg-[#161c24] dark:bg-white dark:hover:bg-gray-100 dark:text-[#212b36] text-white rounded-xl text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
- disabled={isSearching}
+ disabled={isSearching || !isEditing}
  >
  {isSearching ? (
  <Loader2 size={16} className="animate-spin" />
@@ -374,12 +392,14 @@ export default function JobSetupKnowledgeBasePage() {
  Search Results
  <span className="bg-[#1890FF]/10 text-[#1890FF] text-xs px-2.5 py-0.5 rounded-full">{candidates.length} Found</span>
  </h3>
+ {isEditing && (
  <div className="flex gap-2">
  <button className="px-4 py-2 text-sm font-bold text-[#00A76F] bg-[#00A76F]/10 hover:bg-[#00A76F]/20 rounded-lg transition-colors flex items-center gap-2 cursor-pointer">
  <UserPlus size={16} />
  Add Selected
  </button>
  </div>
+ )}
  </div>
 
  <div className="p-6 space-y-4">
@@ -391,8 +411,8 @@ export default function JobSetupKnowledgeBasePage() {
  <div className="flex items-start gap-4">
  {/* Customized Checkbox */}
  <div 
- onClick={() => toggleCandidate(candidate.id)}
- className={`w-6 h-6 shrink-0 rounded-md border flex items-center justify-center cursor-pointer transition-colors mt-1 ${candidate.selected ? 'bg-[#1890FF] border-[#1890FF] text-white' : 'border-gray-300 dark:border-gray-600 hover:border-[#1890FF]'}`}
+ onClick={() => isEditing && toggleCandidate(candidate.id)}
+ className={`w-6 h-6 shrink-0 rounded-md border flex items-center justify-center transition-colors mt-1 ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'} ${candidate.selected ? 'bg-[#1890FF] border-[#1890FF] text-white' : 'border-gray-300 dark:border-gray-600 hover:border-[#1890FF]'}`}
  >
  {candidate.selected && <Check size={14} strokeWidth={3} />}
  </div>

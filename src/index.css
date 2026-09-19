@@ -10,7 +10,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  background-color: #f9fafb;
+  background-color: #f3f4f6;
   color: #000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

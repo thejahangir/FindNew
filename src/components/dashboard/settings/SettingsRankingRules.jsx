@@ -62,7 +62,7 @@ function SortableRuleItem({ rule, isSelected, onSelect, isModal }) {
  );
 }
 
-const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
+const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal, isEditingSettings }) => {
  if (!rule) return null;
 
  return (
@@ -81,8 +81,9 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  <input
  type="text"
  value={rule.skill}
+ disabled={!isEditingSettings}
  onChange={(e) => onUpdate(rule.id, 'skill', e.target.value)}
- className={`w-full h-[46px] px-4 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px] font-semibold' : 'text-sm font-bold'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all`}
+ className={`w-full h-[46px] px-4 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px] font-semibold' : 'text-sm font-bold'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all disabled:opacity-70`}
  placeholder="e.g. Python Proficiency"
  />
  </div>
@@ -100,8 +101,9 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  max="2"
  step="0.1"
  value={rule.weight || 0}
+ disabled={!isEditingSettings}
  onChange={(e) => onUpdate(rule.id, 'weight', Number(e.target.value))}
- className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#1890FF]"
+ className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#1890FF] disabled:opacity-70"
  />
  <div className="text-[11px] font-bold text-gray-400">2.0</div>
  
@@ -112,8 +114,9 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  max="2"
  step="0.1"
  value={rule.weight === 0 && !rule.weight ? '' : rule.weight}
+ disabled={!isEditingSettings}
  onChange={(e) => onUpdate(rule.id, 'weight', Number(e.target.value))}
- className="w-full px-2 h-7 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-center text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all pr-4"
+ className="w-full px-2 h-7 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-center text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none transition-all pr-4 disabled:opacity-70"
  />
  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-gray-400 pointer-events-none">x</span>
  </div>
@@ -125,8 +128,9 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  <label className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-gray-500`}>Evaluation Guidelines (Description)</label>
  <textarea
  value={rule.description}
+ disabled={!isEditingSettings}
  onChange={(e) => onUpdate(rule.id, 'description', e.target.value)}
- className={`w-full min-h-[120px] px-4 py-3 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px]' : 'text-sm'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none resize-none transition-all`}
+ className={`w-full min-h-[120px] px-4 py-3 bg-gray-50 dark:bg-[#1a222c] border border-gray-200 dark:border-gray-700 rounded-xl ${isModal ? 'text-[13px]' : 'text-sm'} text-[#212b36] dark:text-white focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none resize-none transition-all disabled:opacity-70`}
  placeholder="How should the AI evaluate this skill?"
  />
  </div>
@@ -141,11 +145,14 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  <p className="text-xs text-gray-500">Auto-reject if score is 0 on this criteria</p>
  </div>
  </div>
+ <div className={!isEditingSettings ? 'opacity-50 pointer-events-none' : ''}>
  <ToggleSwitch checked={rule.isKnockout || false} onChange={(val) => onUpdate(rule.id, 'isKnockout', val)} />
+ </div>
  </div>
  </div>
  
  {/* Footer Actions */}
+ {isEditingSettings && (
  <div className="p-4 border-t-2 border-gray-200 dark:border-gray-700/50 flex items-center justify-center gap-8 bg-gray-50/50 dark:bg-[#1a222c]/50 rounded-b-2xl mt-auto">
  <button 
  onClick={() => onDelete(rule.id)} 
@@ -165,16 +172,17 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal }) => {
  <CheckCircle2 size={20} />
  </button>
  </div>
+ )}
  </div>
  );
 };
 
 export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter = false, onCancel, onSave }) {
- const navigate = () => {};
- const location = { state: null };
- 
- 
- const jobData = {};
+ const navigate = useNavigate();
+ const location = useLocation();
+ const initialJobData = location.state?.jobData || {};
+ const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
+ const jobData = initialJobData;
 
  const [rules, setRules] = useState([]);
  const [isGenerated, setIsGenerated] = useState(false);
@@ -273,8 +281,8 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  <div className={`flex-1 flex flex-col ${!hideFooter ? 'space-y-4' : 'space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2'}`}>
  {!hideFooter && (
  <div className="flex justify-end gap-4 mb-2 px-2">
- {isGenerated && (
  <div className="flex items-center gap-3">
+ {isGenerated && isEditingSettings && (
  <button 
  onClick={handleGenerate} 
  className="px-5 py-2.5 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-sm whitespace-nowrap"
@@ -282,8 +290,15 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  <Wand2 size={16} />
  Regenerate from JD
  </button>
- </div>
  )}
+ <button
+ onClick={() => setIsEditingSettings(prev => !prev)}
+ className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={isEditingSettings ? "Save changes" : "Edit Rules"}
+ >
+ {isEditingSettings ? <Check size={18} className="text-[#00A76F]" /> : <Settings2 size={18} />}
+ </button>
+ </div>
  </div>
  )}
 
@@ -307,12 +322,14 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  <p className="text-[13px] text-gray-500 max-w-sm mx-auto mb-8">
  Automatically extract and suggest ranking rules based on your Job Description.
  </p>
+ {isEditingSettings && (
  <button 
  onClick={handleGenerate} 
  className="px-6 py-3 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl text-sm font-bold transition-colors shadow-sm inline-flex items-center gap-2 cursor-pointer"
  >
  <Wand2 size={18} /> Generate from JD
  </button>
+ )}
  </div>
  ) : isGenerated && (
  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-start">
@@ -337,6 +354,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  </SortableContext>
  </DndContext>
 
+ {isEditingSettings && (
  <div className="mt-6 flex items-center justify-center pb-2">
  <button 
  onClick={handleAddRule}
@@ -345,6 +363,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  <Plus size={16} /> Add New Rule
  </button>
  </div>
+ )}
  </div>
  
  {/* Right Column: Details Panel */}
@@ -355,6 +374,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  onDelete={(id) => setDeleteConfirmRuleId(id)}
  onSave={() => setToastMessage('Rule changes saved successfully.')}
  isModal={hideFooter}
+ isEditingSettings={isEditingSettings}
  />
  </div>
 

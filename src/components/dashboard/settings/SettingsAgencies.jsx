@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pause, Play, Trash2, X, Building2, Calendar, Check, Search, AlertTriangle, LayoutGrid, List } from 'lucide-react';
+import { Plus, Pause, Play, Trash2, X, Building2, Calendar, Check, Search, AlertTriangle, LayoutGrid, List, Edit2 } from 'lucide-react';
 
 const mockAgencies = [
  { id: 1, name: 'TechTalent Partners', status: 'Active', assignedDate: 'Aug 10, 2026' },
@@ -19,11 +19,11 @@ const availableAgencies = [
 ];
 
 export default function SettingsAgencies({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
- 
- 
- const jobData = ({} /* mock */).jobData;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialJobData = location.state?.jobData || {};
+  const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
+  const jobData = initialJobData;
 
  const [agencies, setAgencies] = useState(mockAgencies);
  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -84,12 +84,23 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
  <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
  </div>
- <button 
- onClick={() => setIsAddModalOpen(true)}
- className="px-5 py-2.5 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
- >
- <Plus size={18} /> Add Agency
- </button>
+  <div className="flex gap-3">
+  <button
+  onClick={() => setIsEditingSettings(prev => !prev)}
+  className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+  title={isEditingSettings ? "Save changes" : "Edit Agencies"}
+  >
+  {isEditingSettings ? <Check size={20} className="text-[#00A76F]" /> : <Edit2 size={20} />}
+  </button>
+  {isEditingSettings && (
+  <button 
+  onClick={() => setIsAddModalOpen(true)}
+  className="px-5 py-2.5 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+  >
+  <Plus size={18} /> Add Agency
+  </button>
+  )}
+  </div>
  </div>
 
  <div className="flex-1">
@@ -98,12 +109,14 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  <Building2 size={48} className="text-gray-300 dark:text-gray-600 mb-4" />
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-2">No Agencies Assigned</h3>
  <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">You haven't assigned any external agencies to this job yet.</p>
- <button 
- onClick={() => setIsAddModalOpen(true)}
- className="px-4 py-2 bg-gray-50 dark:bg-gray-800 text-[#212b36] dark:text-white rounded-lg font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 cursor-pointer"
- >
- <Plus size={16} /> Assign an Agency
- </button>
+  {isEditingSettings && (
+  <button 
+  onClick={() => setIsAddModalOpen(true)}
+  className="px-4 py-2 bg-gray-50 dark:bg-gray-800 text-[#212b36] dark:text-white rounded-lg font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 cursor-pointer"
+  >
+  <Plus size={16} /> Assign an Agency
+  </button>
+  )}
  </div>
  ) : viewMode === 'cards' ? (
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -138,35 +151,37 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  </div>
 
  {/* Card Footer */}
- <div className="bg-gray-50/50 dark:bg-[#212b36]/30 border-t border-gray-100 dark:border-gray-800/50 p-3 flex items-center justify-center gap-2">
- <button 
- onClick={() => setConfirmAlert({ 
- action: agency.status === 'Active' ? 'pause' : 'resume', 
- agencyId: agency.id, 
- agencyName: agency.name 
- })}
- className="p-2.5 text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer group relative"
- title={agency.status === 'Active' ? "Pause Agency" : "Resume Agency"}
- >
- {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
- {/* Tooltip */}
- <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
- {agency.status === 'Active' ? "Pause" : "Resume"}
- </span>
- </button>
- <div className="w-px h-5 bg-gray-200 dark:bg-gray-700"></div>
- <button 
- onClick={() => setConfirmAlert({ action: 'remove', agencyId: agency.id, agencyName: agency.name })}
- className="p-2.5 text-gray-500 hover:text-[#FF5630] hover:bg-[#FF5630]/10 rounded-lg transition-colors cursor-pointer group relative"
- title="Remove Agency"
- >
- <Trash2 size={18} />
- {/* Tooltip */}
- <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
- Remove
- </span>
- </button>
- </div>
+  {isEditingSettings && (
+  <div className="bg-gray-50/50 dark:bg-[#212b36]/30 border-t border-gray-100 dark:border-gray-800/50 p-3 flex items-center justify-center gap-2">
+  <button 
+  onClick={() => setConfirmAlert({ 
+  action: agency.status === 'Active' ? 'pause' : 'resume', 
+  agencyId: agency.id, 
+  agencyName: agency.name 
+  })}
+  className="p-2.5 text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer group relative"
+  title={agency.status === 'Active' ? "Pause Agency" : "Resume Agency"}
+  >
+  {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
+  {/* Tooltip */}
+  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+  {agency.status === 'Active' ? "Pause" : "Resume"}
+  </span>
+  </button>
+  <div className="w-px h-5 bg-gray-200 dark:bg-gray-700"></div>
+  <button 
+  onClick={() => setConfirmAlert({ action: 'remove', agencyId: agency.id, agencyName: agency.name })}
+  className="p-2.5 text-gray-500 hover:text-[#FF5630] hover:bg-[#FF5630]/10 rounded-lg transition-colors cursor-pointer group relative"
+  title="Remove Agency"
+  >
+  <Trash2 size={18} />
+  {/* Tooltip */}
+  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[11px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+  Remove
+  </span>
+  </button>
+  </div>
+  )}
  </div>
  ))}
  </div>
@@ -176,10 +191,10 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  <thead>
  <tr className="bg-gray-50 dark:bg-gray-800/50">
  <th className="p-4 text-xs font-bold text-gray-500 rounded-l-xl">Agency Name</th>
- <th className="p-4 text-xs font-bold text-gray-500 ">Assigned Date</th>
- <th className="p-4 text-xs font-bold text-gray-500 ">Status</th>
- <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>
- </tr>
+  <th className="p-4 text-xs font-bold text-gray-500 ">Assigned Date</th>
+  <th className="p-4 text-xs font-bold text-gray-500 ">Status</th>
+  {isEditingSettings && <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>}
+  </tr>
  </thead>
  <tbody>
  {agencies.map(agency => (
@@ -204,30 +219,32 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  <span className={`w-1.5 h-1.5 rounded-full ${agency.status === 'Active' ? 'bg-[#00A76F]' : 'bg-[#FF5630]'}`}></span>
  {agency.status}
  </span>
- </td>
- <td className="p-4">
- <div className="flex items-center justify-center gap-2">
- <button 
- onClick={() => setConfirmAlert({ 
- action: agency.status === 'Active' ? 'pause' : 'resume', 
- agencyId: agency.id, 
- agencyName: agency.name 
- })}
- className="p-2 text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer"
- title={agency.status === 'Active' ? "Pause Agency" : "Resume Agency"}
- >
- {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
- </button>
- <button 
- onClick={() => setConfirmAlert({ action: 'remove', agencyId: agency.id, agencyName: agency.name })}
- className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-[#FF5630]/10 rounded-lg transition-colors cursor-pointer"
- title="Remove Agency"
- >
- <Trash2 size={18} />
- </button>
- </div>
- </td>
- </tr>
+  </td>
+  {isEditingSettings && (
+  <td className="p-4">
+  <div className="flex items-center justify-center gap-2">
+  <button 
+  onClick={() => setConfirmAlert({ 
+  action: agency.status === 'Active' ? 'pause' : 'resume', 
+  agencyId: agency.id, 
+  agencyName: agency.name 
+  })}
+  className="p-2 text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer"
+  title={agency.status === 'Active' ? "Pause Agency" : "Resume Agency"}
+  >
+  {agency.status === 'Active' ? <Pause size={18} /> : <Play size={18} />}
+  </button>
+  <button 
+  onClick={() => setConfirmAlert({ action: 'remove', agencyId: agency.id, agencyName: agency.name })}
+  className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-[#FF5630]/10 rounded-lg transition-colors cursor-pointer"
+  title="Remove Agency"
+  >
+  <Trash2 size={18} />
+  </button>
+  </div>
+  </td>
+  )}
+  </tr>
  ))}
  </tbody>
  </table>

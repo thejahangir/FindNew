@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, Video, Clock, Users, Plus, CheckCircle2 , Settings2} from 'lucide-react';
+import { Calendar, Video, Clock, Users, Plus, CheckCircle2 , Settings2, Edit3, Save } from 'lucide-react';
 
 export default function JobSetupInterviewsPage() {
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const location = useLocation();
  const navigate = useNavigate();
  const jobData = location.state?.jobData;
+ const [isEditing, setIsEditing] = useState(jobData?.status !== 'Published');
 
  
 
@@ -50,9 +51,22 @@ export default function JobSetupInterviewsPage() {
  <Calendar size={20} className="text-[#FF5630]" />
  Interview Rounds
  </h2>
+ <div className="flex items-center gap-4">
+ {isEditing && (
  <button className="px-4 py-2 bg-[#FF5630]/10 text-[#FF5630] rounded-lg text-sm font-bold hover:bg-[#FF5630]/20 transition-colors flex items-center gap-2 cursor-pointer">
  <Plus size={16} /> Add Round
  </button>
+ )}
+ {isEditing ? (
+ <button onClick={() => setIsEditing(false)} className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Save size={14} /> Save
+ </button>
+ ) : (
+ <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Edit3 size={14} /> Edit
+ </button>
+ )}
+ </div>
  </div>
 
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -82,9 +96,13 @@ export default function JobSetupInterviewsPage() {
  </div>
 
  <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+ {isEditing ? (
  <button className="text-xs font-bold text-[#1890FF] hover:underline cursor-pointer">
  Attach Scorecard
  </button>
+ ) : (
+ <span className="text-xs font-medium text-gray-400">Scorecard Attached</span>
+ )}
  <span className="text-xs font-bold px-2 py-1 bg-green-50 text-[#00A76F] rounded border border-green-200 flex items-center gap-1">
  <CheckCircle2 size={12}/> Ready
  </span>

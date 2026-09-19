@@ -160,7 +160,9 @@ const StageDetailsPanel = ({ stage, isEditing, onUpdateStage }) => {
  <p className="text-xs text-gray-500">{notif.desc}</p>
  </div>
  </div>
+ <div className={!isEditing ? 'opacity-50 pointer-events-none' : ''}>
  <ToggleSwitch checked={stage[notif.id] || false} onChange={(val) => onUpdateStage(notif.id, val)} />
+ </div>
  </div>
  );
  })}
@@ -326,13 +328,13 @@ const ReadOnlyStageItem = ({ stage, index, totalStages, getStageColor, isSelecte
 };
 
 export default function SettingsPipeline({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
- const [isEditing, setIsEditing] = useState(false);
+ const navigate = useNavigate();
+ const location = useLocation();
+ const [isEditingOrder, setIsEditingOrder] = useState(false);
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  
- 
- const initialJobData = {};
+ const initialJobData = location.state?.jobData || {};
+ const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
  const [jobData, setJobData] = useState({ ...initialJobData });
 
  const [stages, setStages] = useState([
@@ -368,7 +370,7 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  const newStage = { id: newId, customName: 'New Stage', systemStage: 'Screening', isTerminal: false };
  setStages([...stages, newStage]);
  setSelectedStageId(newId);
- if (!isEditing) setIsEditing(true);
+ if (!isEditingOrder) setIsEditingOrder(true);
  };
 
  const sensors = useSensors(
@@ -420,9 +422,19 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  Hiring Stages
  </h2>
  
- {!isEditing ? (
+ <div className="flex gap-2 items-center">
+ <button
+ onClick={() => setIsEditingSettings(prev => !prev)}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={isEditingSettings ? "Save changes" : "Edit Pipeline"}
+ >
+ {isEditingSettings ? <Check size={16} className="text-[#00A76F]" /> : <Settings size={16} />}
+ </button>
+
+ {isEditingSettings && (
+ !isEditingOrder ? (
  <button 
- onClick={() => setIsEditing(true)}
+ onClick={() => setIsEditingOrder(true)}
  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-white bg-[#1890FF] rounded-lg hover:bg-[#1890FF]/90 transition-colors shadow-sm cursor-pointer"
  >
  <Settings2 size={14} />
@@ -430,17 +442,19 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  </button>
  ) : (
  <button 
- onClick={() => setIsEditing(false)}
+ onClick={() => setIsEditingOrder(false)}
  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-[#212b36] dark:text-white bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
  >
  Done Editing
  </button>
+ )
  )}
+ </div>
  </div>
 
  <div className="relative pt-2 px-2 flex-1 pb-4">
  <div className="flex flex-col gap-6">
- {!isEditing ? (
+ {!isEditingOrder ? (
  stages.map((stage, index) => (
  <ReadOnlyStageItem
  key={stage.id}
@@ -477,7 +491,8 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  <div className="mt-8 flex items-center justify-center pb-2">
  <button 
  onClick={addStage}
- className="px-5 py-2.5 bg-[#1890FF]/5 hover:bg-[#1890FF]/10 text-[#1890FF] rounded-xl text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer border border-[#1890FF]/20 border-dashed hover:border-[#1890FF]/40 w-full justify-center"
+ disabled={!isEditingSettings}
+ className={`px-5 py-2.5 bg-[#1890FF]/5 hover:bg-[#1890FF]/10 text-[#1890FF] rounded-xl text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer border border-[#1890FF]/20 border-dashed hover:border-[#1890FF]/40 w-full justify-center ${!isEditingSettings ? 'opacity-50 cursor-not-allowed' : ''}`}
  >
  <Plus size={16} /> Add New Stage
  </button>
@@ -489,7 +504,7 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  <div className="col-span-1 lg:col-span-6 xl:col-span-7 h-full">
  <StageDetailsPanel 
  stage={selectedStage} 
- isEditing={isEditing} 
+ isEditing={isEditingSettings} 
  onUpdateStage={(field, value) => {
  const index = stages.findIndex(s => s.id === selectedStageId);
  if (index !== -1) updateStage(index, field, value);

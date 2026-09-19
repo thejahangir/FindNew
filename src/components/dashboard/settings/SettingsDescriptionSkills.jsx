@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, X, Settings2, Minus, Trash2, CheckCircle2, Circle, Code2, FileText, PlusCircle } from 'lucide-react';
+import { Plus, X, Settings2, Minus, Trash2, CheckCircle2, Circle, Code2, FileText, PlusCircle, Edit2, Save } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
+ const navigate = useNavigate();
+ const location = useLocation();
+ const initialJobData = location.state?.jobData || {};
+ const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
- 
- 
- const initialJobData = {};
 
  const [jobData, setJobData] = useState({
  jdText: initialJobData?.jdText || '',
@@ -71,8 +70,16 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
 
  <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4 items-start">
  {/* Description Panel */}
- <div className="col-span-1 lg:col-span-6 xl:col-span-7 bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm h-full flex flex-col">
- <div className="flex flex-col flex-1">
+ <div className="col-span-1 lg:col-span-6 xl:col-span-7 bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm h-full flex flex-col relative">
+ {initialJobData?.status === 'Published' && (
+ <button 
+ onClick={() => setIsEditingSettings(!isEditingSettings)}
+ className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer z-10 bg-gray-100 hover:bg-gray-200 text-gray-700"
+ >
+ {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+ </button>
+ )}
+ <div className={`flex flex-col flex-1 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
  <label className="block text-xs font-bold text-black mb-2">Description</label>
  <div className="react-quill-container flex-1 mt-2">
  <ReactQuill 
@@ -81,24 +88,32 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  onChange={(content) => handleInputChange('jdText', content)}
  className="h-full min-h-[300px] lg:min-h-[450px]"
  placeholder="Enter the full job description here..."
+ readOnly={!isEditingSettings}
  />
  </div>
  </div>
  </div>
 
  {/* Skills Panel */}
- <div className="col-span-1 lg:col-span-6 xl:col-span-5 bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col h-fit">
- <div className="flex items-center justify-between mb-4 sticky top-0 bg-white dark:bg-[#161c24] z-10">
+ <div className="col-span-1 lg:col-span-6 xl:col-span-5 bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col h-fit relative">
+ {initialJobData?.status === 'Published' && (
+ <button 
+ onClick={() => setIsEditingSettings(!isEditingSettings)}
+ className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer z-20 bg-gray-100 hover:bg-gray-200 text-gray-700"
+ >
+ {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+ </button>
+ )}
+ <div className={`flex items-center justify-between mb-4 sticky top-0 bg-white dark:bg-[#161c24] z-10 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
  <label className="block text-xs font-bold text-black">Required Skills</label>
  <button 
  onClick={addSkill}
- className="px-3 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer"
+ className="px-3 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer mr-20"
  >
  <Plus size={14} /> Add
  </button>
  </div>
-
- <div className="flex flex-col mb-6">
+ <div className={`flex flex-col mb-6 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
  {jobData.skills.some(s => s.source === 'jd' && !s.isExpanded) && (
  <div className="pb-4">
  <div className="flex items-center gap-2 mb-3">
@@ -157,7 +172,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  )}
  </div>
 
- <div className="space-y-3">
+ <div className={`space-y-3 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
  {jobData.skills.map((skill, index) => {
  if (!skill.isExpanded) return null;
  

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Globe, Link, Briefcase, Mail, Send , Settings2} from 'lucide-react';
+import { Search, Globe, Link, Briefcase, Mail, Send , Settings2, Edit3, Save } from 'lucide-react';
 
 export default function JobSetupSourcingPage() {
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const location = useLocation();
  const navigate = useNavigate();
  const jobData = location.state?.jobData;
+ const [isEditingChannels, setIsEditingChannels] = useState(jobData?.status !== 'Published');
+ const [isEditingOutreach, setIsEditingOutreach] = useState(jobData?.status !== 'Published');
 
  
 
@@ -48,10 +50,21 @@ export default function JobSetupSourcingPage() {
 
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50">
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white mb-6 flex items-center gap-2">
+ <div className="flex items-center justify-between mb-6">
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  <Search size={20} className="text-[#1890FF]" />
  Publishing Channels
  </h2>
+ {isEditingChannels ? (
+ <button onClick={() => setIsEditingChannels(false)} className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Save size={14} /> Save
+ </button>
+ ) : (
+ <button onClick={() => setIsEditingChannels(true)} className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Edit3 size={14} /> Edit
+ </button>
+ )}
+ </div>
  
  <div className="space-y-4">
  {channels.map(channel => {
@@ -67,12 +80,13 @@ export default function JobSetupSourcingPage() {
  </div>
  <span className="font-bold text-[#212b36] dark:text-white">{channel.name}</span>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
+ <label className={`relative inline-flex items-center ${isEditingChannels ? 'cursor-pointer' : 'opacity-70 cursor-not-allowed'}`}>
  <input 
  type="checkbox" 
  className="sr-only peer" 
  checked={channel.enabled}
- onChange={() => toggleChannel(channel.id)}
+ disabled={!isEditingChannels}
+ onChange={() => isEditingChannels && toggleChannel(channel.id)}
  />
  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00A76F]"></div>
  </label>
@@ -83,10 +97,21 @@ export default function JobSetupSourcingPage() {
  </div>
 
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50">
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white mb-6 flex items-center gap-2">
+ <div className="flex items-center justify-between mb-6">
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  <Send size={20} className="text-[#FF5630]" />
  Automated Outreach
  </h2>
+ {isEditingOutreach ? (
+ <button onClick={() => setIsEditingOutreach(false)} className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Save size={14} /> Save
+ </button>
+ ) : (
+ <button onClick={() => setIsEditingOutreach(true)} className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm">
+ <Edit3 size={14} /> Edit
+ </button>
+ )}
+ </div>
  
  <div className="p-4 bg-gray-50 dark:bg-[#212b36]/50 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
  <div className="flex items-center justify-between">
@@ -94,8 +119,8 @@ export default function JobSetupSourcingPage() {
  <h4 className="font-bold text-[#212b36] dark:text-white text-sm">AI Sourcing Agent</h4>
  <p className="text-xs text-black mt-1">Automatically reach out to passive candidates matching your ranking rules.</p>
  </div>
- <label className="relative inline-flex items-center cursor-pointer">
- <input type="checkbox" className="sr-only peer" defaultChecked />
+ <label className={`relative inline-flex items-center ${isEditingOutreach ? 'cursor-pointer' : 'opacity-70 cursor-not-allowed'}`}>
+ <input type="checkbox" className="sr-only peer" defaultChecked disabled={!isEditingOutreach} />
  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1890FF]"></div>
  </label>
  </div>

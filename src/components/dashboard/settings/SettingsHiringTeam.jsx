@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Plus, Mail, Trash2, Shield , Settings2, X, LayoutGrid, List } from 'lucide-react';
+import { Users, Plus, Mail, Trash2, Shield , Settings2, X, LayoutGrid, List, Check } from 'lucide-react';
 
 import SearchableSelect from '../../ui/SearchableSelect';
 
 export default function SettingsHiringTeam({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
+  const navigate = useNavigate();
+  const location = useLocation();
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
  const [deleteConfirmMemberId, setDeleteConfirmMemberId] = useState(null);
@@ -14,7 +14,8 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  const [formErrors, setFormErrors] = useState({});
  const [viewMode, setViewMode] = useState('cards');
  
- const initialJobData = {};
+  const initialJobData = location.state?.jobData || {};
+  const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
  const [jobData, setJobData] = useState({ ...initialJobData });
 
  const handleJobDataChange = (field, value) => {
@@ -93,15 +94,24 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  <Users size={20} className="text-[#00A76F]" />
  Team Members
  </h2>
- <div className="flex gap-3">
- <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center">
- <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
- <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
- </div>
- <button onClick={() => setIsAddMemberModalOpen(true)} className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-lg text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer">
- <Plus size={16} /> Add Member
- </button>
- </div>
+  <div className="flex gap-3">
+  <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center">
+  <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
+  <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
+  </div>
+  <button
+  onClick={() => setIsEditingSettings(prev => !prev)}
+  className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+  title={isEditingSettings ? "Save changes" : "Edit Hiring Team"}
+  >
+  {isEditingSettings ? <Check size={18} className="text-[#00A76F]" /> : <Settings2 size={18} />}
+  </button>
+  {isEditingSettings && (
+  <button onClick={() => setIsAddMemberModalOpen(true)} className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-lg text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer">
+  <Plus size={16} /> Add Member
+  </button>
+  )}
+  </div>
  </div>
 
  {viewMode === 'cards' ? (
@@ -109,15 +119,17 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  {team.map(member => (
  <div key={member.id} className="flex flex-col h-full bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative group/card overflow-hidden">
  
- <div className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity z-10">
- <button 
- onClick={() => setDeleteConfirmMemberId(member.id)}
- className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors cursor-pointer"
- title="Remove Member"
- >
- <Trash2 size={16} />
- </button>
- </div>
+  {isEditingSettings && (
+  <div className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity z-10">
+  <button 
+  onClick={() => setDeleteConfirmMemberId(member.id)}
+  className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors cursor-pointer"
+  title="Remove Member"
+  >
+  <Trash2 size={16} />
+  </button>
+  </div>
+  )}
 
  <div className="p-8 flex-1 flex flex-col items-center justify-center text-center relative z-0">
  <div className={`w-20 h-20 rounded-full flex items-center justify-center font-black text-2xl ${member.avatar} shadow-sm border border-current/10 mb-4`}>
@@ -138,9 +150,9 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  <table className="w-full text-left border-collapse">
  <thead>
  <tr className="bg-gray-50 dark:bg-gray-800/50">
- <th className="p-4 text-xs font-bold text-gray-500 rounded-l-xl">Name</th>
- <th className="p-4 text-xs font-bold text-gray-500 ">Role</th>
- <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>
+  <th className="p-4 text-xs font-bold text-gray-500 rounded-l-xl">Name</th>
+  <th className="p-4 text-xs font-bold text-gray-500 ">Role</th>
+  {isEditingSettings && <th className="p-4 text-center text-xs font-bold text-gray-500 rounded-r-xl">Actions</th>}
  </tr>
  </thead>
  <tbody>
@@ -154,20 +166,22 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  <span className="text-sm font-bold text-[#212b36] dark:text-white">{member.name}</span>
  </div>
  </td>
- <td className="p-4">
- <span className="text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full ">
- {member.role}
- </span>
- </td>
- <td className="p-4 text-center">
- <button 
- onClick={() => setDeleteConfirmMemberId(member.id)}
- className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors cursor-pointer inline-flex"
- title="Remove Member"
- >
- <Trash2 size={16} />
- </button>
- </td>
+  <td className="p-4">
+  <span className="text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full ">
+  {member.role}
+  </span>
+  </td>
+  {isEditingSettings && (
+  <td className="p-4 text-center">
+  <button 
+  onClick={() => setDeleteConfirmMemberId(member.id)}
+  className="p-2 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors cursor-pointer inline-flex"
+  title="Remove Member"
+  >
+  <Trash2 size={16} />
+  </button>
+  </td>
+  )}
  </tr>
  ))}
  </tbody>

@@ -219,11 +219,21 @@ const PipelineSwimlane = ({ stage, candidates, onMoveStage, onOpenHiddenCandidat
  );
 };
 
-export default function SettingsApplications() {
- const navigate = () => {};
- const location = { state: null };
+export default function SettingsApplications({ setSettingsActiveNav }) {
+ const navigate = useNavigate();
+ const location = useLocation();
+ const initialJobData = location.state?.jobData || {};
+ const jobData = initialJobData;
+ const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [hiddenCandidatesModal, setHiddenCandidatesModal] = useState({ isOpen: false, stageTitle: '', candidates: [] });
+
+ const [pipelines, setPipelines] = useState(() => {
+ if (initialJobData?.pipelines && initialJobData.pipelines.length > 0) {
+ return initialJobData.pipelines;
+ }
+ return PIPELINE_STAGES;
+ });
  const [candidates, setCandidates] = useState(INITIAL_CANDIDATES);
  const [activeId, setActiveId] = useState(null);
  const [searchQuery, setSearchQuery] = useState('');
@@ -239,13 +249,10 @@ export default function SettingsApplications() {
  ));
  };
  
- 
- 
- const initialJobData = {};
- const [jobData, setJobData] = useState({ ...initialJobData });
+ const [jobDataState, setJobDataState] = useState({ ...initialJobData });
 
  const handleJobDataChange = (field, value) => {
- setJobData(prev => ({ ...prev, [field]: value }));
+ setJobDataState(prev => ({ ...prev, [field]: value }));
  };
 
  const sensors = useSensors(
@@ -323,9 +330,15 @@ export default function SettingsApplications() {
  }
 
  return (
- <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
- 
- 
+ <div className="p-6 space-y-6 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in relative">
+ {initialJobData?.status === 'Published' && (
+ <button 
+ onClick={() => setIsEditingSettings(!isEditingSettings)}
+ className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer z-50 bg-gray-100 hover:bg-gray-200 text-gray-700"
+ >
+ {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+ </button>
+ )}
 
  <div className="flex-1 flex flex-col bg-white dark:bg-[#161c24] p-4 sm:p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 overflow-hidden">
  
@@ -367,6 +380,7 @@ export default function SettingsApplications() {
  candidates={filteredCandidates.filter(c => c.stage === stage.id)} 
  onMoveStage={moveCandidate}
  onOpenHiddenCandidates={(stageTitle, hiddenCandidates) => setHiddenCandidatesModal({ isOpen: true, stageTitle, candidates: hiddenCandidates })}
+ isEditingSettings={isEditingSettings}
  />
  ))}
 

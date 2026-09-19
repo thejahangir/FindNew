@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
  Plus, X, ChevronDown, Check, LayoutTemplate, 
- Trash2, GripVertical, FileCheck, Users, Target
+ Trash2, GripVertical, FileCheck, Users, Target, Edit2, Save
 } from 'lucide-react';
 
 const SUGGESTED_ATTRIBUTES = {
@@ -27,11 +27,11 @@ const SUGGESTED_ATTRIBUTES = {
 };
 
 export default function SettingsScorecards({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
- 
- 
- const jobData = ({} /* mock */).jobData;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialJobData = location.state?.jobData || {};
+  const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
+  const jobData = initialJobData;
 
  // State for Categories and their Attributes
  const [categories, setCategories] = useState([
@@ -134,7 +134,15 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  };
 
  return (
- <div className="p-6 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in font-sans">
+ <div className="p-6 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in font-sans relative">
+ {initialJobData?.status === 'Published' && (
+ <button 
+ onClick={() => setIsEditingSettings(!isEditingSettings)}
+ className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer z-50 bg-gray-100 hover:bg-gray-200 text-gray-700"
+ >
+ {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+ </button>
+ )}
  <div className="relative z-10 w-full mb-8">
  
  </div>
@@ -154,34 +162,37 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  </div>
 
  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
- {categories.map((category) => (
- <CategoryCard 
- key={category.id} 
- category={category} 
- onRemove={() => handleRemoveCategory(category.id)}
- onAddAttribute={(attr) => handleAddAttribute(category.id, attr)}
- onRemoveAttribute={(attr) => handleRemoveAttribute(category.id, attr)}
- />
- ))}
+  {categories.map((category) => (
+  <CategoryCard 
+  key={category.id} 
+  category={category} 
+  onRemove={() => handleRemoveCategory(category.id)}
+  onAddAttribute={(attr) => handleAddAttribute(category.id, attr)}
+  onRemoveAttribute={(attr) => handleRemoveAttribute(category.id, attr)}
+  isEditingSettings={isEditingSettings}
+  />
+  ))}
 
- {/* Add New Category */}
- <div className="bg-gray-50 dark:bg-[#161c24]/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-6 flex items-center gap-4 transition-colors focus-within:border-[#1890FF] focus-within:bg-white dark:focus-within:bg-[#161c24]">
- <input 
- type="text" 
- value={newCategoryName}
- onChange={(e) => setNewCategoryName(e.target.value)}
- onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
- placeholder="Enter a new category name (e.g. Technical Skills)" 
- className="flex-1 bg-transparent outline-none text-[#212b36] dark:text-white font-medium"
- />
- <button 
- onClick={handleAddCategory}
- disabled={!newCategoryName.trim()}
- className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl font-bold text-sm disabled:opacity-50 transition-colors flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
- >
- <Plus size={16} /> Add Category
- </button>
- </div>
+  {/* Add New Category */}
+  {isEditingSettings && (
+  <div className="bg-gray-50 dark:bg-[#161c24]/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-6 flex items-center gap-4 transition-colors focus-within:border-[#1890FF] focus-within:bg-white dark:focus-within:bg-[#161c24]">
+  <input 
+  type="text" 
+  value={newCategoryName}
+  onChange={(e) => setNewCategoryName(e.target.value)}
+  onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+  placeholder="Enter a new category name (e.g. Technical Skills)" 
+  className="flex-1 bg-transparent outline-none text-[#212b36] dark:text-white font-medium"
+  />
+  <button 
+  onClick={handleAddCategory}
+  disabled={!newCategoryName.trim()}
+  className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl font-bold text-sm disabled:opacity-50 transition-colors flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+  >
+  <Plus size={16} /> Add Category
+  </button>
+  </div>
+  )}
  </div>
  </section>
 
@@ -213,12 +224,14 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  {rounds.map((round, idx) => (
  <th key={round.id} className="bg-gray-50 dark:bg-[#1a222c] border-b border-l border-gray-200 dark:border-gray-700 p-5 min-w-[200px] align-top relative group">
  <div className="flex flex-col gap-3">
- <div className="flex items-center justify-between">
- <span className="text-sm font-semibold text-gray-400">Round {idx + 1}</span>
- <button onClick={() => handleRemoveRound(round.id)} className="text-gray-400 hover:text-red-500 transition-colors p-1 opacity-0 group-hover:opacity-100 bg-white dark:bg-gray-800 rounded shadow-sm">
- <Trash2 size={14} />
- </button>
- </div>
+  <div className="flex items-center justify-between">
+  <span className="text-sm font-semibold text-gray-400">Round {idx + 1}</span>
+  {isEditingSettings && (
+  <button onClick={() => handleRemoveRound(round.id)} className="text-gray-400 hover:text-red-500 transition-colors p-1 opacity-0 group-hover:opacity-100 bg-white dark:bg-gray-800 rounded shadow-sm cursor-pointer">
+  <Trash2 size={14} />
+  </button>
+  )}
+  </div>
  <div className="flex items-center gap-2">
  <div className="w-6 h-6 rounded-md bg-[#00A76F]/10 text-[#00A76F] flex items-center justify-center shrink-0">
  <Users size={14} />
@@ -277,16 +290,17 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  <td key={round.id} className="border-b border-l border-gray-100 dark:border-gray-800 p-0 text-center relative hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
  {/* Fully Clickable Cell */}
  <label className="absolute inset-0 flex items-center justify-center cursor-pointer w-full h-full group/cb">
- <input 
- type="checkbox" 
- className="sr-only peer"
- checked={isChecked}
- onChange={() => handleToggleFocusAttribute(round.id, attr)}
- />
- {/* Custom Styled Checkbox */}
- <div className="w-4 h-4 rounded-[4px] flex items-center justify-center transition-all duration-200 bg-white dark:bg-[#161c24] border-[1.5px] border-gray-300 dark:border-gray-600 group-hover/cb:border-[#1890FF]/50 peer-focus-visible:ring-2 peer-focus-visible:ring-[#1890FF] peer-checked:bg-[#1890FF] peer-checked:border-[#1890FF] peer-checked:shadow-sm peer-checked:shadow-[#1890FF]/30">
- <Check size={10} className="text-white opacity-0 peer-checked:opacity-100 transition-opacity scale-50 peer-checked:scale-100" strokeWidth={3} />
- </div>
+  <input 
+  type="checkbox" 
+  className="sr-only peer"
+  checked={isChecked}
+  disabled={!isEditingSettings}
+  onChange={() => handleToggleFocusAttribute(round.id, attr)}
+  />
+  {/* Custom Styled Checkbox */}
+  <div className={`w-4 h-4 rounded-[4px] flex items-center justify-center transition-all duration-200 bg-white dark:bg-[#161c24] border-[1.5px] border-gray-300 dark:border-gray-600 ${isEditingSettings ? 'group-hover/cb:border-[#1890FF]/50 peer-focus-visible:ring-2 peer-focus-visible:ring-[#1890FF] peer-checked:bg-[#1890FF] peer-checked:border-[#1890FF] peer-checked:shadow-sm peer-checked:shadow-[#1890FF]/30' : 'opacity-70'} peer-checked:bg-[#1890FF] peer-checked:border-[#1890FF]`}>
+  <Check size={10} className="text-white opacity-0 peer-checked:opacity-100 transition-opacity scale-50 peer-checked:scale-100" strokeWidth={3} />
+  </div>
  </label>
  </td>
  );
@@ -340,7 +354,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
 
 // --- Subcomponents ---
 
-function CategoryCard({ category, onRemove, onAddAttribute, onRemoveAttribute }) {
+function CategoryCard({ category, onRemove, onAddAttribute, onRemoveAttribute, isEditingSettings }) {
  const [inputValue, setInputValue] = useState('');
  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
  const containerRef = useRef(null);
@@ -369,94 +383,100 @@ function CategoryCard({ category, onRemove, onAddAttribute, onRemoveAttribute })
 
  return (
  <div className="bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm relative group">
- <div className="flex items-start justify-between mb-4">
- <div className="flex items-center gap-3">
- <GripVertical size={20} className="text-gray-300 cursor-grab" />
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white">{category.name}</h3>
- <span className="bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs px-2 py-0.5 rounded-full font-bold">
- {category.attributes.length}
- </span>
- </div>
- <button 
- onClick={onRemove}
- className="text-red-500 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
- title="Delete Category"
- >
- <Trash2 size={18} />
- </button>
- </div>
+  <div className="flex items-start justify-between mb-4">
+  <div className="flex items-center gap-3">
+  {isEditingSettings && <GripVertical size={20} className="text-gray-300 cursor-grab" />}
+  <h3 className="text-lg font-bold text-[#212b36] dark:text-white">{category.name}</h3>
+  <span className="bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs px-2 py-0.5 rounded-full font-bold">
+  {category.attributes.length}
+  </span>
+  </div>
+  {isEditingSettings && (
+  <button 
+  onClick={onRemove}
+  className="text-red-500 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+  title="Delete Category"
+  >
+  <Trash2 size={18} />
+  </button>
+  )}
+  </div>
 
  <div className="pl-8">
  <div className="flex flex-wrap gap-2 mb-4">
- {category.attributes.map(attr => (
- <div key={attr} className="flex items-center gap-1.5 bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/20 px-3 py-1.5 rounded-lg text-sm font-semibold">
- {attr}
- <button 
- onClick={() => onRemoveAttribute(attr)}
- className="text-[#1890FF]/60 hover:text-[#1890FF] hover:bg-[#1890FF]/20 rounded-full p-0.5 transition-colors"
- >
- <X size={14} />
- </button>
- </div>
- ))}
+  {category.attributes.map(attr => (
+  <div key={attr} className="flex items-center gap-1.5 bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/20 px-3 py-1.5 rounded-lg text-sm font-semibold">
+  {attr}
+  {isEditingSettings && (
+  <button 
+  onClick={() => onRemoveAttribute(attr)}
+  className="text-[#1890FF]/60 hover:text-[#1890FF] hover:bg-[#1890FF]/20 rounded-full p-0.5 transition-colors cursor-pointer"
+  >
+  <X size={14} />
+  </button>
+  )}
+  </div>
+  ))}
  {category.attributes.length === 0 && (
  <span className="text-sm text-gray-400 italic">No attributes added yet.</span>
  )}
  </div>
 
- {/* Attribute Input & Suggestions */}
- <div className="relative max-w-md" ref={containerRef}>
- <div className="relative flex items-center">
- <input 
- type="text" 
- value={inputValue}
- onChange={(e) => {
- setInputValue(e.target.value);
- setIsDropdownOpen(true);
- }}
- onFocus={() => setIsDropdownOpen(true)}
- onKeyDown={(e) => {
- if (e.key === 'Enter' && inputValue.trim()) {
- handleAdd(inputValue);
- }
- }}
- placeholder="Type to add a custom attribute..."
- className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-xl text-sm outline-none focus:border-[#1890FF] transition-colors text-[#212b36] dark:text-white pr-24"
- />
- <button 
- onClick={() => { if(inputValue.trim()) handleAdd(inputValue); }}
- className="absolute right-2 text-xs font-bold bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] px-3 py-1 rounded-lg hover:opacity-90 cursor-pointer"
- >
- Add
- </button>
- </div>
+  {/* Attribute Input & Suggestions */}
+  {isEditingSettings && (
+  <div className="relative max-w-md" ref={containerRef}>
+  <div className="relative flex items-center">
+  <input 
+  type="text" 
+  value={inputValue}
+  onChange={(e) => {
+  setInputValue(e.target.value);
+  setIsDropdownOpen(true);
+  }}
+  onFocus={() => setIsDropdownOpen(true)}
+  onKeyDown={(e) => {
+  if (e.key === 'Enter' && inputValue.trim()) {
+  handleAdd(inputValue);
+  }
+  }}
+  placeholder="Type to add a custom attribute..."
+  className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-xl text-sm outline-none focus:border-[#1890FF] transition-colors text-[#212b36] dark:text-white pr-24"
+  />
+  <button 
+  onClick={() => { if(inputValue.trim()) handleAdd(inputValue); }}
+  className="absolute right-2 text-xs font-bold bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] px-3 py-1 rounded-lg hover:opacity-90 cursor-pointer"
+  >
+  Add
+  </button>
+  </div>
 
- {/* Suggestions Dropdown */}
- {isDropdownOpen && (filteredSuggestions.length > 0 || inputValue.trim()) && (
- <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-20">
- <div className="max-h-48 overflow-y-auto">
- {filteredSuggestions.map(suggestion => (
- <button 
- key={suggestion}
- onClick={() => handleAdd(suggestion)}
- className="w-full text-left px-4 py-2.5 text-sm text-[#212b36] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between group cursor-pointer"
- >
- {suggestion}
- <Plus size={14} className="text-gray-400 group-hover:text-[#1890FF]" />
- </button>
- ))}
- {inputValue.trim() && !filteredSuggestions.includes(inputValue) && (
- <button 
- onClick={() => handleAdd(inputValue)}
- className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#1890FF] bg-[#1890FF]/5 hover:bg-[#1890FF]/10 transition-colors cursor-pointer border-t border-gray-100 dark:border-gray-700"
- >
- Add "{inputValue}" as custom attribute
- </button>
- )}
- </div>
- </div>
- )}
- </div>
+  {/* Suggestions Dropdown */}
+  {isDropdownOpen && (filteredSuggestions.length > 0 || inputValue.trim()) && (
+  <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-20">
+  <div className="max-h-48 overflow-y-auto">
+  {filteredSuggestions.map(suggestion => (
+  <button 
+  key={suggestion}
+  onClick={() => handleAdd(suggestion)}
+  className="w-full text-left px-4 py-2.5 text-sm text-[#212b36] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between group cursor-pointer"
+  >
+  {suggestion}
+  <Plus size={14} className="text-gray-400 group-hover:text-[#1890FF]" />
+  </button>
+  ))}
+  {inputValue.trim() && !filteredSuggestions.includes(inputValue) && (
+  <button 
+  onClick={() => handleAdd(inputValue)}
+  className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#1890FF] bg-[#1890FF]/5 hover:bg-[#1890FF]/10 transition-colors cursor-pointer border-t border-gray-100 dark:border-gray-700"
+  >
+  Add "{inputValue}" as custom attribute
+  </button>
+  )}
+  </div>
+  </div>
+  )}
+  </div>
+  )}
  </div>
  </div>
  );

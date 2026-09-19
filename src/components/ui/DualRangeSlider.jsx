@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-export default function DualRangeSlider({ min, max, value, onChange, currency }) {
+export default function DualRangeSlider({ min, max, value, onChange, currency, disabled }) {
  const [minVal, setMinVal] = useState(value[0] || min);
  const [maxVal, setMaxVal] = useState(value[1] || max);
  const minValRef = useRef(minVal);
@@ -44,6 +44,7 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
  max={max}
  value={minVal}
  step={1000}
+ disabled={disabled}
  onChange={(event) => {
  const value = Math.min(Number(event.target.value), maxVal - 1);
  setMinVal(value);
@@ -59,6 +60,7 @@ export default function DualRangeSlider({ min, max, value, onChange, currency })
  max={max}
  value={maxVal}
  step={1000}
+ disabled={disabled}
  onChange={(event) => {
  const value = Math.max(Number(event.target.value), minVal + 1);
  setMaxVal(value);

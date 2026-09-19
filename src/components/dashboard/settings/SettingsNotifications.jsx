@@ -114,8 +114,11 @@ const initialNotificationSections = [
 ];
 
 export default function SettingsNotifications({ setSettingsActiveNav }) {
- const navigate = () => {};
- const location = { state: null };
+ const navigate = useNavigate();
+ const location = useLocation();
+ const initialJobData = location.state?.jobData || {};
+ const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
+ const jobData = initialJobData;
  const [sections, setSections] = useState(initialNotificationSections);
  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
  const [activeTab, setActiveTab] = useState('job');
@@ -123,10 +126,6 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  // Edit Modal State
  const [editingItem, setEditingItem] = useState(null); // { sectionTitle, itemIndex, itemData }
  const [tempConfigData, setTempConfigData] = useState(null);
-
- 
- 
- const jobData = ({} /* mock */).jobData;
 
  const handleFinish = (action) => {
  setIsPublishModalOpen(false);
@@ -310,6 +309,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  </div>
  </div>
  
+ {isEditingSettings && (
  <button 
  onClick={() => openEditModal(section.title, index, item)}
  className="shrink-0 px-4 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-sm font-bold text-[#212b36] dark:text-white rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-[#1890FF] hover:text-[#1890FF] transition-all flex items-center gap-2 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer"
@@ -317,6 +317,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  <Edit2 size={16} />
  Configure
  </button>
+ )}
  </div>
  </div>
  ))}

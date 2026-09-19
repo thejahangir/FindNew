@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark } from 'lucide-react';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import DualRangeSlider from '../components/ui/DualRangeSlider';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
@@ -217,7 +217,13 @@ export default function JobDashboardPage() {
  const [showCopyToast, setShowCopyToast] = useState(false);
  const jobData = location.state?.jobData || null;
  const isDraft = jobData?.status === 'Draft';
+ const initialEditMode = jobData?.status !== 'Published';
  const [activeTab, setActiveTab] = useState(location.state?.tab || (isDraft ? 'Job Setup' : 'Overview'));
+ const [editModes, setEditModes] = useState({
+   basicInfo: initialEditMode,
+   budget: initialEditMode,
+   logistics: initialEditMode
+ });
  const [settingsActiveNav, setSettingsActiveNav] = useState('Overview');
  const [setupJobData, setSetupJobData] = useState({
  title: jobData?.title || 'Senior AI Research Scientist',
@@ -480,9 +486,13 @@ export default function JobDashboardPage() {
  
  {/* HEADER */}
  <div className="mb-2">
- <button onClick={() => navigate('/dashboard/jobs')} className="text-[13px] font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit mb-4 cursor-pointer">
- <ArrowLeft size={16} /> Back to Job List
+ <div className="flex items-center gap-2 text-[13px] font-bold mb-4">
+ <button onClick={() => navigate('/dashboard/jobs')} className="text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer">
+ Jobs
  </button>
+ <ChevronRight size={14} className="text-gray-400 shrink-0" />
+ <span className="text-[#212b36] dark:text-white truncate max-w-[300px]" title={setupJobData.title}>{setupJobData.title}</span>
+ </div>
  <div className="flex items-center justify-between">
  <div>
  <div className="flex items-center gap-3">
@@ -1115,48 +1125,43 @@ export default function JobDashboardPage() {
  {/* Search & Filter Card */}
  <div className="bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 rounded-xl p-3 shrink-0 relative overflow-visible z-30 space-y-3">
  
- <div className="relative h-[38px]">
- {/* Search Textbox */}
- <div className="absolute inset-0 transition-all duration-300">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
- <input
- type="text"
- value={appSearchQuery}
- onChange={(e) => { setAppSearchQuery(e.target.value); setCurrentPageApp(1); }}
- placeholder="Search by name, stage, or agency..."
- className="w-full h-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-transparent rounded-lg text-[13px] focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
- />
- </div>
- </div>
-
- {/* Stage Change Block (replaces search when bulk selected) */}
- <div className={`absolute inset-0 bg-[#1890FF] shadow-md z-20 flex items-center px-4 rounded-xl transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-2 invisible pointer-events-none'}`}>
- <button onClick={() => setSelectedAppCandidates([])} className="absolute top-1 right-1 text-white/70 hover:text-white transition-colors cursor-pointer p-0.5 z-10"><X size={12} /></button>
- <div className="flex items-center justify-center w-full relative gap-3">
- <div className="flex items-center gap-1.5">
- <span className="text-[11px] font-medium text-white/90">Move</span>
- <span className="w-24 text-[11px] font-bold text-white border border-white/30 bg-white/10 px-2 py-1.5 rounded-md flex items-center justify-center">{selectedAppCandidates.length} Selected</span>
- </div>
- <div className="flex items-center gap-1.5">
- <span className="text-[11px] font-medium text-white/90">To</span>
- <div className="relative">
+ {/* Bulk Action Overlay */}
+ {selectedAppCandidates.length > 0 && (
+ <div className="absolute inset-0 z-40 bg-[#1890FF] rounded-xl shadow-lg animate-in fade-in zoom-in-95 duration-200 px-3 flex flex-col justify-center">
  <button
- onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
- className="w-28 text-[11px] font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded-md flex items-center justify-between transition-colors cursor-pointer"
+ onClick={() => setSelectedAppCandidates([])}
+ className="absolute top-1.5 right-1.5 text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+ title="Clear selection"
  >
- <span>Stage</span>
- <ChevronDown size={14} />
+ <X size={12} />
  </button>
- {isBulkStageMenuOpen && (
+ <div className="flex items-center justify-center gap-6 w-full mt-2">
+ <div className="flex items-center gap-1.5">
+ <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white text-[#1890FF] text-[10px] font-bold">{selectedAppCandidates.length}</span>
+ <span className="text-[11px] font-bold text-white">Selected</span>
+ </div>
+ <div className="flex items-center gap-1.5">
+ <span className="text-[11px] text-white/90 font-medium whitespace-nowrap">Move to</span>
+ <div className="relative">
  <div
- className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 z-[100]"
+ onClick={(e) => { e.stopPropagation(); setIsBulkStageMenuOpen(!isBulkStageMenuOpen); }}
+ className="flex items-center justify-between text-[11px] font-bold border border-white/20 rounded-md px-2 py-1 bg-white/10 text-white cursor-pointer hover:bg-white/20 transition-colors w-28"
+ >
+ <span className="truncate pr-1">Select Stage</span>
+ <ChevronDown size={12} className="shrink-0" />
+ </div>
+ {isBulkStageMenuOpen && (
+ <div 
+ className="absolute top-full left-0 mt-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 z-[60] overflow-hidden w-40"
  onClick={(e) => e.stopPropagation()}
  >
  {['Applied', 'Screening', 'Technical Interview', 'Culture Fit', 'Offer', 'Reject'].map(stage => (
- <button
- key={stage}
- onClick={() => handleBulkStageChange(stage)}
- className={`w-full text-left px-3 py-1.5 text-[11px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer ${stage === 'Reject' ? 'text-[#FF5630]' : 'text-[#212b36] dark:text-white'}`}
+ <button 
+ key={stage} 
+ onClick={(e) => { e.stopPropagation(); handleBulkStageChange(stage); }}
+ className={`w-full text-left px-3 py-1.5 text-[11px] font-bold flex items-center justify-between transition-colors cursor-pointer ${
+ stage === 'Reject' ? 'text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+ }`}
  >
  {stage}
  </button>
@@ -1167,7 +1172,22 @@ export default function JobDashboardPage() {
  </div>
  </div>
  </div>
- <div className="flex items-center gap-2">
+ )}
+
+ <div className="relative h-[38px]">
+ {/* Search Textbox */}
+ <div className={`absolute inset-0 transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+ <input
+ type="text"
+ value={appSearchQuery}
+ onChange={(e) => { setAppSearchQuery(e.target.value); setCurrentPageApp(1); }}
+ placeholder="Search by name, stage, or agency..."
+ className="w-full h-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-transparent rounded-lg text-[13px] focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
+ />
+ </div>
+ </div>
+ <div className={`flex items-center gap-2 transition-all duration-300 ${selectedAppCandidates.length > 0 ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
  <div className="flex-1 flex flex-col gap-1 relative">
  <span className="text-[11px] font-bold text-gray-400 ">Filter Stage</span>
  <div 
@@ -1360,8 +1380,9 @@ export default function JobDashboardPage() {
  })}
  </div>
  </div>
+
  {filteredAppCandidates.length > itemsPerPageApp && (
- <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/30">
+ <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
  <button 
  disabled={currentPageApp === 1}
  onClick={() => setCurrentPageApp(p => p - 1)}
@@ -1435,12 +1456,17 @@ export default function JobDashboardPage() {
  {SCREENING_CRITERIA.map((item) => {
  const tone = getScoreStyles(item.score);
  return (
- <div key={item.label} className="flex flex-col gap-1">
- <div className="flex items-center justify-between">
- <h5 className="text-[12px] font-bold text-[#212b36] dark:text-white">{item.label}</h5>
- <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${tone.badge}`}>{item.score}/10</span>
+ <div key={item.label} className="flex items-start gap-4">
+ <div className="flex flex-col items-center shrink-0 w-[60px]">
+ <div className={`w-[42px] h-[42px] rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${tone.fill}`}>
+ {item.score}
  </div>
- <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400 leading-relaxed">{item.text}</p>
+ <span className={`text-[9px] font-bold mt-1.5 text-center leading-tight uppercase tracking-wide ${tone.text}`}>{tone.label}</span>
+ </div>
+ <div className="flex-1 pt-1">
+ <h5 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-1.5">{item.label}</h5>
+ <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400">{item.text}</p>
+ </div>
  </div>
  );
  })}
@@ -2044,53 +2070,66 @@ export default function JobDashboardPage() {
  <div className="space-y-8">
  {/* Basic Information Card */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
- <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
- <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Basic Information</h2>
  </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, basicInfo: !prev.basicInfo }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.basicInfo ? "Save changes" : "Edit Basic Information"}
+ >
+ {editModes.basicInfo ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
  
  <div className="space-y-5">
- <div>
- <div className="flex items-center justify-between mb-2">
- <label className="block text-xs font-bold text-gray-500 ">Job Title</label>
- <div className="flex items-center gap-3">
- <span className="bg-[#00A76F]/10 text-[#00A76F] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5">
+ <div className="flex items-center gap-4">
+ <div className="w-1/3">
+ <label className="block text-xs font-bold text-gray-500 mb-1">Job Title</label>
+ <div className="flex items-center gap-2">
+ <span className="bg-[#00A76F]/10 text-[#00A76F] text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-[#00A76F]"></span>
  Published
  </span>
- <span className="text-xs font-medium text-gray-400">
- Posted: 2026-08-10
- </span>
  </div>
  </div>
+ <div className="flex-1">
  <input 
  type="text" 
  value={setupJobData.title}
+ disabled={!editModes.basicInfo}
  onChange={(e) => setSetupJobData(prev => ({...prev, title: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
  placeholder="e.g. Senior Product Designer"
  />
  </div>
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Department</label>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Department</label>
+ <div className="flex-1">
  <input 
  type="text" 
  value={setupJobData.department}
+ disabled={!editModes.basicInfo}
  onChange={(e) => setSetupJobData(prev => ({...prev, department: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
  placeholder="e.g. Design"
  />
  </div>
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Requisition Ref</label>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Requisition Ref</label>
+ <div className="flex-1">
  <input 
  type="text" 
  value={setupJobData.requisitionRef}
+ disabled={!editModes.basicInfo}
  onChange={(e) => setSetupJobData(prev => ({...prev, requisitionRef: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
  placeholder="e.g. REQ-2024-001"
  />
  </div>
@@ -2100,48 +2139,61 @@ export default function JobDashboardPage() {
 
  {/* Budget & Headcount Card */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
- <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
- <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center shrink-0">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Budget & Headcount</h2>
  </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, budget: !prev.budget }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.budget ? "Save changes" : "Edit Budget & Headcount"}
+ >
+ {editModes.budget ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
 
  <div className="space-y-6">
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Headcount Required</label>
- <div className="flex items-center">
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Headcount Required</label>
+ <div className="flex-1 flex items-center">
  <button 
+ disabled={!editModes.budget}
  onClick={() => setSetupJobData(prev => ({...prev, headcount: Math.max(1, Number(prev.headcount) - 1)}))}
- className="w-10 h-10 rounded-l-xl border-y border-l border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+ className={`w-10 h-10 rounded-l-xl border-y border-l border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
  >
  -
  </button>
  <input 
  type="number" 
  min="1"
+ disabled={!editModes.budget}
  value={setupJobData.headcount}
  onChange={(e) => setSetupJobData(prev => ({...prev, headcount: e.target.value}))}
- className="w-20 h-10 border-y border-x-0 border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#161c24] text-center text-[13px] font-bold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/30 text-[#212b36] dark:text-white z-10"
+ className={`w-20 h-10 border-y border-x-0 border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#161c24] text-center text-[13px] font-bold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/30 text-[#212b36] dark:text-white z-10 ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
  />
  <button 
+ disabled={!editModes.budget}
  onClick={() => setSetupJobData(prev => ({...prev, headcount: Number(prev.headcount) + 1}))}
- className="w-10 h-10 rounded-r-xl border-y border-r border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+ className={`w-10 h-10 rounded-r-xl border-y border-r border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
  >
  +
  </button>
  </div>
  </div>
 
- <div className="pt-2">
- <label className="block text-xs font-bold text-gray-500 mb-4 flex justify-between">
- <span>Approved Salary Range</span>
- <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[11px] font-bold">{setupJobData.currency}</span>
- </label>
- <div className="w-full pb-4">
+ <div className="flex items-center gap-4 pt-2">
+ <div className="w-1/3">
+ <label className="block text-xs font-bold text-gray-500">Approved Salary Range</label>
+ <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[11px] font-bold mt-1 inline-block">{setupJobData.currency}</span>
+ </div>
+ <div className={`flex-1 ${!editModes.budget ? 'pointer-events-none opacity-70' : ''}`}>
  <DualRangeSlider 
  min={0}
  max={1000000}
+ disabled={!editModes.budget}
  value={[Number(setupJobData.salaryMin) || 50000, Number(setupJobData.salaryMax) || 150000]}
  onChange={(values) => {
  setSetupJobData(prev => ({ ...prev, salaryMin: values[0].toString(), salaryMax: values[1].toString() }));
@@ -2158,27 +2210,39 @@ export default function JobDashboardPage() {
  <div className="space-y-8">
  {/* Logistics Card */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
- <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
- <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center shrink-0">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Logistics</h2>
  </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, logistics: !prev.logistics }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.logistics ? "Save changes" : "Edit Logistics"}
+ >
+ {editModes.logistics ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
 
  <div className="space-y-5">
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Location</label>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Location</label>
+ <div className="flex-1">
  <input 
  type="text" 
  value={setupJobData.location}
+ disabled={!editModes.logistics}
  onChange={(e) => setSetupJobData(prev => ({...prev, location: e.target.value}))}
- className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 "
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.logistics ? 'opacity-70 cursor-not-allowed' : ''}`}
  placeholder="e.g. San Francisco, CA"
  />
  </div>
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Employment Type</label>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Employment Type</label>
+ <div className={`flex-1 ${!editModes.logistics ? 'opacity-70 pointer-events-none' : ''}`}>
  <SearchableSelect 
  options={[
  { label: 'Full-time', value: 'Full-time' },
@@ -2191,8 +2255,10 @@ export default function JobDashboardPage() {
  placeholder="Select type..."
  />
  </div>
- <div>
- <label className="block text-xs font-bold text-gray-500 mb-2">Work Mode</label>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Work Mode</label>
+ <div className={`flex-1 ${!editModes.logistics ? 'opacity-70 pointer-events-none' : ''}`}>
  <SearchableSelect 
  options={[
  { label: 'On-site', value: 'On-site' },
@@ -2210,19 +2276,29 @@ export default function JobDashboardPage() {
 
  {/* Internal Notes Card */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
- <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
- <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center shrink-0">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Internal Notes</h2>
+ </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, notes: !prev.notes }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.notes ? "Save changes" : "Edit Notes"}
+ >
+ {editModes.notes ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
  </div>
  
  <div>
  <textarea 
  rows="5"
  value={setupJobData.internalNotes}
+ disabled={!editModes.notes}
  onChange={(e) => setSetupJobData(prev => ({...prev, internalNotes: e.target.value}))}
- className="w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[13px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400 "
+ className={`w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[13px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.notes ? 'opacity-70 cursor-not-allowed' : ''}`}
  placeholder="Add any private notes, recruiter context, or approval chain details here. This will not be visible to candidates..."
  ></textarea>
  </div>
@@ -2230,7 +2306,249 @@ export default function JobDashboardPage() {
  </div>
  </div>
  
- <div className="flex items-center justify-end pt-6 mt-12 border-t border-gray-100 dark:border-gray-800/50">
+ <div className="w-full h-px bg-gray-300 dark:bg-gray-600 max-w-6xl mx-auto my-12"></div>
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
+ {/* Left Column */}
+ <div className="space-y-8">
+ {/* Basic Information Card */}
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+ <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ </div>
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Basic Information</h2>
+ </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, basicInfo: !prev.basicInfo }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.basicInfo ? "Save changes" : "Edit Basic Information"}
+ >
+ {editModes.basicInfo ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
+ 
+ <div className="space-y-5">
+ <div className="flex items-center gap-4">
+ <div className="w-1/3">
+ <label className="block text-xs font-bold text-gray-500 mb-1">Job Title</label>
+ <div className="flex items-center gap-2">
+ <span className="bg-[#00A76F]/10 text-[#00A76F] text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+ <span className="w-1.5 h-1.5 rounded-full bg-[#00A76F]"></span>
+ Published
+ </span>
+ </div>
+ </div>
+ <div className="flex-1">
+ <input 
+ type="text" 
+ value={setupJobData.title}
+ disabled={!editModes.basicInfo}
+ onChange={(e) => setSetupJobData(prev => ({...prev, title: e.target.value}))}
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
+ placeholder="e.g. Senior Product Designer"
+ />
+ </div>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Department</label>
+ <div className="flex-1">
+ <input 
+ type="text" 
+ value={setupJobData.department}
+ disabled={!editModes.basicInfo}
+ onChange={(e) => setSetupJobData(prev => ({...prev, department: e.target.value}))}
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
+ placeholder="e.g. Design"
+ />
+ </div>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Requisition Ref</label>
+ <div className="flex-1">
+ <input 
+ type="text" 
+ value={setupJobData.requisitionRef}
+ disabled={!editModes.basicInfo}
+ onChange={(e) => setSetupJobData(prev => ({...prev, requisitionRef: e.target.value}))}
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.basicInfo ? 'opacity-70 cursor-not-allowed' : ''}`}
+ placeholder="e.g. REQ-2024-001"
+ />
+ </div>
+ </div>
+ </div>
+ </div>
+
+ {/* Budget & Headcount Card */}
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+ <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ </div>
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Budget & Headcount</h2>
+ </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, budget: !prev.budget }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.budget ? "Save changes" : "Edit Budget & Headcount"}
+ >
+ {editModes.budget ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
+
+ <div className="space-y-6">
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Headcount Required</label>
+ <div className="flex-1 flex items-center">
+ <button 
+ disabled={!editModes.budget}
+ onClick={() => setSetupJobData(prev => ({...prev, headcount: Math.max(1, Number(prev.headcount) - 1)}))}
+ className={`w-10 h-10 rounded-l-xl border-y border-l border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
+ >
+ -
+ </button>
+ <input 
+ type="number" 
+ min="1"
+ disabled={!editModes.budget}
+ value={setupJobData.headcount}
+ onChange={(e) => setSetupJobData(prev => ({...prev, headcount: e.target.value}))}
+ className={`w-20 h-10 border-y border-x-0 border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#161c24] text-center text-[13px] font-bold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/30 text-[#212b36] dark:text-white z-10 ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
+ />
+ <button 
+ disabled={!editModes.budget}
+ onClick={() => setSetupJobData(prev => ({...prev, headcount: Number(prev.headcount) + 1}))}
+ className={`w-10 h-10 rounded-r-xl border-y border-r border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-center text-[#212b36] dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!editModes.budget ? 'opacity-70 cursor-not-allowed' : ''}`}
+ >
+ +
+ </button>
+ </div>
+ </div>
+
+ <div className="flex items-center gap-4 pt-2">
+ <div className="w-1/3">
+ <label className="block text-xs font-bold text-gray-500">Approved Salary Range</label>
+ <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[11px] font-bold mt-1 inline-block">{setupJobData.currency}</span>
+ </div>
+ <div className={`flex-1 ${!editModes.budget ? 'pointer-events-none opacity-70' : ''}`}>
+ <DualRangeSlider 
+ min={0}
+ max={1000000}
+ disabled={!editModes.budget}
+ value={[Number(setupJobData.salaryMin) || 50000, Number(setupJobData.salaryMax) || 150000]}
+ onChange={(values) => {
+ setSetupJobData(prev => ({ ...prev, salaryMin: values[0].toString(), salaryMax: values[1].toString() }));
+ }}
+ currency={setupJobData.currency}
+ />
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ {/* Right Column */}
+ <div className="space-y-8">
+ {/* Logistics Card */}
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+ <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ </div>
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Logistics</h2>
+ </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, logistics: !prev.logistics }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.logistics ? "Save changes" : "Edit Logistics"}
+ >
+ {editModes.logistics ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
+
+ <div className="space-y-5">
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Location</label>
+ <div className="flex-1">
+ <input 
+ type="text" 
+ value={setupJobData.location}
+ disabled={!editModes.logistics}
+ onChange={(e) => setSetupJobData(prev => ({...prev, location: e.target.value}))}
+ className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/30 border border-transparent dark:border-gray-700/50 rounded-xl text-[13px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]/30 transition-all text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.logistics ? 'opacity-70 cursor-not-allowed' : ''}`}
+ placeholder="e.g. San Francisco, CA"
+ />
+ </div>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Employment Type</label>
+ <div className={`flex-1 ${!editModes.logistics ? 'opacity-70 pointer-events-none' : ''}`}>
+ <SearchableSelect 
+ options={[
+ { label: 'Full-time', value: 'Full-time' },
+ { label: 'Part-time', value: 'Part-time' },
+ { label: 'Contract', value: 'Contract' },
+ { label: 'Internship', value: 'Internship' }
+ ]}
+ value={setupJobData.type}
+ onChange={(value) => setSetupJobData(prev => ({...prev, type: value}))}
+ placeholder="Select type..."
+ />
+ </div>
+ </div>
+ <div className="flex items-center gap-4">
+ <label className="w-1/3 text-xs font-bold text-gray-500">Work Mode</label>
+ <div className={`flex-1 ${!editModes.logistics ? 'opacity-70 pointer-events-none' : ''}`}>
+ <SearchableSelect 
+ options={[
+ { label: 'On-site', value: 'On-site' },
+ { label: 'Hybrid', value: 'Hybrid' },
+ { label: 'Remote', value: 'Remote' }
+ ]}
+ value={setupJobData.workMode}
+ onChange={(value) => setSetupJobData(prev => ({...prev, workMode: value}))}
+ placeholder="Select mode..."
+ />
+ </div>
+ </div>
+ </div>
+ </div>
+
+ {/* Internal Notes Card */}
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+ <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+ </div>
+ <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Internal Notes</h2>
+ </div>
+ <button
+ onClick={() => setEditModes(prev => ({ ...prev, notes: !prev.notes }))}
+ className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
+ title={editModes.notes ? "Save changes" : "Edit Notes"}
+ >
+ {editModes.notes ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
+ </button>
+ </div>
+ 
+ <div>
+ <textarea 
+ rows="5"
+ value={setupJobData.internalNotes}
+ disabled={!editModes.notes}
+ onChange={(e) => setSetupJobData(prev => ({...prev, internalNotes: e.target.value}))}
+ className={`w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[13px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400 ${!editModes.notes ? 'opacity-70 cursor-not-allowed' : ''}`}
+ placeholder="Add any private notes, recruiter context, or approval chain details here. This will not be visible to candidates..."
+ ></textarea>
+ </div>
+ </div>
+ </div>
+ </div>
+
+<div className="flex items-center justify-end pt-6 mt-12 border-t border-gray-100 dark:border-gray-800/50">
  <div className="flex gap-4">
  <button 
  onClick={() => navigate('/dashboard/jobs')}

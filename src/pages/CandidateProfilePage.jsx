@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
  ArrowLeft, Briefcase, MapPin, Clock, FileText, MessageSquare,
- Mail, Copy, ArrowRightLeft, GitBranch, MoreVertical, ChevronDown, Send,
+ Mail, Copy, ArrowRightLeft, GitBranch, MoreVertical, ChevronDown, ChevronRight, Send,
  ChevronsRight, ChevronsLeft, Calendar, User, Star, Sparkles, UserPlus,
  CheckCircle, Check, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu, GripVertical
 } from 'lucide-react';
@@ -517,12 +517,20 @@ export default function CandidateProfilePage() {
 
  return (
  <div className="p-6 space-y-5 relative">
+ <div className="flex items-center gap-2 text-[13px] font-bold mb-2">
+ <button onClick={() => navigate('/dashboard/jobs')} className="text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer">
+ Jobs
+ </button>
+ <ChevronRight size={14} className="text-gray-400 shrink-0" />
  <button
  onClick={() => navigate(from.path, { state: { tab: from.tab || 'Applications', selectedCandidateId: candidate.id } })}
- className="text-[13px] font-bold text-black dark:text-gray-400 hover:text-[#1890FF] flex items-center gap-1.5 transition-colors w-fit cursor-pointer"
+ className="text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer truncate max-w-[200px]"
  >
- <ArrowLeft size={16} /> Back to Applications
+ {location.state?.jobTitle || 'Senior AI Research Scientist'}
  </button>
+ <ChevronRight size={14} className="text-gray-400 shrink-0" />
+ <span className="text-[#212b36] dark:text-white truncate max-w-[200px]">{candidate.name}</span>
+ </div>
 
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 flex flex-col lg:flex-row lg:items-center gap-4">
  <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -534,16 +542,86 @@ export default function CandidateProfilePage() {
  <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F] ml-1">Agency: {candidate.agency}</span>
  )}
  </div>
- <p className="text-[13px] text-gray-500 mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
- <span className="flex items-center gap-1"><Briefcase size={13} /> Senior AI Research Scientist</span>
- <span className="flex items-center gap-1"><MapPin size={13} /> Bangalore</span>
- <span className="flex items-center gap-1"><Clock size={13} /> Applied {candidate.date}</span>
- </p>
- <p className="text-[12px] text-gray-400 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
- <span className="flex items-center gap-1.5"><Mail size={13} /> {candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
- <span className="flex items-center gap-1.5"><Phone size={13} /> +1 (555) 123-4567</span>
- <span className="flex items-center gap-1.5"><Globe size={13} /> EST (UTC-5)</span>
- </p>
+ {/* --- UI OPTION 1: Modern Badge Layout --- */}
+ <div className="mt-4 p-4 rounded-xl border border-[#1890FF]/20 bg-[#1890FF]/5 relative">
+ <div className="absolute -top-2.5 left-4 bg-[#1890FF] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 1: Modern Badges</div>
+ <div className="flex flex-col gap-3">
+ {/* Line 1: Core Contact */}
+ <div className="flex flex-wrap gap-2.5">
+ <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <Mail size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
+ </div>
+ <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <Phone size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">+1 (555) 123-4567</span>
+ </div>
+ </div>
+ {/* Line 2: Professional & Logistics */}
+ <div className="flex flex-wrap gap-2.5">
+ <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <Briefcase size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">Senior Staff Engineer</span>
+ </div>
+ <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <MapPin size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">Bangalore <span className="text-gray-400 font-medium ml-1">• EST (UTC-5)</span></span>
+ </div>
+ <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <Clock size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">Applied {candidate.date}</span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ {/* --- UI OPTION 2: Structured Grid Layout --- */}
+ <div className="mt-4 p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 relative">
+ <div className="absolute -top-2.5 left-4 bg-[#00A76F] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 2: Structured Grid</div>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6">
+ <div className="flex flex-col gap-1.5">
+ <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Mail size={12}/> Contact</span>
+ <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
+ <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300 mt-0.5">+1 (555) 123-4567</span>
+ </div>
+ <div className="flex flex-col gap-1.5">
+ <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Briefcase size={12}/> Current Role</span>
+ <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</span>
+ </div>
+ <div className="flex flex-col gap-1.5">
+ <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><MapPin size={12}/> Location</span>
+ <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Bangalore <span className="text-gray-400 font-medium block mt-0.5">EST (UTC-5)</span></span>
+ </div>
+ <div className="flex flex-col gap-1.5">
+ <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Clock size={12}/> Timeline</span>
+ <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Applied {candidate.date}</span>
+ </div>
+ </div>
+ </div>
+
+ {/* --- UI OPTION 3: Split Panel Layout --- */}
+ <div className="mt-4 p-4 rounded-xl border border-[#8E33FF]/20 bg-[#8E33FF]/5 relative">
+ <div className="absolute -top-2.5 left-4 bg-[#8E33FF] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 3: Split Panels</div>
+ <div className="flex flex-col md:flex-row gap-4">
+ {/* Contact Panel */}
+ <div className="flex-1 bg-white dark:bg-[#161c24] rounded-lg border border-gray-200/60 dark:border-gray-700/60 p-3.5 shadow-sm">
+ <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Contact Details</h4>
+ <div className="flex flex-col gap-2.5 text-[#212b36] dark:text-gray-300 text-[13px] font-bold">
+ <div className="flex items-center gap-2"><Mail size={14} className="text-[#8E33FF]" /><span>{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span></div>
+ <div className="flex items-center gap-2"><Phone size={14} className="text-[#8E33FF]" /><span>+1 (555) 123-4567</span></div>
+ </div>
+ </div>
+ {/* Profile Panel */}
+ <div className="flex-[1.5] bg-white dark:bg-[#161c24] rounded-lg border border-gray-200/60 dark:border-gray-700/60 p-3.5 shadow-sm">
+ <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Candidate Context</h4>
+ <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 text-[#212b36] dark:text-gray-300 text-[13px] font-bold">
+ <div className="flex items-center gap-2"><Briefcase size={14} className="text-gray-500" /><span>Senior Staff Engineer</span></div>
+ <div className="flex items-center gap-2"><MapPin size={14} className="text-gray-500" /><span>Bangalore <span className="text-gray-400 font-medium ml-0.5">(EST / UTC-5)</span></span></div>
+ <div className="flex items-center gap-2"><Clock size={14} className="text-gray-500" /><span>Applied {candidate.date}</span></div>
+ </div>
+ </div>
+ </div>
+ </div>
  </div>
  </div>
 
