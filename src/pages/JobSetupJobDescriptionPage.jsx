@@ -65,7 +65,7 @@ Requirements:
 
  <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">
  <div className="xl:col-span-2 bg-white dark:bg-[#161c24] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 flex flex-col overflow-hidden">
- <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/20">
+ <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50 dark:bg-gray-800/20">
  <div className="flex items-center gap-2 text-sm font-bold text-[#212b36] dark:text-white">
  <Edit3 size={16} className="text-[#1890FF]" /> Editor
  </div>

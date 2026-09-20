@@ -23,13 +23,13 @@ export default function AuthPage() {
  >
  {/* Abstract Background Shapes */}
  <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
- <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/10 blur-3xl"></div>
+ <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white blur-3xl"></div>
  <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-brand-dark/20 blur-3xl"></div>
  </div>
 
  {/* Brand Header */}
  <div className="relative z-10 flex items-center gap-3 text-white">
- <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm border border-white/20">
+ <div className="p-2 bg-white rounded-xl backdrop-blur-sm border border-white/20">
  <BrainCircuit size={32} className="text-white" />
  </div>
  <span className="text-3xl font-bold ">FindNew</span>
@@ -45,11 +45,11 @@ export default function AuthPage() {
  </p>
  
  <div className="flex items-center gap-4 text-sm font-medium animate-fade-in" style={{animationDelay: '0.4s'}}>
- <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+ <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
  <Sparkles size={16} className="text-brand-green" />
  <span>AI-Powered Matching</span>
  </div>
- <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+ <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
  <Bot size={16} className="text-brand-blue" />
  <span>Automated Screening</span>
  </div>

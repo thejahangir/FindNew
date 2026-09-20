@@ -3,10 +3,12 @@ import AuthPage from './pages/AuthPage';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ChatbotProvider } from './contexts/ChatbotContext';
 
 function App() {
  return (
  <ThemeProvider>
+ <ChatbotProvider>
  <Router basename="/FindNew">
  <Routes>
  <Route path="/" element={<LandingPage />} />
@@ -14,6 +16,7 @@ function App() {
  <Route path="/dashboard/*" element={<DashboardPage />} />
  </Routes>
  </Router>
+ </ChatbotProvider>
  </ThemeProvider>
  );
 }

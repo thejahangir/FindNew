@@ -29,7 +29,7 @@ export default function ApprovalsPage() {
  <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 overflow-hidden">
  <table className="w-full text-left border-collapse">
  <thead>
- <tr className="bg-gray-50/50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
+ <tr className="bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Type</th>
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Subject</th>
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Date</th>
@@ -38,7 +38,7 @@ export default function ApprovalsPage() {
  </thead>
  <tbody className="divide-y divide-gray-100 dark:divide-gray-800/50">
  {mockApprovals.map(approval => (
- <tr key={approval.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+ <tr key={approval.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 rounded-xl bg-[#FFC107]/10 flex items-center justify-center text-[#FFC107] shrink-0">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Users, Plus, Mail, Trash2, Shield , Settings2, X, LayoutGrid, List, Check } from 'lucide-react';
+import { Users, Plus, Mail, Trash2, Shield , Settings2, X, LayoutGrid, List, Check , Edit2, Save } from 'lucide-react';
 
 import SearchableSelect from '../../ui/SearchableSelect';
 
@@ -83,10 +83,10 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  }
 
  return (
- <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
+ <div className="p-6 space-y-5 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
  
 
- <div className="flex-1 space-y-6">
+ <div className="flex-1 space-y-5">
 
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center justify-between mb-6">
@@ -99,13 +99,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
   <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'cards' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><LayoutGrid size={16} /></button>
   <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-[#161c24] shadow-sm text-[#1890FF]' : 'text-gray-400 hover:text-gray-600'}`}><List size={16} /></button>
   </div>
-  <button
-  onClick={() => setIsEditingSettings(prev => !prev)}
-  className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
-  title={isEditingSettings ? "Save changes" : "Edit Hiring Team"}
-  >
-  {isEditingSettings ? <Check size={18} className="text-[#00A76F]" /> : <Settings2 size={18} />}
-  </button>
+  <button onClick={() => setIsEditingSettings(prev => !prev)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"> {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>} </button>
   {isEditingSettings && (
   <button onClick={() => setIsAddMemberModalOpen(true)} className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-lg text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer">
   <Plus size={16} /> Add Member
@@ -115,7 +109,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  </div>
 
  {viewMode === 'cards' ? (
- <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+ <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
  {team.map(member => (
  <div key={member.id} className="flex flex-col h-full bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative group/card overflow-hidden">
  
@@ -157,7 +151,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
  </thead>
  <tbody>
  {team.map(member => (
- <tr key={member.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+ <tr key={member.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
  <td className="p-4">
  <div className="flex items-center gap-3">
  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${member.avatar} shadow-sm border border-current/10`}>

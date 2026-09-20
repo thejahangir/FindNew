@@ -40,7 +40,7 @@ export default function Hero() {
  <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
  
  {/* Badge */}
- <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 text-sm font-medium text-brand-blue mb-8 animate-fade-in shadow-sm">
+ <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white backdrop-blur-sm border border-gray-200 text-sm font-medium text-brand-blue mb-8 animate-fade-in shadow-sm">
  <Star size={16} className="fill-brand-blue" />
  <span>The #1 AI-Powered ATS for Modern Teams</span>
  </div>
@@ -67,7 +67,7 @@ export default function Hero() {
  Start Hiring Free
  <ArrowRight size={20} />
  </Link>
- <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/90 backdrop-blur-sm text-brand-dark border border-gray-200 px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-50 transition-all active:scale-[0.98]">
+ <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white backdrop-blur-sm text-brand-dark border border-gray-200 px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-50 transition-all active:scale-[0.98]">
  Book a Demo
  </button>
  </div>

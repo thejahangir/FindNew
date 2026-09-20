@@ -40,39 +40,8 @@ export default function JobsPage() {
  const [currentPage, setCurrentPage] = useState(1);
  const itemsPerPage = 5;
 
- const [chatbotWidth, setChatbotWidth] = useState(DEFAULT_CHATBOT_WIDTH);
- const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(true);
- const [isChatbotResizing, setIsChatbotResizing] = useState(false);
  const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
  const [selectedJobToView, setSelectedJobToView] = useState(null);
-
- useEffect(() => {
- const handleMouseMove = (e) => {
- if (!isChatbotResizing || isChatbotCollapsed) return;
- e.preventDefault();
- const newWidth = document.body.clientWidth - e.clientX;
- if (newWidth < DEFAULT_CHATBOT_WIDTH) {
- setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
- return;
- }
- setChatbotWidth(Math.min(MAX_CHATBOT_WIDTH, newWidth));
- };
- const handleMouseUp = () => setIsChatbotResizing(false);
- if (isChatbotResizing) {
- document.body.style.cursor = 'w-resize';
- document.body.style.userSelect = 'none';
- document.documentElement.style.cursor = 'w-resize';
- document.addEventListener('mousemove', handleMouseMove);
- document.addEventListener('mouseup', handleMouseUp);
- }
- return () => {
- document.body.style.cursor = '';
- document.body.style.userSelect = '';
- document.documentElement.style.cursor = '';
- document.removeEventListener('mousemove', handleMouseMove);
- document.removeEventListener('mouseup', handleMouseUp);
- };
- }, [isChatbotResizing, isChatbotCollapsed]);
 
  useEffect(() => {
  const handleClickOutside = () => setOpenActionMenuId(null);
@@ -185,9 +154,6 @@ export default function JobsPage() {
 
  return (
  <>
- {isChatbotResizing && (
- <div className="fixed inset-0 z-[200] cursor-w-resize" />
- )}
  <div className="p-6 space-y-6 relative">
  {/* Header */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -266,7 +232,7 @@ export default function JobsPage() {
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse">
  <thead>
- <tr className="bg-gray-50/50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
+ <tr className="bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Job Details</th>
  <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Active Candidates</th>
  <th className="px-6 py-4 text-center text-xs font-bold text-black dark:text-gray-400 ">Actions</th>
@@ -277,7 +243,7 @@ export default function JobsPage() {
  <tr 
  key={job.id} 
  onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
- className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors group cursor-pointer"
+ className="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group cursor-pointer"
  >
  <td className="px-6 py-4">
  <div className="flex items-start gap-3">
@@ -423,7 +389,7 @@ export default function JobsPage() {
  </div>
  
  {filteredJobs.length > 0 && (
- <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/30 dark:bg-gray-800/10">
+ <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50 dark:bg-gray-800/10">
  <span className="text-sm text-black dark:text-gray-400 font-medium">
  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredJobs.length)} of {filteredJobs.length} jobs
  </span>
@@ -485,7 +451,7 @@ export default function JobsPage() {
  { candidate: 'Sarah Jenkins', role: 'UX', time: 'Today, 2:00 PM', type: 'Tech', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026024d' },
  { candidate: 'Michael Lee', role: 'Frontend', time: 'Tmrw, 10:30 AM', type: 'Culture', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }
  ].map((interview, i) => (
- <div key={i} className="flex items-center gap-2.5 p-2 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">
+ <div key={i} className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
  <img src={interview.avatar} alt={interview.candidate} className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-800" />
  <div className="flex-1 min-w-0">
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{interview.candidate}</p>
@@ -507,7 +473,7 @@ export default function JobsPage() {
  { title: 'Review candidates', desc: '5 new applicants', action: 'Review', color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
  { title: 'Draft expires soon', desc: 'Expires in 2 days', action: 'Publish', color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' }
  ].map((item, i) => (
- <div key={i} className="flex flex-col gap-1.5 p-2.5 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">
+ <div key={i} className="flex flex-col gap-1.5 p-2.5 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
  <div>
  <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.title}</p>
  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</p>
@@ -520,111 +486,6 @@ export default function JobsPage() {
  </div>
  </div>
  </div>
-
- <button
- type="button"
- onClick={() => {
- setChatbotWidth(DEFAULT_CHATBOT_WIDTH);
- setIsChatbotCollapsed(false);
- }}
- className={`hidden xl:flex fixed right-0 top-16 bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-none text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
- isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
- } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
- aria-label="Expand FindNeo AI"
- >
- <ChevronsLeft size={18} className="shrink-0" />
- <img src={findNewIco} alt="" className="w-6 h-6 object-contain shrink-0" />
- <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
- FindNeo AI Assistant
- </span>
- </button>
-
- <div
- style={{
- width: chatbotWidth,
- transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
- transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
- }}
- className={`fixed right-0 top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
- chatbotWidth > DEFAULT_CHATBOT_WIDTH && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
- } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
- >
- <div
- onMouseDown={(e) => {
- e.preventDefault();
- if (!isChatbotCollapsed) setIsChatbotResizing(true);
- }}
- className={`absolute left-0 top-0 bottom-0 w-4 z-10 flex items-center justify-center cursor-w-resize group ${
- isChatbotResizing ? 'bg-[#1890FF]/15' : 'hover:bg-[#1890FF]/10'
- }`}
- title="Drag left to widen"
- >
- <span
- className={`flex items-center justify-center w-[18px] h-11 rounded-full border shadow-sm transition-colors ${
- isChatbotResizing
- ? 'bg-[#1890FF] border-[#1890FF] text-white'
- : 'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-600 text-[#454f5b] dark:text-gray-300 group-hover:border-[#1890FF] group-hover:text-[#1890FF]'
- }`}
- >
- <GripVertical size={14} />
- </span>
- </div>
- <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/20">
- <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
- <img src={findNewIco} alt="FindNew AI" className="w-8 h-8 object-contain" />
- </div>
- <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNeo AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>
- <button
- type="button"
- onClick={() => setIsChatbotCollapsed(true)}
- className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0"
- aria-label="Collapse FindNew AI"
- >
- <ChevronsRight size={16} />
- </button>
- </div>
- <div className="flex-1 p-4 overflow-y-auto space-y-4">
- <div className="flex flex-col gap-1 items-start max-w-[85%]">
- <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
- Hi! I can help you analyze your hiring pipeline, find jobs, or summarize candidates.
- </div>
- </div>
- 
- <div className="flex flex-col gap-1 items-end ml-auto max-w-[85%]">
- <div className="bg-[#1890FF] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-[13px] font-medium shadow-sm">
- Which jobs need attention today?
- </div>
- </div>
-
- <div className="flex flex-col gap-1 items-start max-w-[90%]">
- <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
- <p className="mb-2">Three areas need attention:</p>
- <ul className="list-disc pl-4 space-y-1">
- <li><span className="font-bold">Product Design Lead</span> — still in Draft</li>
- <li><span className="font-bold">Backend Developer</span> — no candidates yet</li>
- <li><span className="font-bold">Data Engineer</span> — 12 active candidates</li>
- </ul>
- </div>
- </div>
-
- <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
- <p className="text-[11px] font-bold text-gray-400 mb-2 ">Suggested Questions</p>
- <div className="space-y-2">
- {["Who are my top candidates?", "Which jobs are overdue?", "Summarize this week"].map((q, i) => (
- <button key={i} className="w-full text-left px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl text-[12px] font-medium text-[#212b36] dark:text-white transition-colors cursor-pointer shadow-sm">
- {q}
- </button>
- ))}
- </div>
- </div>
- </div>
- <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
- <div className="relative">
- <input type="text" placeholder="Ask me anything..." className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-[#212b36] dark:text-white"/>
- <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg"><Send size={16} /></button>
- </div>
- </div>
- </div>
  </div>
  </div>
 
@@ -633,7 +494,7 @@ export default function JobsPage() {
  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#212b36] rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col scale-in-center">
  
- <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10">
+ <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10">
  <h2 className="text-xl font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  <Send size={24} className="text-[#00A76F]" />
  Send to Agency
@@ -679,7 +540,7 @@ export default function JobsPage() {
  </div>
 
  </div>
- <div className="p-6 border-t border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10 rounded-b-2xl">
+ <div className="p-6 border-t border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10 rounded-b-2xl">
  <button 
  onClick={() => setModalStep(1)}
  className="px-5 py-2.5 text-sm font-bold text-black hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
@@ -967,7 +828,7 @@ export default function JobsPage() {
  )}
  </div>
 
- <div className="p-6 border-t border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10 rounded-b-2xl">
+ <div className="p-6 border-t border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10 rounded-b-2xl">
  <button 
  onClick={() => setModalStep(1)}
  className="px-5 py-2.5 text-sm font-bold text-black hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"

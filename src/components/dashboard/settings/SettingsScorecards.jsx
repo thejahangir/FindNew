@@ -161,7 +161,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  </div>
  </div>
 
- <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+ <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
   {categories.map((category) => (
   <CategoryCard 
   key={category.id} 
@@ -250,7 +250,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  <tr>
  <td 
  colSpan={rounds.length + 1} 
- className="bg-gray-100/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 p-3 sticky left-0 z-10 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151]"
+ className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 p-3 sticky left-0 z-10 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151]"
  >
  <div className="flex items-center gap-2 font-bold text-[#212b36] dark:text-white text-sm">
  <ChevronDown size={16} className="text-gray-400" />
@@ -326,7 +326,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
  </div>
 
  {/* Footer Navigation */}
- <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-12 sticky bottom-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-20 pb-4">
+ <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-12 sticky bottom-0 bg-white dark:bg-gray-900/80 backdrop-blur-md z-20 pb-4">
  <button 
  onClick={() => setSettingsActiveNav('Pipeline')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"

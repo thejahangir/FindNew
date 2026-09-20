@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { 
  Star, GripVertical, Settings2, Plus, Info, X, ChevronDown, 
  ChevronRight, BrainCircuit, Lightbulb, GraduationCap, Briefcase, 
- User, CheckCircle2, Play, Trash2, Code, ArrowRight, FileText, Loader2, Edit3, Wand2, Zap
-} from 'lucide-react';
+ User, CheckCircle2, Play, Trash2, Code, ArrowRight, FileText, Loader2, Edit3, Wand2, Zap, UploadCloud, Check
+, Edit2, Save } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -73,7 +73,7 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal, isEditing
  </div>
 
  <div className="p-6 space-y-4 flex-1 overflow-y-auto">
- <div className="flex flex-col xl:flex-row gap-6">
+ <div className="flex flex-col xl:flex-row gap-5">
  <div className="space-y-2 flex-1">
  <div className="flex items-center h-5">
  <label className={`text-xs ${isModal ? 'font-semibold' : 'font-bold'} text-gray-500`}>Skill / Criteria Name</label>
@@ -153,7 +153,7 @@ const RuleDetailsPanel = ({ rule, onUpdate, onDelete, onSave, isModal, isEditing
  
  {/* Footer Actions */}
  {isEditingSettings && (
- <div className="p-4 border-t-2 border-gray-200 dark:border-gray-700/50 flex items-center justify-center gap-8 bg-gray-50/50 dark:bg-[#1a222c]/50 rounded-b-2xl mt-auto">
+ <div className="p-4 border-t-2 border-gray-200 dark:border-gray-700/50 flex items-center justify-center gap-5 bg-gray-50 dark:bg-[#1a222c]/50 rounded-b-2xl mt-auto">
  <button 
  onClick={() => onDelete(rule.id)} 
  title="Delete Rule"
@@ -277,7 +277,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  const selectedRule = rules.find(r => r.id === selectedRuleId) || (rules.length > 0 ? rules[0] : null);
 
  return (
- <div className={`${!hideFooter ? 'p-6 space-y-6 min-h-[calc(100vh-100px)]' : 'p-1 h-full overflow-hidden'} animate-fade-in flex flex-col relative`}>
+ <div className={`${!hideFooter ? 'p-6 space-y-5 min-h-[calc(100vh-100px)]' : 'p-1 h-full overflow-hidden'} animate-fade-in flex flex-col relative`}>
  <div className={`flex-1 flex flex-col ${!hideFooter ? 'space-y-4' : 'space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-2'}`}>
  {!hideFooter && (
  <div className="flex justify-end gap-4 mb-2 px-2">
@@ -291,20 +291,14 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  Regenerate from JD
  </button>
  )}
- <button
- onClick={() => setIsEditingSettings(prev => !prev)}
- className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={isEditingSettings ? "Save changes" : "Edit Rules"}
- >
- {isEditingSettings ? <Check size={18} className="text-[#00A76F]" /> : <Settings2 size={18} />}
- </button>
+ <button onClick={() => setIsEditingSettings(prev => !prev)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"> {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>} </button>
  </div>
  </div>
  )}
 
  <div className="relative flex-1 flex flex-col">
  {isGenerating && (
- <div className="absolute inset-0 bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center animate-fade-in rounded-2xl h-[500px]">
+ <div className="absolute inset-0 bg-white dark:bg-[#161c24]/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center animate-fade-in rounded-2xl h-[500px]">
  <div className="w-16 h-16 bg-[#1890FF]/10 text-[#1890FF] rounded-full flex items-center justify-center mb-4">
  <Loader2 size={32} className="animate-spin" />
  </div>
@@ -314,7 +308,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  )}
 
  {!isGenerated && !isGenerating ? (
- <div className="text-center py-20 border border-dashed border-gray-300 dark:border-gray-700 rounded-[20px] bg-gray-50/30 dark:bg-[#161c24]/30">
+ <div className="text-center py-20 border border-dashed border-gray-300 dark:border-gray-700 rounded-[20px] bg-gray-50 dark:bg-[#161c24]/30">
  <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] rounded-full flex items-center justify-center mx-auto mb-6">
  <FileText size={24} />
  </div>
@@ -322,17 +316,31 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  <p className="text-[13px] text-gray-500 max-w-sm mx-auto mb-8">
  Automatically extract and suggest ranking rules based on your Job Description.
  </p>
+ <div className="flex flex-col items-center gap-3">
+ <div className="relative inline-block">
+ <input 
+ type="file" 
+ accept=".pdf,.doc,.docx,.txt"
+ className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+ onChange={handleGenerate}
+ title="Upload JD"
+ />
+ <button className="px-6 py-3 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl text-sm font-bold transition-colors shadow-sm inline-flex items-center gap-2 cursor-pointer w-[200px] justify-center">
+ <UploadCloud size={18} /> Upload JD
+ </button>
+ </div>
  {isEditingSettings && (
  <button 
  onClick={handleGenerate} 
- className="px-6 py-3 bg-[#1890FF] hover:bg-[#1890FF]/90 text-white rounded-xl text-sm font-bold transition-colors shadow-sm inline-flex items-center gap-2 cursor-pointer"
+ className="px-6 py-3 bg-white dark:bg-[#212b36] border border-[#1890FF]/30 hover:border-[#1890FF] text-[#1890FF] rounded-xl text-sm font-bold transition-colors shadow-sm inline-flex items-center gap-2 cursor-pointer w-[200px] justify-center"
  >
  <Wand2 size={18} /> Generate from JD
  </button>
  )}
  </div>
+ </div>
  ) : isGenerated && (
- <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-start">
+ <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-full items-start">
  
  {/* Left Column: Master List */}
  <div className="col-span-1 lg:col-span-6 xl:col-span-5 flex flex-col">
@@ -384,7 +392,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter 
  </div>
 
  {!hideFooter && (
- <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
+ <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
  <button 
  onClick={() => setSettingsActiveNav('Scorecards')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"

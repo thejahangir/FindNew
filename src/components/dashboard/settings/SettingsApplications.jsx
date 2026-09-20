@@ -165,8 +165,8 @@ const PipelineSwimlane = ({ stage, candidates, onMoveStage, onOpenHiddenCandidat
  const hiddenCount = sortedCandidates.length - 4;
 
  return (
- <div ref={setNodeRef} className="flex flex-col w-full bg-gray-50/80 dark:bg-[#161c24]/80 rounded-2xl border border-gray-200 dark:border-gray-800/80 overflow-visible shrink-0 relative hover:z-[50] focus-within:z-[50] transition-all duration-300">
- <div className={`px-4 py-3 border-gray-200/80 dark:border-gray-800/80 flex items-center justify-between bg-white/50 dark:bg-[#212b36]/50 transition-all ${isExpanded ? 'border-b rounded-t-2xl' : 'rounded-2xl'}`}>
+ <div ref={setNodeRef} className="flex flex-col w-full bg-gray-50 dark:bg-[#161c24]/80 rounded-2xl border border-gray-200 dark:border-gray-800/80 overflow-visible shrink-0 relative hover:z-[50] focus-within:z-[50] transition-all duration-300">
+ <div className={`px-4 py-3 border-gray-200/80 dark:border-gray-800/80 flex items-center justify-between bg-white dark:bg-[#212b36]/50 transition-all ${isExpanded ? 'border-b rounded-t-2xl' : 'rounded-2xl'}`}>
  <div 
  className="flex items-center gap-2 cursor-pointer select-none group"
  onClick={() => setIsExpanded(!isExpanded)}
@@ -206,7 +206,7 @@ const PipelineSwimlane = ({ stage, candidates, onMoveStage, onOpenHiddenCandidat
  <SortableCandidateCard key={candidate.id} candidate={candidate} onMoveStage={onMoveStage} />
  ))
  ) : (
- <div className="w-full h-full min-h-[80px] flex items-center justify-center text-sm font-bold text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-gray-700/50 rounded-xl bg-white/30 dark:bg-[#212b36]/30">
+ <div className="w-full h-full min-h-[80px] flex items-center justify-center text-sm font-bold text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-gray-700/50 rounded-xl bg-white dark:bg-[#212b36]/30">
  No candidates in this stage right now
  </div>
  )}
@@ -463,7 +463,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
  {hiddenCandidatesModal.isOpen && createPortal(
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4 animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-lg flex flex-col shadow-2xl animate-scale-up overflow-hidden max-h-[80vh]">
- <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10">
+ <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  <Users size={18} className="text-[#1890FF]" />
  Hidden Candidates - {hiddenCandidatesModal.stageTitle}

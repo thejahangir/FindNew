@@ -186,7 +186,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  
  </div>
 
- <div className="flex-1 space-y-8 flex flex-col w-full">
+ <div className="flex-1 space-y-5 flex flex-col w-full">
  
  {/* Top Controls: Job vs User Settings */}
  <div className="flex items-center justify-between bg-white dark:bg-[#161c24] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
@@ -232,12 +232,12 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  </div>
 
  {/* Notifications Sections Grid */}
- <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+ <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 items-start">
  {sections.map(section => (
  <div key={section.title} className="bg-white dark:bg-[#161c24] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden">
  
  {/* Section Header */}
- <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-4 bg-gray-50/50 dark:bg-[#1a222c]/50">
+ <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex items-center gap-4 bg-gray-50 dark:bg-[#1a222c]/50">
  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${section.bg} ${section.color}`}>
  <section.icon size={24} />
  </div>
@@ -250,8 +250,8 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  {/* Items */}
  <div className="divide-y divide-gray-100 dark:divide-gray-800/60">
  {section.items.map((item, index) => (
- <div key={item.key} className="p-8 hover:bg-gray-50/30 dark:hover:bg-gray-800/20 transition-colors group">
- <div className="flex items-start justify-between gap-8">
+ <div key={item.key} className="p-8 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+ <div className="flex items-start justify-between gap-5">
  <div className="flex-1 space-y-4">
  <div>
  <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-1">{item.label}</h3>
@@ -433,7 +433,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  )}
  </div>
 
- <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex gap-3 bg-gray-50/50 dark:bg-gray-800/30">
+ <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex gap-3 bg-gray-50 dark:bg-gray-800/30">
  <button 
  onClick={closeEditModal} 
  className="flex-1 py-2.5 text-sm font-bold text-[#212b36] dark:text-white bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl shadow-sm transition-colors cursor-pointer"
@@ -453,7 +453,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  )}
 
  {/* Footer Navigation */}
- <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-12 sticky bottom-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-20 pb-4">
+ <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-12 sticky bottom-0 bg-white dark:bg-gray-900/80 backdrop-blur-md z-20 pb-4">
  <button 
  onClick={() => setSettingsActiveNav('Agencies')}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
@@ -481,7 +481,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
  You've successfully configured the entire hiring process for this role. You can publish it now to start accepting candidates, or save it as a draft to review later.
  </p>
  </div>
- <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex flex-col gap-3 bg-gray-50/50 dark:bg-gray-800/30">
+ <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/30">
  <button 
  onClick={() => handleFinish('publish')}
  className="w-full py-3.5 text-sm font-bold text-white bg-[#00A76F] hover:bg-[#00A76F]/90 rounded-xl shadow-[0_8px_16px_rgba(0,167,111,0.24)] transition-colors cursor-pointer flex items-center justify-center gap-2"

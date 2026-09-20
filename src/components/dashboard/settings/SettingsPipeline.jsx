@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Columns, GitBranch, ArrowRight, Settings, Plus, Zap, Settings2, Trash2, ArrowUp, ArrowDown, GripVertical, PenLine, Mail, Calendar, FileCheck, CheckCircle2, Circle, AlertCircle, Clock } from 'lucide-react';
+import { Columns, GitBranch, ArrowRight, Settings, Plus, Zap, Settings2, Trash2, ArrowUp, ArrowDown, GripVertical, PenLine, Mail, Calendar, FileCheck, CheckCircle2, Circle, AlertCircle, Clock, Check, Edit2, Save } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -136,7 +136,7 @@ const StageDetailsPanel = ({ stage, isEditing, onUpdateStage }) => {
  <p className="text-sm text-gray-500 mt-1">Configure actions and requirements for candidates entering this stage.</p>
  </div>
 
- <div className="p-6 space-y-8 flex-1 overflow-y-auto">
+ <div className="p-6 space-y-5 flex-1 overflow-y-auto">
  {/* Automated Actions */}
  <section>
  <h4 className="text-[13px] font-bold text-gray-400 mb-4 flex items-center gap-2">
@@ -407,12 +407,12 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  const selectedStage = stages.find(s => s.id === selectedStageId) || stages[0];
 
  return (
- <div className="p-6 space-y-6 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
+ <div className="p-6 space-y-5 animate-fade-in flex flex-col min-h-[calc(100vh-100px)]">
  
  
 
  <div className="flex-1">
- <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-start">
+ <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-full items-start">
  
  {/* Left Column: Vertical Pipeline */}
  <div className="col-span-1 lg:col-span-6 xl:col-span-5 bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 flex flex-col">
@@ -425,10 +425,9 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  <div className="flex gap-2 items-center">
  <button
  onClick={() => setIsEditingSettings(prev => !prev)}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={isEditingSettings ? "Save changes" : "Edit Pipeline"}
+ className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"
  >
- {isEditingSettings ? <Check size={16} className="text-[#00A76F]" /> : <Settings size={16} />}
+ {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
  </button>
 
  {isEditingSettings && (
@@ -453,7 +452,7 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
  </div>
 
  <div className="relative pt-2 px-2 flex-1 pb-4">
- <div className="flex flex-col gap-6">
+ <div className="flex flex-col gap-5">
  {!isEditingOrder ? (
  stages.map((stage, index) => (
  <ReadOnlyStageItem

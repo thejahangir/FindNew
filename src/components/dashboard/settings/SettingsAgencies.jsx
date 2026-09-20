@@ -87,10 +87,9 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
   <div className="flex gap-3">
   <button
   onClick={() => setIsEditingSettings(prev => !prev)}
-  className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
-  title={isEditingSettings ? "Save changes" : "Edit Agencies"}
+  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"
   >
-  {isEditingSettings ? <Check size={20} className="text-[#00A76F]" /> : <Edit2 size={20} />}
+  {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
   </button>
   {isEditingSettings && (
   <button 
@@ -119,7 +118,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
   )}
  </div>
  ) : viewMode === 'cards' ? (
- <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+ <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
  {agencies.map(agency => (
  <div key={agency.id} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col transition-all hover:shadow-md hover:-translate-y-1">
  
@@ -152,7 +151,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
 
  {/* Card Footer */}
   {isEditingSettings && (
-  <div className="bg-gray-50/50 dark:bg-[#212b36]/30 border-t border-gray-100 dark:border-gray-800/50 p-3 flex items-center justify-center gap-2">
+  <div className="bg-gray-50 dark:bg-[#212b36]/30 border-t border-gray-100 dark:border-gray-800/50 p-3 flex items-center justify-center gap-2">
   <button 
   onClick={() => setConfirmAlert({ 
   action: agency.status === 'Active' ? 'pause' : 'resume', 
@@ -198,7 +197,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  </thead>
  <tbody>
  {agencies.map(agency => (
- <tr key={agency.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+ <tr key={agency.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
  <td className="p-4">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 shrink-0 bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] rounded-xl flex items-center justify-center">
@@ -279,7 +278,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  {isAddModalOpen && createPortal(
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md flex flex-col shadow-2xl animate-scale-up overflow-hidden">
- <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-[#161c24]">
+ <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-[#161c24]">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  <Building2 size={20} className="text-[#1890FF]" />
  Assign Agency
@@ -345,7 +344,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  </div>
  </div>
  
- <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#161c24]">
+ <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex justify-end gap-3 bg-gray-50 dark:bg-[#161c24]">
  <button 
  onClick={() => setIsAddModalOpen(false)}
  className="px-4 py-2 text-sm font-bold text-[#212b36] dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
@@ -383,7 +382,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
  {confirmAlert.action === 'remove' && " This action cannot be undone."}
  </p>
  </div>
- <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex gap-3 bg-gray-50/50 dark:bg-[#212b36]/30">
+ <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 flex gap-3 bg-gray-50 dark:bg-[#212b36]/30">
  <button 
  onClick={() => setConfirmAlert(null)}
  className="flex-1 px-4 py-2.5 text-sm font-bold text-[#212b36] dark:text-white bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"

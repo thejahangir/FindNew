@@ -18,7 +18,7 @@ export default function ForgotPasswordForm({ setView }) {
  </div>
  <input
  type="email"
- className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand-dark transition-colors bg-white/50"
+ className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand-dark transition-colors bg-white"
  placeholder="Enter your email"
  required
  />

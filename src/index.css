@@ -10,7 +10,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  background-color: #f3f4f6;
+  background-color: #e5e7eb;
   color: #000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -146,4 +146,10 @@ th, h2, h3, h4, h5, h6 {
 .react-quill-container .ql-editor {
   min-height: 300px;
   max-height: 600px;
+}
+
+/* Global hover effect for icons inside buttons */
+button:not(.text-white):not(.bg-\[\#1890FF\]):hover svg {
+  color: #1890FF;
+  transition: color 0.15s ease-in-out;
 }

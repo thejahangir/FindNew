@@ -71,7 +71,7 @@ export default function JobSetupInterviewsPage() {
 
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
  {interviews.map((interview, index) => (
- <div key={interview.id} className="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-[#161c24] hover:shadow-md hover:border-[#FF5630]/40 transition-all group relative overflow-hidden">
+ <div key={interview.id} className="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#161c24] hover:shadow-md hover:border-[#FF5630]/40 transition-all group relative overflow-hidden">
  <div className="absolute top-0 left-0 w-1 h-full bg-[#FF5630] opacity-0 group-hover:opacity-100 transition-opacity"></div>
  
  <div className="flex justify-between items-start mb-4">

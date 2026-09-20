@@ -366,7 +366,7 @@ export default function JobSetupKnowledgeBasePage() {
  // Loading Skeleton State
  <div className="flex-1 p-6 space-y-4">
  {[1, 2, 3].map((skeleton) => (
- <div key={skeleton} className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 animate-pulse bg-gray-50/50 dark:bg-gray-800/30">
+ <div key={skeleton} className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 animate-pulse bg-gray-50 dark:bg-gray-800/30">
  <div className="flex items-start gap-4">
  <div className="w-6 h-6 shrink-0 rounded-md bg-gray-200 dark:bg-gray-700" />
  <div className="flex-1 min-w-0 space-y-4">
@@ -387,7 +387,7 @@ export default function JobSetupKnowledgeBasePage() {
  ) : (
  // Results State
  <>
- <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50/50 dark:bg-[#1a222c]/50">
+ <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50 dark:bg-[#1a222c]/50">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
  Search Results
  <span className="bg-[#1890FF]/10 text-[#1890FF] text-xs px-2.5 py-0.5 rounded-full">{candidates.length} Found</span>
@@ -522,7 +522,7 @@ export default function JobSetupKnowledgeBasePage() {
  </div>
 
  {/* Footer Navigation */}
- <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white/80 dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
+ <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto bg-white dark:bg-[#161c24]/80 backdrop-blur-md sticky bottom-0 z-20 pb-2">
  <button 
  onClick={() => navigate('/dashboard/job-setup/description-skills', { state: { jobData } })}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"

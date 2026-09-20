@@ -103,7 +103,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  {cards.map((card, index) => (
  <div
  key={card.id}
- className={`rounded-xl border p-4 transition-colors ${errors[card.id] ? 'border-[#FF5630] bg-[#FF5630]/5' : 'border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-800/20'}`}
+ className={`rounded-xl border p-4 transition-colors ${errors[card.id] ? 'border-[#FF5630] bg-[#FF5630]/5' : 'border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/20'}`}
  >
  <div className="flex items-start gap-3 mb-4">
  <div className="w-10 h-10 rounded-full bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">
@@ -112,7 +112,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  <div className="min-w-0 flex-1">
  <div className="flex items-start justify-between gap-2 mb-1">
  <h3 className="text-sm font-extrabold text-[#212b36] dark:text-white truncate uppercase">{card.name}</h3>
- <span className="text-[10px] font-bold text-gray-400 bg-gray-100/50 dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 px-2 py-0.5 rounded-md shrink-0">
+ <span className="text-[10px] font-bold text-gray-400 bg-gray-50 dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 px-2 py-0.5 rounded-md shrink-0">
  {index + 1} of {cards.length}
  </span>
  </div>
@@ -160,7 +160,7 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  ))}
  </div>
 
- <div className={`flex items-center gap-3 p-5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50/80 dark:bg-[#161c24] shrink-0 ${cards.length > 1 ? 'justify-between' : 'justify-end'}`}>
+ <div className={`flex items-center gap-3 p-5 border-t border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#161c24] shrink-0 ${cards.length > 1 ? 'justify-between' : 'justify-end'}`}>
  {cards.length > 1 && (
  <p className="text-[12px] text-gray-500 font-medium hidden sm:block">
  {cards.length} emails will send together.

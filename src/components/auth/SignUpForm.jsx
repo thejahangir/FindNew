@@ -18,7 +18,7 @@ export default function SignUpForm({ setView }) {
  </div>
  <input
  type="text"
- className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white/50"
+ className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white"
  placeholder="John Doe"
  required
  />
@@ -33,7 +33,7 @@ export default function SignUpForm({ setView }) {
  </div>
  <input
  type="email"
- className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white/50"
+ className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white"
  placeholder="you@company.com"
  required
  />
@@ -48,7 +48,7 @@ export default function SignUpForm({ setView }) {
  </div>
  <input
  type="password"
- className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white/50"
+ className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors bg-white"
  placeholder="Create a strong password"
  required
  />

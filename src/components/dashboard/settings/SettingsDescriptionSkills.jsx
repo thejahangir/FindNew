@@ -68,7 +68,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  <div className="p-6 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in">
  
 
- <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4 items-start">
+ <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 mt-4 items-start">
  {/* Description Panel */}
  <div className="col-span-1 lg:col-span-6 xl:col-span-7 bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm h-full flex flex-col relative">
  {initialJobData?.status === 'Published' && (
@@ -79,8 +79,9 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
  </button>
  )}
- <div className={`flex flex-col flex-1 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
+ <div className="flex flex-col flex-1">
  <label className="block text-xs font-bold text-black mb-2">Description</label>
+ {isEditingSettings ? (
  <div className="react-quill-container flex-1 mt-2">
  <ReactQuill 
  theme="snow"
@@ -88,9 +89,14 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  onChange={(content) => handleInputChange('jdText', content)}
  className="h-full min-h-[300px] lg:min-h-[450px]"
  placeholder="Enter the full job description here..."
- readOnly={!isEditingSettings}
  />
  </div>
+ ) : (
+ <div 
+ className="prose dark:prose-invert max-w-none text-sm text-[#212b36] dark:text-gray-300 mt-2 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl" 
+ dangerouslySetInnerHTML={{ __html: jobData.jdText || '<p>No description provided.</p>' }} 
+ />
+ )}
  </div>
  </div>
 
@@ -104,16 +110,19 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  {isEditingSettings ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
  </button>
  )}
- <div className={`flex items-center justify-between mb-4 sticky top-0 bg-white dark:bg-[#161c24] z-10 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
- <label className="block text-xs font-bold text-black">Required Skills</label>
- <button 
- onClick={addSkill}
- className="px-3 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer mr-20"
- >
- <Plus size={14} /> Add
- </button>
- </div>
- <div className={`flex flex-col mb-6 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
+  {isEditingSettings ? (
+    <>
+      <div className="flex items-center justify-between mb-4 sticky top-0 bg-white dark:bg-[#161c24] z-10">
+        <label className="block text-xs font-bold text-black">Required Skills</label>
+        <button 
+          onClick={addSkill}
+          className="px-3 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer mr-20"
+        >
+          <Plus size={14} /> Add
+        </button>
+      </div>
+
+ <div className={`flex flex-col mb-6`}>
  {jobData.skills.some(s => s.source === 'jd' && !s.isExpanded) && (
  <div className="pb-4">
  <div className="flex items-center gap-2 mb-3">
@@ -172,7 +181,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  )}
  </div>
 
- <div className={`space-y-3 ${!isEditingSettings ? 'opacity-60 pointer-events-none' : ''}`}>
+ <div className={`space-y-3`}>
  {jobData.skills.map((skill, index) => {
  if (!skill.isExpanded) return null;
  
@@ -192,7 +201,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  value={skill.name}
  onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
  placeholder="Enter the skill"
- className="w-full pl-9 pr-3 py-1 bg-gray-50/50 dark:bg-gray-800/30 border border-transparent focus:border-[#1890FF] focus:bg-white dark:focus:bg-[#161c24] rounded-md text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/20 transition-all text-[#212b36] dark:text-white placeholder-gray-400 placeholder:text-xs placeholder:font-normal"
+ className="w-full pl-9 pr-3 py-1 bg-gray-50 dark:bg-gray-800/30 border border-transparent focus:border-[#1890FF] focus:bg-white dark:focus:bg-[#161c24] rounded-md text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[#1890FF]/20 transition-all text-[#212b36] dark:text-white placeholder-gray-400 placeholder:text-xs placeholder:font-normal"
  autoFocus={skill.source === 'manual' && !skill.name}
  />
  </div>
@@ -206,42 +215,42 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  </div>
  
  <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800/60 pt-2">
- <div className="flex items-center gap-6">
+ <div className="flex items-center gap-4">
  <div className="flex items-center gap-2">
  <span className="text-[11px] font-extrabold text-gray-600 dark:text-gray-400">Exp</span>
  <div className="flex items-center bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-md p-0.5">
  <button 
  onClick={() => handleSkillChange(index, 'years', Math.max(0, Number(skill.years) - 1).toString())}
- className="w-6 h-6 flex items-center justify-center rounded hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-black dark:text-gray-400 transition-all cursor-pointer"
+ className="w-5 h-5 flex items-center justify-center rounded hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-black dark:text-gray-400 transition-all cursor-pointer"
  >
  <Minus size={12} />
  </button>
- <div className="w-8 text-center flex flex-col justify-center">
+ <div className="w-5 text-center flex flex-col justify-center">
  <span className="text-xs font-bold text-[#212b36] dark:text-white">{skill.years}</span>
  </div>
  <button 
  onClick={() => handleSkillChange(index, 'years', (Number(skill.years) + 1).toString())}
- className="w-6 h-6 flex items-center justify-center rounded hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-black dark:text-gray-400 transition-all cursor-pointer"
+ className="w-5 h-5 flex items-center justify-center rounded hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-black dark:text-gray-400 transition-all cursor-pointer"
  >
  <Plus size={12} />
  </button>
  </div>
- <span className="text-[11px] font-bold text-gray-500">Years</span>
+ <span className="text-[11px] font-bold text-gray-500">Yrs</span>
  </div>
  
- <div className="flex bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-md p-0.5">
+ <div className="flex items-center bg-gray-50 dark:bg-gray-800/50 p-1 rounded-lg border border-gray-200 dark:border-gray-700/50">
  <button 
  onClick={() => handleSkillChange(index, 'required', true)}
- className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${skill.required ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
+ className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${skill.required ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
  >
  {skill.required ? <CheckCircle2 size={12} className="text-[#1890FF] fill-[#1890FF]/10" /> : <Circle size={12} />}
  Must Have
  </button>
  <button 
  onClick={() => handleSkillChange(index, 'required', false)}
- className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${!skill.required ? 'bg-white dark:bg-[#161c24] text-[#8e33ff] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
+ className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${!skill.required ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-sm' : 'text-black dark:text-gray-400 hover:text-[#212b36] dark:hover:text-gray-200'}`}
  >
- {!skill.required ? <CheckCircle2 size={12} className="text-[#8e33ff] fill-[#8e33ff]/10" /> : <Circle size={12} />}
+ {!skill.required ? <CheckCircle2 size={12} className="text-[#1890FF] fill-[#1890FF]/10" /> : <Circle size={12} />}
  Nice to Have
  </button>
  </div>
@@ -267,9 +276,30 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
  )
  })}
  </div>
+    </>
+  ) : (
+    <div className="flex flex-col">
+      <label className="block text-xs font-bold text-black mb-4">Required Skills</label>
+      <div className="flex flex-wrap gap-2">
+        {jobData.skills.filter(s => s.name.trim()).map((skill, index) => (
+          <span key={index} className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700/50 rounded-xl text-[13px] font-semibold text-[#212b36] dark:text-gray-300 flex items-center gap-2">
+            {skill.name} 
+            <span className="w-1 h-1 rounded-full bg-gray-400"></span> 
+            {skill.years} Yrs
+            <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+            <span className={skill.required ? 'text-[#1890FF]' : 'text-[#1890FF]'}>
+              {skill.required ? 'Must Have' : 'Nice to Have'}
+            </span>
+          </span>
+        ))}
+        {jobData.skills.filter(s => s.name.trim()).length === 0 && (
+          <span className="text-[13px] text-gray-500 italic">No skills added</span>
+        )}
+      </div>
+    </div>
+  )}
  </div>
  </div>
-
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto">
  <button 
  onClick={() => setSettingsActiveNav('Overview')}

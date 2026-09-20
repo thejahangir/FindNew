@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
 import findNewIco from '../assets/findnew-ico.png';
+import { useChatbot } from '../contexts/ChatbotContext';
 
 const getInitials = (name = '') => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 
@@ -434,10 +435,10 @@ export default function CandidateProfilePage() {
 
  const [activeTab, setActiveTab] = useState('Overview');
  const [openStages, setOpenStages] = useState(['interview-hm']);
+ const { isChatbotCollapsed, setIsChatbotCollapsed } = useChatbot();
  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
- const [isChatbotCollapsed, setIsChatbotCollapsed] = useState(true);
- const [chatbotWidth, setChatbotWidth] = useState(320);
- const [isChatbotResizing, setIsChatbotResizing] = useState(false);
+ const [teamChatWidth, setTeamChatWidth] = useState(320);
+ const [isTeamChatResizing, setIsTeamChatResizing] = useState(false);
  const [expandedEmails, setExpandedEmails] = useState({});
  const [chatInput, setChatInput] = useState('');
  const [messages, setMessages] = useState(TEAM_CHAT);
@@ -458,16 +459,16 @@ export default function CandidateProfilePage() {
 
  useEffect(() => {
  const handleMouseMove = (e) => {
-  if (!isChatbotResizing || (isChatbotCollapsed && isChatCollapsed)) return;
+  if (!isTeamChatResizing || isChatCollapsed) return;
   const newWidth = document.documentElement.clientWidth - e.clientX;
-  setChatbotWidth(Math.max(280, Math.min(newWidth, 600)));
+  setTeamChatWidth(Math.max(280, Math.min(newWidth, 600)));
  };
 
  const handleMouseUp = () => {
-  setIsChatbotResizing(false);
+  setIsTeamChatResizing(false);
  };
 
- if (isChatbotResizing) {
+ if (isTeamChatResizing) {
   document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseUp);
   document.body.style.userSelect = 'none';
@@ -482,7 +483,7 @@ export default function CandidateProfilePage() {
   document.removeEventListener('mouseup', handleMouseUp);
   document.body.style.userSelect = '';
  };
- }, [isChatbotResizing, isChatbotCollapsed, isChatCollapsed]);
+ }, [isTeamChatResizing, isChatCollapsed]);
 
  const showToast = (text) => {
  setToast(text);
@@ -516,7 +517,13 @@ export default function CandidateProfilePage() {
  }, {});
 
  return (
- <div className="p-6 space-y-5 relative">
+    <div 
+      className="p-6 space-y-5 relative"
+      style={{ 
+        paddingRight: !isChatCollapsed ? `calc(1.5rem + ${teamChatWidth}px)` : 'calc(1.5rem + 32px)',
+        transition: isTeamChatResizing ? 'none' : 'padding-right 300ms cubic-bezier(0.22, 1, 0.36, 1)'
+      }}
+    >
  <div className="flex items-center gap-2 text-[13px] font-bold mb-2">
  <button onClick={() => navigate('/dashboard/jobs')} className="text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer">
  Jobs
@@ -542,83 +549,31 @@ export default function CandidateProfilePage() {
  <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F] ml-1">Agency: {candidate.agency}</span>
  )}
  </div>
- {/* --- UI OPTION 1: Modern Badge Layout --- */}
- <div className="mt-4 p-4 rounded-xl border border-[#1890FF]/20 bg-[#1890FF]/5 relative">
- <div className="absolute -top-2.5 left-4 bg-[#1890FF] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 1: Modern Badges</div>
- <div className="flex flex-col gap-3">
+ <div className="mt-4 flex flex-col gap-3">
  {/* Line 1: Core Contact */}
- <div className="flex flex-wrap gap-2.5">
- <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <div className="flex flex-wrap gap-4">
+ <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
  <Mail size={14} className="text-gray-500" />
- <span className="text-[13px] font-bold">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
+ <span className="text-[13px] font-bold">{candidate.name.split(' ').slice(0, 2).join('.').toLowerCase()}@example.com</span>
  </div>
- <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
  <Phone size={14} className="text-gray-500" />
  <span className="text-[13px] font-bold">+1 (555) 123-4567</span>
  </div>
- </div>
- {/* Line 2: Professional & Logistics */}
- <div className="flex flex-wrap gap-2.5">
- <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
- <Briefcase size={14} className="text-gray-500" />
- <span className="text-[13px] font-bold">Senior Staff Engineer</span>
- </div>
- <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
  <MapPin size={14} className="text-gray-500" />
  <span className="text-[13px] font-bold">Bangalore <span className="text-gray-400 font-medium ml-1">• EST (UTC-5)</span></span>
  </div>
- <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-[#212b36] dark:text-gray-300 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+ </div>
+ {/* Line 2: Professional & Logistics */}
+ <div className="flex flex-wrap gap-4">
+ <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+ <Briefcase size={14} className="text-gray-500" />
+ <span className="text-[13px] font-bold">Senior Staff Engineer <span className="text-gray-500 font-medium">at Google India</span></span>
+ </div>
+ <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
  <Clock size={14} className="text-gray-500" />
  <span className="text-[13px] font-bold">Applied {candidate.date}</span>
- </div>
- </div>
- </div>
- </div>
-
- {/* --- UI OPTION 2: Structured Grid Layout --- */}
- <div className="mt-4 p-4 rounded-xl border border-[#00A76F]/20 bg-[#00A76F]/5 relative">
- <div className="absolute -top-2.5 left-4 bg-[#00A76F] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 2: Structured Grid</div>
- <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6">
- <div className="flex flex-col gap-1.5">
- <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Mail size={12}/> Contact</span>
- <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
- <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300 mt-0.5">+1 (555) 123-4567</span>
- </div>
- <div className="flex flex-col gap-1.5">
- <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Briefcase size={12}/> Current Role</span>
- <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Senior Staff Engineer</span>
- </div>
- <div className="flex flex-col gap-1.5">
- <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><MapPin size={12}/> Location</span>
- <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Bangalore <span className="text-gray-400 font-medium block mt-0.5">EST (UTC-5)</span></span>
- </div>
- <div className="flex flex-col gap-1.5">
- <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1"><Clock size={12}/> Timeline</span>
- <span className="text-[13px] font-bold text-[#212b36] dark:text-gray-300">Applied {candidate.date}</span>
- </div>
- </div>
- </div>
-
- {/* --- UI OPTION 3: Split Panel Layout --- */}
- <div className="mt-4 p-4 rounded-xl border border-[#8E33FF]/20 bg-[#8E33FF]/5 relative">
- <div className="absolute -top-2.5 left-4 bg-[#8E33FF] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Option 3: Split Panels</div>
- <div className="flex flex-col md:flex-row gap-4">
- {/* Contact Panel */}
- <div className="flex-1 bg-white dark:bg-[#161c24] rounded-lg border border-gray-200/60 dark:border-gray-700/60 p-3.5 shadow-sm">
- <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Contact Details</h4>
- <div className="flex flex-col gap-2.5 text-[#212b36] dark:text-gray-300 text-[13px] font-bold">
- <div className="flex items-center gap-2"><Mail size={14} className="text-[#8E33FF]" /><span>{candidate.name.toLowerCase().replace(/\s+/g, '.')}@example.com</span></div>
- <div className="flex items-center gap-2"><Phone size={14} className="text-[#8E33FF]" /><span>+1 (555) 123-4567</span></div>
- </div>
- </div>
- {/* Profile Panel */}
- <div className="flex-[1.5] bg-white dark:bg-[#161c24] rounded-lg border border-gray-200/60 dark:border-gray-700/60 p-3.5 shadow-sm">
- <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Candidate Context</h4>
- <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 text-[#212b36] dark:text-gray-300 text-[13px] font-bold">
- <div className="flex items-center gap-2"><Briefcase size={14} className="text-gray-500" /><span>Senior Staff Engineer</span></div>
- <div className="flex items-center gap-2"><MapPin size={14} className="text-gray-500" /><span>Bangalore <span className="text-gray-400 font-medium ml-0.5">(EST / UTC-5)</span></span></div>
- <div className="flex items-center gap-2"><Clock size={14} className="text-gray-500" /><span>Applied {candidate.date}</span></div>
- </div>
  </div>
  </div>
  </div>
@@ -727,7 +682,7 @@ export default function CandidateProfilePage() {
  </button>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Candidate Info</h3>
  <div className="flex flex-col gap-2.5">
  <div className="flex justify-between items-start gap-4">
@@ -753,7 +708,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Professional Summary</h3>
  <div className="flex flex-col gap-2.5">
  <div className="flex justify-between items-start gap-4">
@@ -775,7 +730,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Skills & Expertise</h3>
  <div className="flex justify-between items-start gap-4">
  <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Primary Skills</p>
@@ -788,7 +743,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Availability & Logistics</h3>
  <div className="flex flex-col gap-2.5">
  <div className="flex justify-between items-start gap-4">
@@ -814,7 +769,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Experience</h3>
  <div className="flex justify-between items-start gap-4">
  <p className="text-[12px] text-gray-500 shrink-0 mt-0.5">Timeline</p>
@@ -833,7 +788,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700/50">Education</h3>
  <div className="flex flex-col gap-2.5">
  <div className="flex justify-between items-start gap-4">
@@ -847,7 +802,7 @@ export default function CandidateProfilePage() {
  </div>
  </div>
 
- <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
+ <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800/50 p-3">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-gray-700/50">Profiles</h3>
   <div className="flex flex-col gap-2">
  <a href="#" className="flex items-center gap-2 text-[13px] leading-relaxed font-semibold text-[#1890FF] hover:underline">
@@ -931,7 +886,7 @@ export default function CandidateProfilePage() {
 
   {/* Active Stage (Prominent Pill) */}
   <div className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#1890FF] to-[#0c66c2] text-white shadow-[0_6px_16px_rgba(24,144,255,0.35)] transform hover:scale-105 transition-transform cursor-default relative overflow-hidden group/active mx-2">
-  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/active:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+  <div className="absolute inset-0 bg-white translate-x-[-100%] group-hover/active:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
   <div className="w-6 h-6 rounded-full bg-white text-[#1890FF] flex items-center justify-center shadow-sm relative">
   <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-20"></span>
  <span className="text-[12px] font-black">4</span>
@@ -1072,7 +1027,7 @@ export default function CandidateProfilePage() {
  onClick={() => toggleStage(stage.id, stage.status)}
  className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${
  isUpcoming
- ? 'border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20 cursor-not-allowed'
+ ? 'border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/20 cursor-not-allowed'
  : isOpen
  ? 'border-[#1890FF]/25 bg-[#1890FF]/5 cursor-pointer'
  : 'border-gray-100 dark:border-gray-800/50 hover:border-gray-200 dark:hover:border-gray-700 cursor-pointer'
@@ -1110,7 +1065,7 @@ export default function CandidateProfilePage() {
  aria-hidden={!isOpen}
  >
  <div className="overflow-hidden min-h-0">
- <div className="rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50/70 dark:bg-gray-800/30 p-4 space-y-3">
+ <div className="rounded-xl border border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/30 p-4 space-y-3">
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
  <div>
  <p className="text-[11px] font-bold text-gray-400 ">Entered</p>
@@ -1166,7 +1121,7 @@ export default function CandidateProfilePage() {
   <p className="text-[13px] leading-relaxed text-gray-500 leading-relaxed mt-1">Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.</p>
   </div>
 
-  <div className="bg-gray-50/50 dark:bg-[#161c24]/30 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/80 flex flex-col items-center justify-center text-center gap-1.5 hover:bg-gray-100/50 dark:hover:bg-gray-800/30 transition-colors group min-h-[120px] h-full">
+  <div className="bg-gray-50 dark:bg-[#161c24]/30 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/80 flex flex-col items-center justify-center text-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group min-h-[120px] h-full">
  <h3 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5 uppercase ">
   <User size={14} /> Human Interviews
   </h3>
@@ -1181,7 +1136,7 @@ export default function CandidateProfilePage() {
 
   {/* Expandable Scorecards */}
   <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 overflow-hidden">
-  <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/20">
+  <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/20">
  <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2 ">
   <FileText size={16} className="text-[#1890FF]" /> Interview Scorecards
   </h2>
@@ -1197,7 +1152,7 @@ export default function CandidateProfilePage() {
   {MOCK_SCORECARDS.map(scorecard => {
   const isOpen = openScorecards.includes(scorecard.id);
   return (
-  <div key={scorecard.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+  <div key={scorecard.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/20">
   <button 
   onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
   className="w-full flex items-center justify-between p-5 cursor-pointer"
@@ -1309,7 +1264,7 @@ export default function CandidateProfilePage() {
  </div>
  <div className="overflow-x-auto border border-gray-100 dark:border-gray-800/50 rounded-xl">
  <table className="w-full text-left border-collapse">
- <thead className="bg-gray-50/50 dark:bg-gray-800/20">
+ <thead className="bg-gray-50 dark:bg-gray-800/20">
  <tr className="border-b border-gray-100 dark:border-gray-800/50">
  <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Stage</th>
  <th className="py-3 px-4 text-[11px] font-bold text-gray-400 uppercase ">Date Entered</th>
@@ -1406,7 +1361,7 @@ export default function CandidateProfilePage() {
  <Icon size={14} />
  </div>
  )}
- <div className={`flex-1 min-w-0 rounded-xl px-3.5 py-3 ${item.isDetailedEmail ? 'bg-[#f8f9fa] dark:bg-gray-800/10' : 'border border-gray-100 dark:border-gray-800/50 bg-gray-50/60 dark:bg-gray-800/20'}`}>
+ <div className={`flex-1 min-w-0 rounded-xl px-3.5 py-3 ${item.isDetailedEmail ? 'bg-[#f8f9fa] dark:bg-gray-800/10' : 'border border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/20'}`}>
  {item.isDetailedEmail ? (
  <div className="flex flex-col gap-0.5 text-[13px] text-[#454f5b] dark:text-gray-300">
  <div className="font-bold text-[#212b36] dark:text-white mb-2">{item.emailData.title} <span className="font-normal text-gray-500">· {item.emailData.dateStr}</span></div>
@@ -1464,202 +1419,92 @@ export default function CandidateProfilePage() {
  </div>
 </div>
 
-  {/* Hiring Team Collapsed Tab */}
-  <button
-  type="button"
-  onClick={() => {
-  setIsChatbotCollapsed(true);
-  setIsChatCollapsed(false);
-  setChatbotWidth(320);
-  }}
-  className={`hidden xl:flex fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 w-8 z-40 flex-col items-center justify-center gap-4 bg-amber-50 dark:bg-amber-900/20 border border-r-0 border-amber-500/20 dark:border-amber-500/30 shadow-sm rounded-none text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer ${
-  isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
-  } ${isChatCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
-  aria-label="Expand team chat"
-  >
-  <MessageSquare size={18} className="shrink-0" />
-  <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
-  Hiring Team
-  </span>
-  </button>
+      <button
+        type="button"
+        onClick={() => {
+          setIsChatbotCollapsed(true);
+          setIsChatCollapsed(false);
+          setTeamChatWidth(320);
+        }}
+        className={`hidden xl:flex fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 w-8 z-40 flex-col items-center justify-center gap-4 bg-amber-50 dark:bg-amber-900/20 border border-r-0 border-amber-500/20 dark:border-amber-500/30 shadow-sm rounded-none text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer ${
+          isTeamChatResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
+        } ${isChatCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
+        aria-label="Expand team chat"
+      >
+        <ChevronsLeft size={18} className="shrink-0" />
+        <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
+          Hiring Team Chat
+        </span>
+      </button>
 
-  {/* Hiring Team Expanded Panel */}
-  <div
-  style={{
-  width: chatbotWidth,
-  transform: !isChatCollapsed ? 'translateX(0)' : 'translateX(100%)',
-  transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
-  }}
-  className={`fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
-  chatbotWidth > 320 && !isChatCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
-  } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${!isChatCollapsed ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-  >
-  <div
-  onMouseDown={(e) => {
-  e.preventDefault();
-  if (!isChatCollapsed) setIsChatbotResizing(true);
-  }}
-  className={`absolute left-0 top-0 bottom-0 w-4 z-10 flex items-center justify-center cursor-w-resize group ${
-  isChatbotResizing ? 'bg-[#1890FF]/15' : 'hover:bg-[#1890FF]/10'
-  }`}
-  title="Drag left to widen"
-  >
-  <span
-  className={`flex items-center justify-center w-[18px] h-11 rounded-full border shadow-sm transition-colors ${
-  isChatbotResizing
-  ? 'bg-[#1890FF] border-[#1890FF] text-white'
-  : 'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-600 text-[#454f5b] dark:text-gray-300 group-hover:border-[#1890FF] group-hover:text-[#1890FF]'
-  }`}
-  >
-  <GripVertical size={14} />
-  </span>
-  </div>
-  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between pl-6 bg-gray-50/50 dark:bg-gray-800/20">
-  <div>
-  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Hiring team</h3>
-  <p className="text-[11px] text-gray-500">Private to this requisition</p>
-  </div>
-  <button type="button" onClick={() => setIsChatCollapsed(true)} className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors" aria-label="Collapse team chat">
-  <ChevronsRight size={16} />
-  </button>
-  </div>
-  <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-  {messages.map(msg => (
-  <div key={msg.id} className={`flex flex-col ${msg.role === 'Hiring Manager' ? 'items-end' : 'items-start'}`}>
-  <div className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 ${msg.role === 'Hiring Manager' ? 'bg-[#1890FF] text-white rounded-tr-sm' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white rounded-tl-sm'}`}>
-  <p className={`text-[11px] font-bold mb-1 ${msg.role === 'Hiring Manager' ? 'text-white/80' : 'text-gray-500'}`}>{msg.name} · {msg.role}</p>
-  <p className="text-[13px] leading-relaxed">{msg.text}</p>
-  </div>
-  <span className="text-[11px] text-gray-400 mt-1 px-1">{msg.time}</span>
-  </div>
-  ))}
-  </div>
-  <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
-  <div className="relative">
-  <input
-  type="text"
-  value={chatInput}
-  onChange={(e) => setChatInput(e.target.value)}
-  onKeyDown={(e) => { if (e.key === 'Enter') sendChat(); }}
-  placeholder="Message the hiring team..."
-  className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-[13px] text-[#212b36] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20"
-  />
-  <button type="button" onClick={sendChat} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg cursor-pointer">
-  <Send size={16} />
-  </button>
-  </div>
-  </div>
-  </div>
-
-
-  <button
-  type="button"
-  onClick={() => {
-  setIsChatbotCollapsed(false);
-  setIsChatCollapsed(true);
-  setChatbotWidth(320);
-  }}
-  className={`hidden xl:flex fixed right-0 top-16 bottom-0 w-10 z-40 flex-col items-center justify-center gap-4 bg-[#E6F4FF] dark:bg-[#1C2C47] border border-r-0 border-[#1890FF]/20 dark:border-[#1890FF]/30 shadow-sm rounded-none text-[#1890FF] hover:bg-[#D6EFFF] dark:hover:bg-[#203456] cursor-pointer ${
-  isChatbotResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
-  } ${isChatbotCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
-  aria-label="Expand FindNew AI"
-  >
-  <ChevronsLeft size={18} className="shrink-0" />
-  <img src={findNewIco} alt="" className="w-6 h-6 object-contain shrink-0" />
-  <span className="text-[12px] font-bold tracking-wider uppercase whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
-  FindNew AI Assistant
-  </span>
-  </button>
-
-  <div
-  style={{
-  width: chatbotWidth,
-  transform: isChatbotCollapsed ? 'translateX(100%)' : 'translateX(0)',
-  transition: isChatbotResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
-  }}
-  className={`fixed right-8 top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
-  chatbotWidth > 320 && !isChatbotCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
-  } ${isChatbotResizing ? 'select-none pointer-events-none' : ''} ${isChatbotCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-  >
-  <div
-  onMouseDown={(e) => {
-  e.preventDefault();
-  if (!isChatbotCollapsed) setIsChatbotResizing(true);
-  }}
-  className={`absolute left-0 top-0 bottom-0 w-4 z-10 flex items-center justify-center cursor-w-resize group ${
-  isChatbotResizing ? 'bg-[#1890FF]/15' : 'hover:bg-[#1890FF]/10'
-  }`}
-  title="Drag left to widen"
-  >
-  <span
-  className={`flex items-center justify-center w-[18px] h-11 rounded-full border shadow-sm transition-colors ${
-  isChatbotResizing
-  ? 'bg-[#1890FF] border-[#1890FF] text-white'
-  : 'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-600 text-[#454f5b] dark:text-gray-300 group-hover:border-[#1890FF] group-hover:text-[#1890FF]'
-  }`}
-  >
-  <GripVertical size={14} />
-  </span>
-  </div>
-  <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/20">
-  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
-  <img src={findNewIco} alt="FindNew AI" className="w-8 h-8 object-contain" />
-  </div>
-  <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-[#212b36] dark:text-white">FindNew AI</h3><p className="text-[11px] text-gray-500">Always here to help</p></div>
-  <button
-  type="button"
-  onClick={() => setIsChatbotCollapsed(true)}
-  className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0"
-  aria-label="Collapse FindNew AI"
-  >
-  <ChevronsRight size={16} />
-  </button>
-  </div>
-  <div className="flex-1 p-4 overflow-y-auto space-y-4">
-  <div className="flex flex-col gap-1 items-start max-w-[85%]">
-  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
-  Hi! I can help you analyze your hiring pipeline, find jobs, or summarize candidates.
-  </div>
-  </div>
-  
-  <div className="flex flex-col gap-1 items-end ml-auto max-w-[85%]">
-  <div className="bg-[#1890FF] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-[13px] font-medium shadow-sm">
-  Can you summarize Ananya's profile?
-  </div>
-  </div>
-
-  <div className="flex flex-col gap-1 items-start max-w-[90%]">
-  <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed">
-  <p className="mb-2">Here is a quick summary:</p>
-  <ul className="list-disc pl-4 space-y-1">
-  <li><span className="font-bold">Score</span> — 9.8/10 on technical interview</li>
-  <li><span className="font-bold">Experience</span> — Very strong</li>
-  <li><span className="font-bold">Next Steps</span> — Schedule HM Interview</li>
-  </ul>
-  </div>
-  </div>
-
-  <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
-  <p className="text-[11px] font-bold text-gray-400 mb-2 ">Suggested Questions</p>
-  <div className="space-y-2">
-  {["Draft a rejection email", "Schedule next round", "Compare with other candidates"].map((q, i) => (
-  <button key={i} className="w-full text-left px-3 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl text-[12px] font-medium text-[#212b36] dark:text-white transition-colors cursor-pointer shadow-sm">
-  {q}
-  </button>
-  ))}
-  </div>
-  </div>
-  </div>
-  <div className="p-4 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
-  <div className="relative">
-  <input type="text" placeholder="Ask me anything..." className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 text-[#212b36] dark:text-white"/>
-  <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg"><Send size={16} /></button>
-  </div>
-  </div>
-  </div>
-
-</div>
-
+      <div
+        style={{
+          width: teamChatWidth,
+          transform: !isChatCollapsed ? 'translateX(0)' : 'translateX(100%)',
+          transition: isTeamChatResizing ? 'none' : 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1)'
+        }}
+        className={`fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 z-40 hidden xl:flex flex-col bg-white dark:bg-[#161c24] rounded-none border-t border-l border-r xl:border-r-0 border-gray-100 dark:border-gray-800/50 overflow-hidden ${
+          teamChatWidth > 320 && !isChatCollapsed ? 'shadow-[-12px_0_32px_rgba(22,28,36,0.12)]' : 'shadow-sm'
+        } ${isTeamChatResizing ? 'select-none pointer-events-none' : ''} ${!isChatCollapsed ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      >
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+            if (!isChatCollapsed) setIsTeamChatResizing(true);
+          }}
+          className={`absolute left-0 top-0 bottom-0 w-4 z-10 flex items-center justify-center cursor-w-resize group ${
+            isTeamChatResizing ? 'bg-[#1890FF]/15' : 'hover:bg-[#1890FF]/10'
+          }`}
+          title="Drag left to widen"
+        >
+          <span
+            className={`flex items-center justify-center w-[18px] h-11 rounded-full border shadow-sm transition-colors ${
+              isTeamChatResizing
+                ? 'bg-[#1890FF] border-[#1890FF] text-white'
+                : 'bg-white dark:bg-[#161c24] border-gray-200 dark:border-gray-600 text-[#454f5b] dark:text-gray-300 group-hover:border-[#1890FF] group-hover:text-[#1890FF]'
+            }`}
+          >
+          <GripVertical size={14} />
+          </span>
+        </div>
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between pl-6 bg-gray-50 dark:bg-gray-800/20">
+          <div>
+            <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Hiring team</h3>
+            <p className="text-[11px] text-gray-500">Private to this requisition</p>
+          </div>
+          <button type="button" onClick={() => setIsChatCollapsed(true)} className="p-1.5 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors" aria-label="Collapse team chat">
+            <ChevronsRight size={16} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+          {messages.map(msg => (
+            <div key={msg.id} className={`flex flex-col ${msg.role === 'Hiring Manager' ? 'items-end' : 'items-start'}`}>
+              <div className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 ${msg.role === 'Hiring Manager' ? 'bg-[#1890FF] text-white rounded-tr-sm' : 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white rounded-tl-sm'}`}>
+                <p className={`text-[11px] font-bold mb-1 ${msg.role === 'Hiring Manager' ? 'text-white/80' : 'text-gray-500'}`}>{msg.name} · {msg.role}</p>
+                <p className="text-[13px] leading-relaxed">{msg.text}</p>
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 px-1">{msg.time}</span>
+            </div>
+          ))}
+        </div>
+        <div className="p-3 border-t border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
+          <div className="relative">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') sendChat(); }}
+              placeholder="Message the hiring team..."
+              className="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-[13px] text-[#212b36] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20"
+            />
+            <button type="button" onClick={sendChat} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#1890FF] hover:bg-[#1890FF]/10 rounded-lg cursor-pointer">
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
+      
 {toast && (
  <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3 rounded-xl shadow-lg text-[13px] font-medium">
  {toast}
