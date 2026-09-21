@@ -1432,13 +1432,13 @@ export default function JobDashboardPage() {
 
  <div className="pt-2">
  <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
- <div className="flex items-start gap-3">
- <div className="flex flex-col items-center shrink-0 w-[50px] mt-2.5">
+ <div className="bg-white dark:bg-[#161c24] rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 border border-gray-100 dark:border-gray-800 shadow-sm flex items-start gap-4">
+ <div className="flex flex-col items-center shrink-0">
  <div className={`w-[48px] h-[48px] rounded-full flex items-center justify-center text-[16px] font-bold shadow-sm ${scoreTone.fill}`}>
  {scoreValue}
  </div>
  </div>
- <div className="flex-1 bg-white dark:bg-[#161c24] rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 space-y-2 leading-relaxed border border-gray-100 dark:border-gray-800 shadow-sm">
+ <div className="flex-1 space-y-2 leading-relaxed">
  <p>Excellent fit for the technical requirements.</p>
  <p>Strong React, Node.js and architecture experience.</p>
  {showRejectCta ? (
