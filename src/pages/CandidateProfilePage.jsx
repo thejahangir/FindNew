@@ -439,7 +439,7 @@ export default function CandidateProfilePage() {
 
  const [activeTab, setActiveTab] = useState('Overview');
  const [openStages, setOpenStages] = useState(['interview-hm']);
- const { isChatbotCollapsed, setIsChatbotCollapsed } = useChatbot();
+ const { isChatbotCollapsed, setIsChatbotCollapsed, chatbotWidth } = useChatbot();
  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
  const [teamChatWidth, setTeamChatWidth] = useState(320);
  const [isTeamChatResizing, setIsTeamChatResizing] = useState(false);
@@ -462,6 +462,12 @@ export default function CandidateProfilePage() {
  document.addEventListener('click', close);
  return () => document.removeEventListener('click', close);
  }, []);
+
+ useEffect(() => {
+ if (!isChatbotCollapsed) {
+ setIsChatCollapsed(true);
+ }
+ }, [isChatbotCollapsed]);
 
  useEffect(() => {
  const handleMouseMove = (e) => {
@@ -1543,12 +1549,13 @@ export default function CandidateProfilePage() {
 
       <button
         type="button"
+        style={{ right: isChatbotCollapsed ? '40px' : chatbotWidth }}
         onClick={() => {
           setIsChatbotCollapsed(true);
           setIsChatCollapsed(false);
           setTeamChatWidth(320);
         }}
-        className={`hidden xl:flex fixed ${isChatbotCollapsed ? 'right-10' : 'right-0'} top-16 bottom-0 w-8 z-40 flex-col items-center justify-center gap-4 bg-amber-50 dark:bg-amber-900/20 border border-r-0 border-amber-500/20 dark:border-amber-500/30 shadow-sm rounded-none text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer ${
+        className={`hidden xl:flex fixed top-16 bottom-0 w-8 z-[110] flex-col items-center justify-center gap-4 bg-amber-50 dark:bg-amber-900/20 border border-l border-r-0 border-amber-500/20 dark:border-amber-500/30 shadow-sm rounded-none text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer ${
           isTeamChatResizing ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
         } ${isChatCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
         aria-label="Expand team chat"
