@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit } from 'lucide-react';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles } from 'lucide-react';
+import { useChatbot } from '../contexts/ChatbotContext';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import DualRangeSlider from '../components/ui/DualRangeSlider';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
@@ -253,7 +254,9 @@ export default function JobDashboardPage() {
  const [isEditRankingModalOpen, setIsEditRankingModalOpen] = useState(false);
 
  // Applications Tab State
+ const { compareCandidates } = useChatbot();
  const [selectedAppCandidates, setSelectedAppCandidates] = useState([]);
+ const [maxCompareAlert, setMaxCompareAlert] = useState(false);
  const [currentPageApp, setCurrentPageApp] = useState(1);
  const [openStageMenuId, setOpenStageMenuId] = useState(null);
  const [isBulkStageMenuOpen, setIsBulkStageMenuOpen] = useState(false);
@@ -330,7 +333,26 @@ export default function JobDashboardPage() {
  setSelectedAppCandidates(prev => prev.filter(x => x !== id));
  return;
  }
+ if (selectedAppCandidates.length >= 3) {
+ setMaxCompareAlert(true);
+ setTimeout(() => setMaxCompareAlert(false), 3500);
+ return;
+ }
  setSelectedAppCandidates(prev => [...prev, id]);
+ };
+
+ const handleSelectAll = (e) => {
+ e?.stopPropagation();
+ if (selectedAppCandidates.length > 0) {
+ setSelectedAppCandidates([]);
+ } else {
+ const toSelect = currentAppCandidates.slice(0, 3).map(c => c.id);
+ setSelectedAppCandidates(toSelect);
+ if (currentAppCandidates.length > 3) {
+ setMaxCompareAlert(true);
+ setTimeout(() => setMaxCompareAlert(false), 3500);
+ }
+ }
  };
 
  const openRejectModal = (ids) => {
@@ -1114,14 +1136,17 @@ export default function JobDashboardPage() {
  <input type="file" id="new-applicant-upload" accept=".pdf" className="hidden" onChange={() => { setIsUploadingResume(true); setTimeout(() => setIsUploadingResume(false), 1500); }} />
  </div>
 
- <div className="flex flex-1 overflow-hidden relative">
+ <div className="flex flex-1 overflow-hidden relative p-4 gap-4 bg-gray-50/70 dark:bg-black/30">
  {/* Left Panel: Candidates List */}
- <div className="w-[360px] shrink-0 border-r border-gray-100 dark:border-gray-800/50 flex flex-col bg-gray-50 dark:bg-[#161c24] relative p-3 gap-3">
- 
- <div className="flex items-center justify-between px-1 shrink-0">
+ <div className="w-[360px] shrink-0 border border-gray-200/80 dark:border-gray-800/60 rounded-2xl flex flex-col bg-white dark:bg-[#161c24] relative min-w-0 overflow-hidden shadow-sm">
+ <div className="h-[52px] px-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex items-center justify-between shrink-0">
  <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Application List</h3>
+ <span className="text-[11px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+ {filteredAppCandidates.length} Candidates
+ </span>
  </div>
 
+ <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar flex flex-col min-h-0 bg-white dark:bg-[#161c24]">
  {/* Search & Filter Card */}
  <div className="bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700/50 rounded-xl p-3 shrink-0 relative overflow-visible z-30 space-y-3">
  
@@ -1251,25 +1276,12 @@ export default function JobDashboardPage() {
  {currentAppCandidates.length > 0 && (
  <div className="flex gap-3 px-3 py-1 mb-1 border-b border-gray-100 dark:border-gray-800/50 sticky top-0 z-20 bg-white dark:bg-[#161c24]/90 backdrop-blur-sm -mx-2 -mt-2">
  <div className="w-8 h-8 shrink-0 flex items-center justify-center">
- <div className="relative w-4 h-4 rounded cursor-pointer group/list" onClick={(e) => {
- e.stopPropagation();
- if (selectedAppCandidates.length === currentAppCandidates.length) {
- setSelectedAppCandidates([]);
- } else {
- setSelectedAppCandidates(currentAppCandidates.map(c => c.id));
- }
- }}>
+ <div className="relative w-4 h-4 rounded cursor-pointer group/list" onClick={handleSelectAll}>
  <MiniCheckbox
- checked={selectedAppCandidates.length > 0 && selectedAppCandidates.length === currentAppCandidates.length}
- indeterminate={selectedAppCandidates.length > 0 && selectedAppCandidates.length < currentAppCandidates.length}
+ checked={selectedAppCandidates.length > 0 && selectedAppCandidates.length === Math.min(3, currentAppCandidates.length)}
+ indeterminate={selectedAppCandidates.length > 0 && selectedAppCandidates.length < Math.min(3, currentAppCandidates.length)}
  visible={true}
- onChange={() => {
- if (selectedAppCandidates.length === currentAppCandidates.length) {
- setSelectedAppCandidates([]);
- } else {
- setSelectedAppCandidates(currentAppCandidates.map(c => c.id));
- }
- }}
+ onChange={handleSelectAll}
  label="Select All"
  revealGroup="list"
  />
@@ -1278,16 +1290,9 @@ export default function JobDashboardPage() {
  <div className="flex-1 min-w-0 flex items-center pr-2">
  <span 
  className="text-[11px] font-bold text-gray-500 hover:text-[#212b36] dark:hover:text-white cursor-pointer transition-colors"
- onClick={(e) => {
- e.stopPropagation();
- if (selectedAppCandidates.length === currentAppCandidates.length) {
- setSelectedAppCandidates([]);
- } else {
- setSelectedAppCandidates(currentAppCandidates.map(c => c.id));
- }
- }}
+ onClick={handleSelectAll}
  >
- Select All
+ Select All {selectedAppCandidates.length > 0 ? `(${selectedAppCandidates.length}/3)` : ''}
  </span>
  </div>
  </div>
@@ -1402,11 +1407,12 @@ export default function JobDashboardPage() {
  )}
 
  </div>
+ </div>
 
  {/* Middle Panel: AI Screening Results */}
- <div className="w-[420px] shrink-0 flex flex-col bg-gray-50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-800/50 relative min-w-0">
- <div className="p-3 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex items-center justify-between">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white px-1">AI Review Comments</h3>
+ <div className="w-[720px] shrink-0 flex flex-col bg-white dark:bg-[#161c24] border border-gray-200/80 dark:border-gray-800/60 rounded-2xl shadow-sm relative min-w-0 overflow-hidden">
+ <div className="h-[52px] px-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex items-center justify-between shrink-0">
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white">AI Review Comments</h3>
  <button onClick={() => setIsEditRankingModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-2 py-1 rounded transition-colors cursor-pointer">
  <Settings2 size={12} />
  Edit AI Ranking Rules
@@ -1414,31 +1420,31 @@ export default function JobDashboardPage() {
  </div>
  {selectedAppCandidate ? (
  <>
- <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar bg-gray-50 dark:bg-[#161c24]">
+ <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar bg-white dark:bg-[#161c24]">
  {(() => {
  const scoreTone = getScoreStyles(previewScore);
  const scoreValue = String(previewCandidate.score).replace('/10', '');
  return (
  <>
- <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
- <div>
- <div className="text-[16px] font-bold text-[#212b36] dark:text-white mb-1.5">{previewCandidate.name}</div>
- <div className="flex items-center gap-1.5 text-[13px] leading-relaxed text-gray-500">
- <Briefcase size={12} className="text-gray-400" />
+ <div className="flex items-center justify-between gap-4 pb-2 border-b border-gray-200 dark:border-gray-800">
+ <div className="text-[16px] font-bold text-[#212b36] dark:text-white truncate">
+ {previewCandidate.name}
+ </div>
+ <div className="flex items-center gap-1.5 text-[13px] leading-relaxed text-gray-500 shrink-0">
+ <Briefcase size={13} className="text-gray-400" />
  <span>Agency: <span className="font-semibold text-[#212b36] dark:text-gray-300">{previewCandidate.agency || 'Direct Application'}</span></span>
  </div>
  </div>
- </div>
 
- <div className="pt-2">
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-3">AI Screening Summary</h4>
- <div className="bg-white dark:bg-[#161c24] rounded-xl p-4 text-[13px] text-[#454f5b] dark:text-gray-300 border border-gray-100 dark:border-gray-800 shadow-sm flex items-start gap-4">
- <div className="flex flex-col items-center shrink-0">
- <div className={`w-[48px] h-[48px] rounded-full flex items-center justify-center text-[16px] font-bold shadow-sm ${scoreTone.fill}`}>
- {scoreValue}
+ <div className="-mt-2.5">
+ <div className="bg-white dark:bg-[#161c24] rounded-xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
+ <div className="flex items-center justify-between gap-3 mb-2.5">
+ <h4 className="text-sm font-bold text-[#212b36] dark:text-white">AI Screening Summary</h4>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${scoreTone.badge}`}>
+ {previewCandidate.score || `${scoreValue}/10`}
+ </span>
  </div>
- </div>
- <div className="flex-1 space-y-2 leading-relaxed">
+ <div className="text-[13px] text-[#454f5b] dark:text-gray-300 space-y-1.5 leading-relaxed">
  <p>Excellent fit for the technical requirements.</p>
  <p>Strong React, Node.js and architecture experience.</p>
  {showRejectCta ? (
@@ -1454,10 +1460,17 @@ export default function JobDashboardPage() {
  <div>
  <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-4">Key Screening Criteria</h4>
  <div className="space-y-3">
- {SCREENING_CRITERIA.map((item) => {
+ {SCREENING_CRITERIA.map((item, idx) => {
  const tone = getScoreStyles(item.score);
+ const isReferenceBlock = idx === SCREENING_CRITERIA.length - 1;
+
+ if (isReferenceBlock) {
  return (
- <div key={item.label} className="flex items-start gap-4 bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+ <div key={item.label} className="bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+ <div className="flex items-center justify-between mb-2">
+ <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Reference (Original Layout)</span>
+ </div>
+ <div className="flex items-start gap-4">
  <div className="flex flex-col items-center shrink-0 w-[50px]">
  <div className={`w-[42px] h-[42px] rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${tone.fill}`}>
  {item.score}
@@ -1467,6 +1480,20 @@ export default function JobDashboardPage() {
  <h5 className="text-[13px] font-bold text-[#212b36] dark:text-white mb-1.5">{item.label}</h5>
  <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400">{item.text}</p>
  </div>
+ </div>
+ </div>
+ );
+ }
+
+ return (
+ <div key={item.label} className="bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+ <div className="flex items-center justify-between gap-3 mb-2">
+ <h5 className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.label}</h5>
+ <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 ${tone.badge}`}>
+ {item.score}/10
+ </span>
+ </div>
+ <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-400">{item.text}</p>
  </div>
  );
  })}
@@ -1516,7 +1543,7 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Right Panel: Smart Profile (Resume) */}
- <div className="flex-1 min-w-[400px] border-l border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-black/20 flex flex-col min-h-0 relative">
+ <div className="flex-1 min-w-[400px] border border-gray-200/80 dark:border-gray-800/60 rounded-2xl bg-white dark:bg-[#161c24] shadow-sm flex flex-col min-h-0 relative overflow-hidden">
  {isUploadingResume && (
  <div className="absolute inset-0 bg-white dark:bg-[#161c24]/80 backdrop-blur-sm z-50 flex items-center justify-center">
  <div className="text-center">
@@ -1525,8 +1552,8 @@ export default function JobDashboardPage() {
  </div>
  </div>
  )}
- <div className="p-3 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24]">
- <h3 className="text-sm font-bold text-[#212b36] dark:text-white px-1">Resume Viewer</h3>
+ <div className="h-[52px] px-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#161c24] flex items-center justify-between shrink-0">
+ <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Resume Viewer</h3>
  </div>
 
  {selectedAppCandidate ? (
@@ -2396,6 +2423,74 @@ export default function JobDashboardPage() {
     onSave={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }}
   />
  </div>
+ </div>
+ </div>
+ )}
+
+ {/* Max Compare Alert Toast */}
+ {maxCompareAlert && (
+ <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[110] bg-[#FF5630] text-white px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-in fade-in slide-in-from-top-4 duration-200">
+ <AlertCircle size={16} className="shrink-0" />
+ <span>Only 3 candidates are allowed to compare.</span>
+ <button onClick={() => setMaxCompareAlert(false)} className="ml-2 p-0.5 hover:bg-white/20 rounded cursor-pointer">
+ <X size={14} />
+ </button>
+ </div>
+ )}
+
+ {/* Floating Compare Panel at Bottom Center */}
+ {selectedAppCandidates.length >= 2 && (
+ <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-[#161c24] text-white dark:bg-[#1E2732] border border-gray-700/70 shadow-[0_16px_40px_rgba(0,0,0,0.35)] rounded-2xl px-4 py-2.5 flex items-center gap-4 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+ <div className="flex items-center gap-2 pr-3 border-r border-gray-700/60">
+ <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold">
+ {selectedAppCandidates.length}
+ </span>
+ <span className="text-xs font-bold text-gray-200 whitespace-nowrap">
+ Compare Candidates
+ </span>
+ <span className="text-[10px] text-gray-400 font-medium">(Max 3)</span>
+ </div>
+
+ <div className="flex items-center gap-1.5">
+ {selectedAppCandidates.map(id => {
+ const cand = liveCandidates.find(c => c.id === id);
+ if (!cand) return null;
+ return (
+ <div key={id} className="flex items-center gap-1.5 bg-white/10 dark:bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 text-xs text-white">
+ <span className="font-semibold text-xs truncate max-w-[110px]">{cand.name}</span>
+ <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getScoreStyles(cand.score).badge}`}>
+ {cand.score}
+ </span>
+ <button 
+ onClick={(e) => { e.stopPropagation(); toggleAppCandidateSelect(id); }} 
+ className="text-gray-400 hover:text-white ml-0.5 cursor-pointer"
+ title="Remove candidate"
+ >
+ <X size={12} />
+ </button>
+ </div>
+ );
+ })}
+ </div>
+
+ <div className="flex items-center gap-2 pl-2 border-l border-gray-700/60">
+ <button
+ onClick={() => {
+ const selectedObjs = liveCandidates.filter(c => selectedAppCandidates.includes(c.id));
+ compareCandidates(selectedObjs);
+ }}
+ className="bg-[#1890FF] hover:bg-[#1890FF]/90 active:scale-95 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md shadow-[#1890FF]/25 transition-all cursor-pointer"
+ >
+ <Sparkles size={13} />
+ <span>Compare</span>
+ </button>
+
+ <button
+ onClick={() => setSelectedAppCandidates([])}
+ className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+ >
+ Clear
+ </button>
  </div>
  </div>
  )}
