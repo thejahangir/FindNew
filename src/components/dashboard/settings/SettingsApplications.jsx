@@ -224,7 +224,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
  const location = useLocation();
  const initialJobData = location.state?.jobData || {};
  const jobData = initialJobData;
- const [isEditingSettings, setIsEditingSettings] = useState(initialJobData?.status !== 'Published');
+ const [isEditingSettings, setIsEditingSettings] = useState(false);
  const [isConfirmDraftModalOpen, setIsConfirmDraftModalOpen] = useState(false);
  const [hiddenCandidatesModal, setHiddenCandidatesModal] = useState({ isOpen: false, stageTitle: '', candidates: [] });
 

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles } from 'lucide-react';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2 } from 'lucide-react';
 import { useChatbot } from '../contexts/ChatbotContext';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import DualRangeSlider from '../components/ui/DualRangeSlider';
@@ -218,12 +218,12 @@ export default function JobDashboardPage() {
  const [showCopyToast, setShowCopyToast] = useState(false);
  const jobData = location.state?.jobData || null;
  const isDraft = jobData?.status === 'Draft';
- const initialEditMode = jobData?.status !== 'Published';
  const [activeTab, setActiveTab] = useState(location.state?.tab || (isDraft ? 'Job Setup' : 'Overview'));
  const [editModes, setEditModes] = useState({
-   basicInfo: initialEditMode,
-   budget: initialEditMode,
-   logistics: initialEditMode
+   basicInfo: false,
+   budget: false,
+   logistics: false,
+   notes: false
  });
  const [settingsActiveNav, setSettingsActiveNav] = useState('Overview');
  const [setupJobData, setSetupJobData] = useState({
@@ -2106,13 +2106,24 @@ export default function JobDashboardPage() {
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Basic Information</h2>
  </div>
- <button
- onClick={() => setEditModes(prev => ({ ...prev, basicInfo: !prev.basicInfo }))}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={editModes.basicInfo ? "Save changes" : "Edit Basic Information"}
- >
- {editModes.basicInfo ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
- </button>
+ {editModes.basicInfo ? (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, basicInfo: false }))}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    title="Done"
+  >
+    <Check size={14} className="text-white stroke-[2.5]" />
+    <span>Done</span>
+  </button>
+) : (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, basicInfo: true }))}
+    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    title="Edit"
+  >
+    <Edit2 size={14} className="text-white" />
+  </button>
+)}
  </div>
  
  <div className="space-y-5">
@@ -2184,13 +2195,24 @@ export default function JobDashboardPage() {
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Budget & Headcount</h2>
  </div>
- <button
- onClick={() => setEditModes(prev => ({ ...prev, budget: !prev.budget }))}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={editModes.budget ? "Save changes" : "Edit Budget & Headcount"}
- >
- {editModes.budget ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
- </button>
+ {editModes.budget ? (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, budget: false }))}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    title="Done"
+  >
+    <Check size={14} className="text-white stroke-[2.5]" />
+    <span>Done</span>
+  </button>
+) : (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, budget: true }))}
+    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    title="Edit"
+  >
+    <Edit2 size={14} className="text-white" />
+  </button>
+)}
  </div>
 
  <div className="space-y-5">
@@ -2263,13 +2285,24 @@ export default function JobDashboardPage() {
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Logistics</h2>
  </div>
- <button
- onClick={() => setEditModes(prev => ({ ...prev, logistics: !prev.logistics }))}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={editModes.logistics ? "Save changes" : "Edit Logistics"}
- >
- {editModes.logistics ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
- </button>
+ {editModes.logistics ? (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, logistics: false }))}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    title="Done"
+  >
+    <Check size={14} className="text-white stroke-[2.5]" />
+    <span>Done</span>
+  </button>
+) : (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, logistics: true }))}
+    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    title="Edit"
+  >
+    <Edit2 size={14} className="text-white" />
+  </button>
+)}
  </div>
 
  <div className="space-y-5">
@@ -2340,13 +2373,24 @@ export default function JobDashboardPage() {
  </div>
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Internal Notes</h2>
  </div>
- <button
- onClick={() => setEditModes(prev => ({ ...prev, notes: !prev.notes }))}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-[#1890FF] transition-colors cursor-pointer"
- title={editModes.notes ? "Save changes" : "Edit Notes"}
- >
- {editModes.notes ? <Check size={16} className="text-[#00A76F]" /> : <Edit size={16} />}
- </button>
+ {editModes.notes ? (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, notes: false }))}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    title="Done"
+  >
+    <Check size={14} className="text-white stroke-[2.5]" />
+    <span>Done</span>
+  </button>
+) : (
+  <button
+    onClick={() => setEditModes(prev => ({ ...prev, notes: true }))}
+    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    title="Edit"
+  >
+    <Edit2 size={14} className="text-white" />
+  </button>
+)}
  </div>
  
  <div>
