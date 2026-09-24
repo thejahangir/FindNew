@@ -256,7 +256,7 @@ export default function JobDashboardPage() {
  // Applications Tab State
  const { compareCandidates } = useChatbot();
  const [selectedAppCandidates, setSelectedAppCandidates] = useState([]);
- const [maxCompareAlert, setMaxCompareAlert] = useState(false);
+
  const [currentPageApp, setCurrentPageApp] = useState(1);
  const [openStageMenuId, setOpenStageMenuId] = useState(null);
  const [isBulkStageMenuOpen, setIsBulkStageMenuOpen] = useState(false);
@@ -329,30 +329,20 @@ export default function JobDashboardPage() {
  const currentAppCandidates = filteredAppCandidates.slice((currentPageApp - 1) * itemsPerPageApp, currentPageApp * itemsPerPageApp);
 
  const toggleAppCandidateSelect = (id) => {
- if (selectedAppCandidates.includes(id)) {
- setSelectedAppCandidates(prev => prev.filter(x => x !== id));
- return;
- }
- if (selectedAppCandidates.length >= 3) {
- setMaxCompareAlert(true);
- setTimeout(() => setMaxCompareAlert(false), 3500);
- return;
- }
- setSelectedAppCandidates(prev => [...prev, id]);
+  if (selectedAppCandidates.includes(id)) {
+    setSelectedAppCandidates(prev => prev.filter(x => x !== id));
+  } else {
+    setSelectedAppCandidates(prev => [...prev, id]);
+  }
  };
 
  const handleSelectAll = (e) => {
- e?.stopPropagation();
- if (selectedAppCandidates.length > 0) {
- setSelectedAppCandidates([]);
- } else {
- const toSelect = currentAppCandidates.slice(0, 3).map(c => c.id);
- setSelectedAppCandidates(toSelect);
- if (currentAppCandidates.length > 3) {
- setMaxCompareAlert(true);
- setTimeout(() => setMaxCompareAlert(false), 3500);
- }
- }
+  e?.stopPropagation();
+  if (selectedAppCandidates.length > 0) {
+    setSelectedAppCandidates([]);
+  } else {
+    setSelectedAppCandidates(currentAppCandidates.map(c => c.id));
+  }
  };
 
  const openRejectModal = (ids) => {
@@ -1278,8 +1268,8 @@ export default function JobDashboardPage() {
  <div className="w-8 h-8 shrink-0 flex items-center justify-center">
  <div className="relative w-4 h-4 rounded cursor-pointer group/list" onClick={handleSelectAll}>
  <MiniCheckbox
- checked={selectedAppCandidates.length > 0 && selectedAppCandidates.length === Math.min(3, currentAppCandidates.length)}
- indeterminate={selectedAppCandidates.length > 0 && selectedAppCandidates.length < Math.min(3, currentAppCandidates.length)}
+ checked={selectedAppCandidates.length > 0 && selectedAppCandidates.length === currentAppCandidates.length}
+                indeterminate={selectedAppCandidates.length > 0 && selectedAppCandidates.length < currentAppCandidates.length}
  visible={true}
  onChange={handleSelectAll}
  label="Select All"
@@ -1292,7 +1282,7 @@ export default function JobDashboardPage() {
  className="text-[11px] font-bold text-gray-500 hover:text-[#212b36] dark:hover:text-white cursor-pointer transition-colors"
  onClick={handleSelectAll}
  >
- Select All {selectedAppCandidates.length > 0 ? `(${selectedAppCandidates.length}/3)` : ''}
+ Select All {selectedAppCandidates.length > 0 ? `(${selectedAppCandidates.length})` : ''}
  </span>
  </div>
  </div>
@@ -2471,75 +2461,59 @@ export default function JobDashboardPage() {
  </div>
  )}
 
- {/* Max Compare Alert Toast */}
- {maxCompareAlert && (
- <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[110] bg-[#FF5630] text-white px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-in fade-in slide-in-from-top-4 duration-200">
- <AlertCircle size={16} className="shrink-0" />
- <span>Only 3 candidates are allowed to compare.</span>
- <button onClick={() => setMaxCompareAlert(false)} className="ml-2 p-0.5 hover:bg-white/20 rounded cursor-pointer">
- <X size={14} />
- </button>
- </div>
- )}
-
  {/* Floating Compare Panel at Bottom Center */}
- {selectedAppCandidates.length >= 2 && (
- <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-[#161c24] text-white dark:bg-[#1E2732] border border-gray-700/70 shadow-[0_16px_40px_rgba(0,0,0,0.35)] rounded-2xl px-4 py-2.5 flex items-center gap-4 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200">
- <div className="flex items-center gap-2 pr-3 border-r border-gray-700/60">
- <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold">
- {selectedAppCandidates.length}
- </span>
- <span className="text-xs font-bold text-gray-200 whitespace-nowrap">
- Compare Candidates
- </span>
- <span className="text-[10px] text-gray-400 font-medium">(Max 3)</span>
- </div>
+      {selectedAppCandidates.length >= 2 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-[#161c24] text-white dark:bg-[#1E2732] border border-gray-700/70 shadow-[0_16px_40px_rgba(0,0,0,0.35)] rounded-2xl px-4 py-2.5 flex items-center gap-3.5 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold">
+              {selectedAppCandidates.length}
+            </span>
+            <span className="text-xs font-bold text-gray-200 whitespace-nowrap">
+              {selectedAppCandidates.length} {selectedAppCandidates.length === 1 ? 'Candidate' : 'Candidates'} Selected
+            </span>
+          </div>
 
- <div className="flex items-center gap-1.5">
- {selectedAppCandidates.map(id => {
- const cand = liveCandidates.find(c => c.id === id);
- if (!cand) return null;
- return (
- <div key={id} className="flex items-center gap-1.5 bg-white/10 dark:bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 text-xs text-white">
- <span className="font-semibold text-xs truncate max-w-[110px]">{cand.name}</span>
- <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getScoreStyles(cand.score).badge}`}>
- {cand.score}
- </span>
- <button 
- onClick={(e) => { e.stopPropagation(); toggleAppCandidateSelect(id); }} 
- className="text-gray-400 hover:text-white ml-0.5 cursor-pointer"
- title="Remove candidate"
- >
- <X size={12} />
- </button>
- </div>
- );
- })}
- </div>
+          {selectedAppCandidates.length > 3 && (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#FF5630]/15 border border-[#FF5630]/30 text-[#FF5630] text-xs font-semibold whitespace-nowrap">
+              <AlertCircle size={14} className="shrink-0" />
+              <span>Only 3 candidates are allowed to compare.</span>
+            </div>
+          )}
 
- <div className="flex items-center gap-2 pl-2 border-l border-gray-700/60">
- <button
- onClick={() => {
- const selectedObjs = liveCandidates.filter(c => selectedAppCandidates.includes(c.id));
- compareCandidates(selectedObjs);
- }}
- className="bg-[#1890FF] hover:bg-[#1890FF]/90 active:scale-95 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md shadow-[#1890FF]/25 transition-all cursor-pointer"
- >
- <Sparkles size={13} />
- <span>Compare</span>
- </button>
+          <div className="flex items-center gap-2 pl-2 border-l border-gray-700/60">
+            {selectedAppCandidates.length <= 3 ? (
+              <button
+                onClick={() => {
+                  const selectedObjs = liveCandidates.filter(c => selectedAppCandidates.includes(c.id));
+                  compareCandidates(selectedObjs);
+                }}
+                className="bg-[#1890FF] hover:bg-[#1890FF]/90 active:scale-95 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md shadow-[#1890FF]/25 transition-all cursor-pointer"
+              >
+                <Sparkles size={13} />
+                <span>Compare</span>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="bg-gray-700/40 text-gray-500 font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 cursor-not-allowed opacity-60"
+                title="Select up to 3 candidates to compare"
+              >
+                <Sparkles size={13} />
+                <span>Compare</span>
+              </button>
+            )}
 
- <button
- onClick={() => setSelectedAppCandidates([])}
- className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
- >
- Clear
- </button>
- </div>
- </div>
- )}
+            <button
+              onClick={() => setSelectedAppCandidates([])}
+              className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
 
- {/* Copy Toast */}
+      {/* Copy Toast */}
  <div className={`fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl shadow-2xl transition-all duration-300 z-[100] ${showCopyToast ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}`}>
  <div className="w-8 h-8 rounded-full bg-white dark:bg-black/10 flex items-center justify-center shrink-0">
  <Check size={16} strokeWidth={3} className="text-white dark:text-gray-900" />

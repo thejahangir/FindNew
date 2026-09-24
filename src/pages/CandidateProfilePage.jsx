@@ -14,96 +14,310 @@ const getInitials = (name = '') => name.split(' ').filter(Boolean).slice(0, 2).m
 
 const MOCK_SCORECARDS = [
   {
-  id: 'sc-1',
-  interviewer: 'Amit Sharma',
-  stage: 'Technical Interview',
-  date: '10 Mar 2026',
-  score: '9.0/10',
-  takeaways: 'Strong technical foundation. Cleared the system design question easily. Communication was clear.',
-  notes: 'I asked about handling race conditions in distributed systems. Candidate mapped out a robust distributed lock mechanism using Redis. We discussed edge cases like clock drift and network partitions. The candidate also correctly identified potential bottlenecks in the API gateway layer and proposed an elegant rate-limiting strategy using token buckets. Overall, highly impressed with their depth of knowledge and practical experience in scaling systems.',
-  softSkills: 8.0,
-  hardSkills: 9.6,
-  cultureFit: 9.0,
-  attributes: [
-  { name: 'Strong grasp of distributed system design patterns', rating: 'Strong Yes' },
-  { name: 'Deep knowledge in React and Node ecosystems', rating: 'Yes' },
-  { name: 'Clear communication during complex problem solving', rating: 'No' },
-  ]
+    id: 'sc-1',
+    interviewer: 'Amit Sharma',
+    stage: 'Technical Interview',
+    date: '10 Mar 2026',
+    score: '9.4/10',
+    recommendation: 'Strong Hire',
+    takeaways: 'Strong technical foundation. Cleared the system design and distributed locking questions with ease.',
+    notes: 'I asked about handling race conditions in distributed systems. Candidate mapped out a robust distributed lock mechanism using Redis. We discussed edge cases like clock drift and network partitions. The candidate also correctly identified potential bottlenecks in the API gateway layer and proposed an elegant rate-limiting strategy using token buckets. Overall, highly impressed with their depth of knowledge and practical experience in scaling systems.',
+    softSkills: 8.8,
+    hardSkills: 9.8,
+    cultureFit: 9.2,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Advanced' },
+          { name: 'Team Player & Empathy', rating: 'Competent' },
+          { name: 'Clear Communication', rating: 'Competent' },
+          { name: 'Disciplined & Adaptable', rating: 'Advanced' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Advanced' },
+          { name: 'React & Node Ecosystems', rating: 'Advanced' },
+          { name: 'System Design & Concurrency', rating: 'Advanced' },
+          { name: 'API Design & Scalability', rating: 'Advanced' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Advanced' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Competent' },
+          { name: 'Creative Problem Solving', rating: 'Advanced' },
+          { name: 'Analytical Thinking', rating: 'Advanced' },
+        ]
+      }
+    ]
   },
   {
-  id: 'sc-2',
-  interviewer: 'Priya Patel',
-  stage: 'Culture Fit',
-  date: '12 Mar 2026',
-  score: '9.2/10',
-  recommendation: 'Strong Yes',
-  takeaways: 'Great alignment with our core values. Shows high ownership and bias for action.',
-  notes: 'Candidate discussed their experience leading a cross-functional team under a tight deadline. Exhibited strong empathy and pragmatism. They gave a great example of resolving a conflict between engineering and product by relying on data-driven metrics rather than opinions. Their approach to mentorship and continuous learning is also very commendable. Highly recommended for our engineering culture.',
-  softSkills: 9.8,
-  hardSkills: 8.4,
-  cultureFit: 9.5,
-  attributes: [
-  { name: 'Demonstrates extreme ownership of end-to-end product delivery', rating: 'Strong Yes' },
-  { name: 'Exhibits strong empathy towards team members issues', rating: 'Yes' },
-  { name: 'Struggles slightly with resolving conflicts under pressure', rating: 'No' },
-  ]
+    id: 'sc-2',
+    interviewer: 'Priya Patel',
+    stage: 'Culture Fit',
+    date: '12 Mar 2026',
+    score: '8.4/10',
+    recommendation: 'Leaning Yes',
+    takeaways: 'Great alignment with our core values. Shows high ownership, good communication, and bias for action.',
+    notes: 'Candidate discussed their experience leading a cross-functional team under a tight deadline. Exhibited strong empathy and pragmatism. They gave a great example of resolving a conflict between engineering and product by relying on data-driven metrics rather than opinions. Would fit well into our culture with quick onboarding.',
+    softSkills: 8.8,
+    hardSkills: 8.2,
+    cultureFit: 8.6,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Advanced' },
+          { name: 'Team Player & Empathy', rating: 'Advanced' },
+          { name: 'Clear Communication', rating: 'Advanced' },
+          { name: 'Disciplined & Adaptable', rating: 'Competent' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Unassessed' },
+          { name: 'React & Node Ecosystems', rating: 'Competent' },
+          { name: 'System Design & Concurrency', rating: 'Competent' },
+          { name: 'API Design & Scalability', rating: 'Unassessed' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Unassessed' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Competent' },
+          { name: 'Creative Problem Solving', rating: 'Competent' },
+          { name: 'Analytical Thinking', rating: 'Competent' },
+        ]
+      }
+    ]
   },
   {
-  id: 'sc-3',
-  interviewer: 'David Chen',
-  stage: 'Product Sense',
-  date: '14 Mar 2026',
-  score: '7.5/10',
-  recommendation: 'Mixed',
-  takeaways: 'Good overall grasp of product lifecycle but struggled slightly to prioritize features under resource constraints.',
-  notes: 'Asked about launching a hypothetical feature in an emerging market. Candidate identified key user pain points but over-indexed on engineering complexity rather than time-to-market. They eventually pivoted to an MVP approach after some nudging, but their initial instinct was to over-engineer. Will need coaching on balancing technical perfection with business needs.',
-  softSkills: 7.0,
-  hardSkills: 8.0,
-  cultureFit: 7.5,
-  attributes: [
-  { name: 'Solid understanding of overall product strategy goals', rating: 'Yes' },
-  { name: 'Needs improvement in prioritizing limited engineering resources', rating: 'Mixed' },
-  { name: 'Deeply understands the core user pain points', rating: 'Strong Yes' },
-  ]
+    id: 'sc-3',
+    interviewer: 'David Chen',
+    stage: 'Product Sense',
+    date: '14 Mar 2026',
+    score: '6.2/10',
+    recommendation: 'Leaning No',
+    takeaways: 'Good overall grasp of product lifecycle but struggled to prioritize features under resource constraints.',
+    notes: 'Asked about launching a hypothetical feature in an emerging market. Candidate identified key user pain points but over-indexed on engineering complexity rather than time-to-market. Their initial instinct was to over-engineer rather than iterate through MVPs. Will require heavy guidance on product tradeoffs.',
+    softSkills: 6.8,
+    hardSkills: 7.2,
+    cultureFit: 6.5,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Competent' },
+          { name: 'Team Player & Empathy', rating: 'Beginner' },
+          { name: 'Clear Communication', rating: 'Competent' },
+          { name: 'Disciplined & Adaptable', rating: 'Competent' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Competent' },
+          { name: 'React & Node Ecosystems', rating: 'Competent' },
+          { name: 'System Design & Concurrency', rating: 'Beginner' },
+          { name: 'API Design & Scalability', rating: 'Competent' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Competent' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Beginner' },
+          { name: 'Creative Problem Solving', rating: 'Beginner' },
+          { name: 'Analytical Thinking', rating: 'Competent' },
+        ]
+      }
+    ]
   },
   {
-  id: 'sc-4',
-  interviewer: 'Sarah Jenkins',
-  stage: 'Executive Review',
-  date: '15 Mar 2026',
-  score: '8.8/10',
-  recommendation: 'Yes',
-  takeaways: 'Very mature candidate with strong leadership potential. Highly articulate and strategic.',
-  notes: 'Discussed long-term technical vision. The candidate has a clear framework for balancing technical debt against product velocity. Confident hire. Their previous experience managing a team of 15 engineers through a major re-architecture will be invaluable for our upcoming milestones. They articulate complex technical concepts in a way that non-technical stakeholders can easily understand.',
-  softSkills: 9.6,
-  hardSkills: 9.0,
-  cultureFit: 9.2,
-  attributes: [
-  { name: 'Shows incredible leadership potential for growing teams', rating: 'Strong Yes' },
-  { name: 'Lacks experience in setting very long-term visions', rating: 'Strong No' },
-  { name: 'Commands strong executive presence in meeting rooms', rating: 'Yes' },
-  ]
+    id: 'sc-4',
+    interviewer: 'Sarah Jenkins',
+    stage: 'Executive Review',
+    date: '15 Mar 2026',
+    score: '4.8/10',
+    recommendation: 'Strong Reject',
+    takeaways: 'Did not meet the senior leadership bar. Lacked clarity on multi-year technical vision and executive communication.',
+    notes: 'Discussed long-term technical roadmap and leading organizational transformations. Candidate was unable to articulate a structured framework for managing technical debt vs business velocity. Struggled with high-level stakeholder alignment and showed defensiveness when questioned on past project setbacks.',
+    softSkills: 4.8,
+    hardSkills: 5.4,
+    cultureFit: 4.2,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Beginner' },
+          { name: 'Team Player & Empathy', rating: 'Beginner' },
+          { name: 'Clear Communication', rating: 'Beginner' },
+          { name: 'Disciplined & Adaptable', rating: 'Beginner' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Beginner' },
+          { name: 'React & Node Ecosystems', rating: 'Beginner' },
+          { name: 'System Design & Concurrency', rating: 'Beginner' },
+          { name: 'API Design & Scalability', rating: 'Unassessed' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Beginner' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Beginner' },
+          { name: 'Creative Problem Solving', rating: 'Beginner' },
+          { name: 'Analytical Thinking', rating: 'Beginner' },
+        ]
+      }
+    ]
   }
 ];
 
+// Ensure attributes array exists for backward compatibility
+MOCK_SCORECARDS.forEach(sc => {
+  sc.attributes = sc.categories.flatMap(c => c.attributes.map(a => ({ ...a, category: c.name })));
+});
+
+const getAggregatedAttributeRating = (categoryName, attrName) => {
+  const ratings = MOCK_SCORECARDS
+    .map(sc => sc.categories?.find(c => c.name === categoryName)?.attributes?.find(a => a.name === attrName)?.rating)
+    .filter(Boolean);
+  
+  if (ratings.length === 0) return 'Unassessed';
+  
+  const weights = { 'advanced': 3, 'competent': 2, 'beginner': 1, 'unassessed': 0 };
+  const validWeights = ratings.map(r => weights[r.toLowerCase()] ?? 0);
+  const avg = validWeights.reduce((a, b) => a + b, 0) / validWeights.length;
+  
+  if (avg >= 2.3) return 'Advanced';
+  if (avg >= 1.5) return 'Competent';
+  if (avg >= 0.5) return 'Beginner';
+  return 'Unassessed';
+};
+
+const renderRatingCircle = (rating, size = "w-3.5 h-3.5") => {
+  switch (rating?.toLowerCase()) {
+    case 'advanced':
+    case 'exceeds expectations':
+    case 'advanced / exceeds expectations':
+    case 'strong yes':
+      return <span title="Advanced / Exceeds Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#00A76F] shadow-xs`} />;
+    case 'competent':
+    case 'meets expectations':
+    case 'competent / meets expectations':
+    case 'yes':
+      return <span title="Competent / Meets Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#FFAB00] shadow-xs`} />;
+    case 'beginner':
+    case 'below expectations':
+    case 'beginner / below expectations':
+    case 'no':
+    case 'strong no':
+      return <span title="Beginner / Below Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#FF5630] shadow-xs`} />;
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return <span title="Unassessed / Insufficient Data" className={`inline-block shrink-0 ${size} rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shadow-xs`} />;
+  }
+};
+
+const getRatingLabel = (rating) => {
+  switch (rating?.toLowerCase()) {
+    case 'advanced':
+    case 'exceeds expectations':
+    case 'advanced / exceeds expectations':
+    case 'strong yes':
+      return { label: 'Advanced', text: 'text-[#00A76F]' };
+    case 'competent':
+    case 'meets expectations':
+    case 'competent / meets expectations':
+    case 'yes':
+      return { label: 'Competent', text: 'text-[#FFAB00]' };
+    case 'beginner':
+    case 'below expectations':
+    case 'beginner / below expectations':
+    case 'no':
+    case 'strong no':
+      return { label: 'Beginner', text: 'text-[#FF5630]' };
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return { label: 'Unassessed', text: 'text-gray-400' };
+  }
+};
+
+
 const getRecBadge = (recommendation) => {
   switch (recommendation) {
-    case 'Strong Yes':
     case 'Strong Hire':
-      return { label: 'Strong Yes', emoji: '🌟', bg: 'bg-[#00A76F]/10', border: 'border-[#00A76F]/30', text: 'text-[#00A76F]', dot: 'bg-[#00A76F]', borderNode: 'border-[#00A76F]' };
+    case 'Strong Yes':
+      return { 
+        label: 'Strong Hire', 
+        emoji: '🌟', 
+        bg: 'bg-[#00A76F]/10 dark:bg-[#00A76F]/20', 
+        border: 'border-[#00A76F]/30', 
+        text: 'text-[#00A76F]', 
+        dot: 'bg-[#00A76F]', 
+        borderNode: 'border-[#00A76F]' 
+      };
+    case 'Leaning Yes':
     case 'Yes':
     case 'Hire':
-      return { label: 'Yes', emoji: '👍', bg: 'bg-[#00A76F]/10', border: 'border-[#00A76F]/20', text: 'text-[#00A76F]', dot: 'bg-[#00A76F]', borderNode: 'border-[#00A76F]' };
+      return { 
+        label: 'Leaning Yes', 
+        emoji: '👍', 
+        bg: 'bg-[#1890FF]/10 dark:bg-[#1890FF]/20', 
+        border: 'border-[#1890FF]/30', 
+        text: 'text-[#1890FF]', 
+        dot: 'bg-[#1890FF]', 
+        borderNode: 'border-[#1890FF]' 
+      };
+    case 'Leaning No':
     case 'Mixed':
-      return { label: 'Mixed', emoji: '➖', bg: 'bg-[#FFC107]/10', border: 'border-[#FFC107]/20', text: 'text-[#FFC107]', dot: 'bg-[#FFC107]', borderNode: 'border-[#FFC107]' };
+      return { 
+        label: 'Leaning No', 
+        emoji: '👎', 
+        bg: 'bg-[#FFAB00]/10 dark:bg-[#FFAB00]/20', 
+        border: 'border-[#FFAB00]/30', 
+        text: 'text-[#FFAB00]', 
+        dot: 'bg-[#FFAB00]', 
+        borderNode: 'border-[#FFAB00]' 
+      };
+    case 'Strong Reject':
+    case 'Strong No':
     case 'No':
     case 'No Hire':
-      return { label: 'No', emoji: '👎', bg: 'bg-[#FF5630]/10', border: 'border-[#FF5630]/20', text: 'text-[#FF5630]', dot: 'bg-[#FF5630]', borderNode: 'border-[#FF5630]' };
-    case 'Strong No':
     case 'Strong No Hire':
-      return { label: 'Strong No', emoji: '⛔', bg: 'bg-[#FF5630]/15', border: 'border-[#FF5630]/30', text: 'text-[#FF5630]', dot: 'bg-[#FF5630]', borderNode: 'border-[#FF5630]' };
+      return { 
+        label: 'Strong Reject', 
+        emoji: '⛔', 
+        bg: 'bg-[#FF5630]/10 dark:bg-[#FF5630]/20', 
+        border: 'border-[#FF5630]/30', 
+        text: 'text-[#FF5630]', 
+        dot: 'bg-[#FF5630]', 
+        borderNode: 'border-[#FF5630]' 
+      };
     default:
-      return { label: recommendation || 'Yes', emoji: '👍', bg: 'bg-[#00A76F]/10', border: 'border-[#00A76F]/20', text: 'text-[#00A76F]', dot: 'bg-[#00A76F]', borderNode: 'border-[#00A76F]' };
+      return { 
+        label: recommendation || 'Leaning Yes', 
+        emoji: '👍', 
+        bg: 'bg-[#1890FF]/10 dark:bg-[#1890FF]/20', 
+        border: 'border-[#1890FF]/30', 
+        text: 'text-[#1890FF]', 
+        dot: 'bg-[#1890FF]', 
+        borderNode: 'border-[#1890FF]' 
+      };
   }
 };
 
@@ -1173,220 +1387,273 @@ export default function CandidateProfilePage() {
   </div>
 
   {/* Expandable Scorecards */}
-     {/* Design Toggle */}
-     <div className="flex justify-end mb-2">
-        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-full sm:w-auto mt-6 shadow-inner">
-           <button 
-             onClick={() => setScorecardView('option1')}
-             className={`flex-1 sm:flex-none px-6 py-2 text-[12px] font-bold rounded-lg transition-all cursor-pointer ${scorecardView === 'option1' ? 'bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-           >
-             Option 1 (Cards)
-           </button>
-           <button 
-             onClick={() => setScorecardView('option2')}
-             className={`flex-1 sm:flex-none px-6 py-2 text-[12px] font-bold rounded-lg transition-all cursor-pointer ${scorecardView === 'option2' ? 'bg-[#1890FF] text-white shadow-md' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-           >
-             Option 2 (Timeline)
-           </button>
-        </div>
-     </div>
-
-     {scorecardView === 'option1' ? (
-     <div className="space-y-6">
-       {/* OVERARCHING SUMMARY */}
-     <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-8 mt-6">
-       <div>
-         <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white uppercase tracking-wider mb-4">Interview Summary</h3>
-         <div className="flex flex-wrap gap-4">
-           {MOCK_SCORECARDS.map(sc => {
-              const score = parseFloat(sc.score.split('/')[0]);
-              const verdictEmoji = score >= 9.0 ? '🌟' : score >= 8.0 ? '👍' : score >= 7.0 ? '➖' : '👎';
-              const verdictText = score >= 9.0 ? 'Strong Hire' : score >= 8.0 ? 'Hire' : score >= 7.0 ? 'Mixed' : 'No Hire';
-              return (
-                <div key={`summary-${sc.id}`} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/40 p-3 rounded-xl border border-gray-100 dark:border-gray-800 w-full sm:w-auto">
-                   <div className="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-lg shadow-sm border border-gray-100 dark:border-gray-600">
-                     {verdictEmoji}
-                   </div>
-                   <div>
-                     <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-200">{sc.stage}</p>
-                     <p className="text-[11px] text-gray-500">{sc.interviewer} • <span className="font-semibold text-gray-700 dark:text-gray-300">{verdictText}</span></p>
-                   </div>
-                </div>
-              )
-           })}
+           {/* Design Toggle */}
+      <div className="flex justify-end mb-2">
+         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-full sm:w-auto mt-6 shadow-inner">
+            <button 
+              onClick={() => setScorecardView('option1')}
+              className={`flex-1 sm:flex-none px-6 py-2 text-[12px] font-bold rounded-lg transition-all cursor-pointer ${scorecardView === 'option1' ? 'bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+            >
+              Option 1 (Cards)
+            </button>
+            <button 
+              onClick={() => setScorecardView('option2')}
+              className={`flex-1 sm:flex-none px-6 py-2 text-[12px] font-bold rounded-lg transition-all cursor-pointer ${scorecardView === 'option2' ? 'bg-[#1890FF] text-white shadow-md' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+            >
+              Option 2 (Timeline)
+            </button>
          </div>
-       </div>
+      </div>
 
-       <div>
-         <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white uppercase tracking-wider mb-4">Aggregated Attributes</h3>
-         <div className="space-y-3">
-           {Array.from(new Set(MOCK_SCORECARDS.flatMap(sc => sc.attributes.map(a => a.name)))).slice(0, 5).map(attrName => {
-              // Find all ratings for this attribute across scorecards
-              const ratings = MOCK_SCORECARDS.flatMap(sc => sc.attributes.filter(a => a.name === attrName).map(a => a.rating));
-              return (
-                <div key={attrName} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-                  <span className="text-[13px] font-medium text-[#454f5b] dark:text-gray-300">{attrName}</span>
-                  <div className="flex gap-2">
-                    {ratings.map((r, i) => {
-                      let rEmoji = '➖';
-                      if (r === 'Strong Yes') rEmoji = '🌟';
-                      if (r === 'Yes') rEmoji = '👍';
-                      if (r === 'No') rEmoji = '👎';
-                      if (r === 'Strong No') rEmoji = '⛔';
-                      return <span key={i} title={r} className="text-[14px]">{rEmoji}</span>;
-                    })}
+      {scorecardView === 'option1' ? (
+      <div className="space-y-6">
+        {/* OVERARCHING SUMMARY */}
+        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-8 mt-6">
+          <div>
+            <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white uppercase tracking-wider mb-4">Interview Summary</h3>
+            <div className="flex flex-wrap gap-4">
+              {MOCK_SCORECARDS.map(sc => {
+                  const recStyle = getRecBadge(sc.recommendation);
+                  return (
+                    <div key={`summary-${sc.id}`} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/40 p-3 rounded-xl border border-gray-100 dark:border-gray-800 w-full sm:w-auto">
+                       <div className="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-lg shadow-sm border border-gray-100 dark:border-gray-600">
+                         {recStyle.emoji}
+                       </div>
+                       <div>
+                         <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-200">{sc.stage}</p>
+                         <p className="text-[11px] text-gray-500">{sc.interviewer} • <span className={`font-semibold ${recStyle.text}`}>{recStyle.label}</span></p>
+                       </div>
+                    </div>
+                  )
+               })}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white uppercase tracking-wider mb-4">Aggregated Attributes</h3>
+            <div className="space-y-4">
+              {['Personality Traits', 'Technical Competencies', 'Research & Problem Solving'].map(categoryName => {
+                const attrNames = Array.from(new Set(
+                  MOCK_SCORECARDS.flatMap(sc => 
+                    (sc.categories?.find(c => c.name === categoryName)?.attributes || [])
+                      .map(a => a.name)
+                  )
+                ));
+
+                if (attrNames.length === 0) return null;
+
+                return (
+                  <div key={categoryName} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF]">{categoryName}</span>
+                      <div className="h-px bg-gray-200 dark:bg-gray-700/60 flex-1" />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                      {attrNames.map(attrName => {
+                        const aggRating = getAggregatedAttributeRating(categoryName, attrName);
+                        return (
+                          <div key={attrName} className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/70 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+                            <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attrName}>{attrName}</span>
+                            <div className="shrink-0 flex items-center justify-center">
+                              {renderRatingCircle(aggRating, "w-3.5 h-3.5")}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* Rating Scale Legend */}
+            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50/60 dark:bg-gray-800/30 p-3 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rating Scale Legend:</span>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
+                  <span className="font-medium text-gray-600 dark:text-gray-300">Unassessed / Insufficient Data</span>
                 </div>
-              )
-           })}
-         </div>
-       </div>
-     </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
+                  <span className="font-medium text-gray-600 dark:text-gray-300">Beginner / Below Expectations</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
+                  <span className="font-medium text-gray-600 dark:text-gray-300">Competent / Meets Expectations</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
+                  <span className="font-medium text-gray-600 dark:text-gray-300">Advanced / Exceeds Expectations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-     <div className="flex items-center justify-between mt-8 mb-4">
-       <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
-         <FileText size={16} className="text-[#1890FF]" /> Detailed Scorecards
-       </h2>
-       <button 
-         onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
-         className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#1890FF]/20 bg-[#1890FF]/5"
-       >
-         {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
-       </button>
-     </div>
+        <div className="flex items-center justify-between mt-8 mb-4">
+          <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+            <FileText size={16} className="text-[#1890FF]" /> Detailed Scorecards
+          </h2>
+          <button 
+            onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
+            className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#1890FF]/20 bg-[#1890FF]/5"
+          >
+            {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
+          </button>
+        </div>
 
-     <div className="space-y-4">
-       {MOCK_SCORECARDS.map(scorecard => {
-         const isOpen = openScorecards.includes(scorecard.id);
-         return (
-           <div key={scorecard.id} className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 shadow-sm overflow-hidden transition-colors hover:border-[#1890FF]/30">
-             <button 
-               onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
-               className={`w-full flex items-center justify-between p-5 cursor-pointer transition-colors ${isOpen ? 'bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50' : 'hover:bg-gray-50 dark:hover:bg-gray-800/20'}`}
-             >
-               <div className="flex items-center gap-4">
-                 <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
-                   {getInitials(scorecard.interviewer)}
-                 </div>
-                 <div className="text-left">
-                   <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
-                   <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-6">
-                  {(() => {
-                    const recStyle = getRecBadge(scorecard.recommendation);
-                    return (
-                      <div className="text-right hidden sm:block">
-                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
-                          <span>{recStyle.emoji}</span>
-                          <span>{recStyle.label}</span>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                  <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-               </div>
-             </button>
+        <div className="space-y-4">
+          {MOCK_SCORECARDS.map(scorecard => {
+            const isOpen = openScorecards.includes(scorecard.id);
+            return (
+              <div key={scorecard.id} className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 shadow-sm overflow-hidden transition-colors hover:border-[#1890FF]/30">
+                <button 
+                  onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
+                  className={`w-full flex items-center justify-between p-5 cursor-pointer transition-colors ${isOpen ? 'bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50' : 'hover:bg-gray-50 dark:hover:bg-gray-800/20'}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+                      {getInitials(scorecard.interviewer)}
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
+                      <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                     {(() => {
+                       const recStyle = getRecBadge(scorecard.recommendation);
+                       return (
+                         <div className="text-right hidden sm:block">
+                           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
+                           <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
+                             <span>{recStyle.emoji}</span>
+                             <span>{recStyle.label}</span>
+                           </div>
+                         </div>
+                       );
+                     })()}
+                     <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                  </div>
+                </button>
 
-             <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
-               <div className="overflow-hidden">
-                 <div className="p-6 space-y-8">
-                   
-                   {/* Top Row: Key Takeaways & Core Metrics */}
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
-                      <div className="xl:col-span-7 flex flex-col">
-                        <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Key Takeaways</h5>
-                        <div className="bg-gradient-to-br from-[#1890FF]/10 to-transparent border border-[#1890FF]/20 rounded-xl p-4 relative overflow-hidden flex-1 flex items-center">
-                          <div className="absolute top-0 right-0 p-3 opacity-10"><FileText size={40} className="text-[#1890FF]" /></div>
-                          <p className="text-[13px] text-[#212b36] dark:text-gray-200 font-semibold leading-relaxed relative z-10 italic">
-                            "{scorecard.takeaways}"
-                          </p>
-                        </div>
-                      </div>
+                <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+                  <div className="overflow-hidden">
+                    <div className="p-6 space-y-8">
                       
-                      <div className="xl:col-span-5 flex flex-col justify-between">
-                        <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Core Metrics</h5>
-                        <div className="grid gap-2 flex-1">
-                          {[
-                            { label: 'Hard Skills', value: scorecard.hardSkills },
-                            { label: 'Soft Skills', value: scorecard.softSkills },
-                            { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
-                          ].map(metric => {
-                             const isHigh = metric.value >= 8.0;
-                             const isMed = metric.value >= 5.0 && metric.value < 8.0;
-                             const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
-                             const colorBg = isHigh ? 'bg-[#00A76F]/10' : isMed ? 'bg-[#FFC107]/10' : 'bg-[#FF5630]/10';
-                             const statusLabel = isHigh ? 'Strong' : isMed ? 'Average' : 'Needs Work';
-                             return (
-                               <div key={metric.label} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
-                                 <span className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{metric.label}</span>
-                                 <div className="flex items-center gap-2.5">
-                                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${colorBg} ${colorText}`}>{statusLabel}</span>
-                                   <span className={`text-[14px] font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</span>
-                                 </div>
-                               </div>
-                             );
-                          })}
-                        </div>
-                      </div>
-                    </div>
+                      {/* Top Row: Key Takeaways (80%) & Core Metrics (20%) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
+                          <div className="lg:col-span-4 flex flex-col">
+                           <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Key Takeaways</h5>
+                           <div className="bg-gradient-to-br from-[#1890FF]/10 to-transparent border border-[#1890FF]/20 rounded-xl p-4 relative overflow-hidden flex-1 flex items-center">
+                             <div className="absolute top-0 right-0 p-3 opacity-10"><FileText size={40} className="text-[#1890FF]" /></div>
+                             <p className="text-[13px] text-[#212b36] dark:text-gray-200 font-semibold leading-relaxed relative z-10 italic">
+                               "{scorecard.takeaways}"
+                             </p>
+                           </div>
+                         </div>
+                          <div className="lg:col-span-1 flex flex-col justify-between">
+                           <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Core Metrics</h5>
+                           <div className="grid gap-2 flex-1">
+                             {[
+                                { label: 'Hard Skills', value: scorecard.hardSkills },
+                                { label: 'Soft Skills', value: scorecard.softSkills },
+                                { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
+                              ].map(metric => {
+                                 const isHigh = metric.value >= 8.0;
+                                 const isMed = metric.value >= 5.0 && metric.value < 8.0;
+                                 const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
+                                 return (
+                                   <div key={metric.label} className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
+                                     <span className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{metric.label}</span>
+                                     <span className={`text-[14px] font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</span>
+                                   </div>
+                                 );
+                              })}
+                           </div>
+                         </div>
+                       </div>
 
-                    {/* Interviewer Notes (Full Width 100%) */}
-                    <div className="w-full bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileText size={14} className="text-[#1890FF]" />
-                        <h5 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Interviewer Notes</h5>
-                      </div>
-                      <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed w-full">
-                        {expandedNotes[scorecard.id] || scorecard.notes.length <= 250 
-                          ? scorecard.notes 
-                          : `${scorecard.notes.slice(0, 250).trim()}...`}
-                        {scorecard.notes.length > 250 && (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setExpandedNotes(prev => ({...prev, [scorecard.id]: !prev[scorecard.id]})) }}
-                            className="ml-2 font-bold text-[#1890FF] hover:underline cursor-pointer focus:outline-none inline-flex"
-                          >
-                            {expandedNotes[scorecard.id] ? 'Read Less' : 'Read More'}
-                          </button>
-                        )}
-                      </p>
-                    </div>
+                       {/* Interviewer Notes (Full Width 100%) */}
+                       <div className="w-full bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
+                         <div className="flex items-center gap-2 mb-2">
+                           <FileText size={14} className="text-[#1890FF]" />
+                           <h5 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Interviewer Notes</h5>
+                         </div>
+                         <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed w-full">
+                           {expandedNotes[scorecard.id] || scorecard.notes.length <= 250 
+                             ? scorecard.notes 
+                             : `${scorecard.notes.slice(0, 250).trim()}...`}
+                           {scorecard.notes.length > 250 && (
+                             <button
+                               type="button"
+                               onClick={(e) => { e.stopPropagation(); setExpandedNotes(prev => ({...prev, [scorecard.id]: !prev[scorecard.id]})) }}
+                               className="ml-2 font-bold text-[#1890FF] hover:underline cursor-pointer focus:outline-none inline-flex"
+                             >
+                               {expandedNotes[scorecard.id] ? 'Read Less' : 'Read More'}
+                             </button>
+                           )}
+                         </p>
+                       </div>
 
-                    {/* Detailed Attributes (1 per line) */}
-                   <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-8">
-                     <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">Detailed Attributes Evaluated</h5>
-                     <div className="space-y-3">
-                       {scorecard.attributes.map((attr, idx) => {
-                          let bgStyle = 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
-                          let emoji = '➖';
-                          if (attr.rating === 'Strong Yes') { bgStyle = 'bg-[#00A76F]/15 text-[#00A76F] border-[#00A76F]/30'; emoji = '🌟'; }
-                          if (attr.rating === 'Yes') { bgStyle = 'bg-[#00A76F]/10 text-[#00A76F] border-[#00A76F]/20'; emoji = '👍'; }
-                          if (attr.rating === 'Mixed') { bgStyle = 'bg-[#FFC107]/10 text-[#FFC107] border-[#FFC107]/20'; emoji = '➖'; }
-                          if (attr.rating === 'No') { bgStyle = 'bg-[#FF5630]/10 text-[#FF5630] border-[#FF5630]/20'; emoji = '👎'; }
-                          if (attr.rating === 'Strong No') { bgStyle = 'bg-[#FF5630]/15 text-[#FF5630] border-[#FF5630]/30'; emoji = '⛔'; }
-
-                          return (
-                            <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100/50 dark:border-gray-700/30 group hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
-                              <span className="text-[13px] font-medium text-[#454f5b] dark:text-gray-300 pr-4">{attr.name}</span>
-                              <div className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full border ${bgStyle}`}>
-                                <span className="text-[12px]">{emoji}</span>
-                                <span className="text-[11px] font-bold uppercase tracking-wider">{attr.rating}</span>
+                       {/* Detailed Attributes (Categorized) */}
+                      <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-8">
+                        <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">Detailed Attributes Evaluated</h5>
+                        <div className="space-y-4">
+                          {(scorecard.categories || []).map(cat => (
+                            <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
+                              <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
+                                <span>{cat.name}</span>
+                                <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
+                              </h6>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                {cat.attributes.map((attr, idx) => {
+                                   return (
+                                     <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+                                       <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>{attr.name}</span>
+                                       <div className="shrink-0 flex items-center justify-center">
+                                         {renderRatingCircle(attr.rating, "w-3.5 h-3.5")}
+                                       </div>
+                                     </div>
+                                   );
+                                })}
                               </div>
                             </div>
-                          )
-                       })}
-                     </div>
+                          ))}
+                        </div>
+
+                        {/* Rating Scale Legend */}
+                        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
+                          <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
+                              <span>Unassessed</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
+                              <span>Beginner</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
+                              <span>Competent</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
+                              <span>Advanced</span>
+                            </div>
+                          </div>
+                        </div>
+                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       </div>
       ) : (
       <div className="space-y-6">
@@ -1396,14 +1663,13 @@ export default function CandidateProfilePage() {
             <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Interview Summary</h3>
             <div className="flex flex-wrap gap-3">
               {MOCK_SCORECARDS.map(sc => {
-                 const score = parseFloat(sc.score.split('/')[0]);
-                 const verdictEmoji = score >= 9.0 ? '🌟' : score >= 8.0 ? '👍' : score >= 7.0 ? '➖' : '👎';
+                 const recStyle = getRecBadge(sc.recommendation);
                  return (
-                   <div key={`summary-${sc.id}`} className="flex items-center gap-2 p-2">
-                      <div className="text-xl">{verdictEmoji}</div>
+                   <div key={`summary-${sc.id}`} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/30 p-2.5 px-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <div className="text-xl">{recStyle.emoji}</div>
                       <div>
                         <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-200">{sc.stage}</p>
-                        <p className="text-[11px] text-gray-500">{sc.interviewer}</p>
+                        <p className="text-[11px] text-gray-500">{sc.interviewer} • <span className={`font-semibold ${recStyle.text}`}>{recStyle.label}</span></p>
                       </div>
                    </div>
                  )
@@ -1413,25 +1679,56 @@ export default function CandidateProfilePage() {
           
           <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50">
             <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Aggregated Attributes</h3>
-            <div className="space-y-2">
-              {Array.from(new Set(MOCK_SCORECARDS.flatMap(sc => sc.attributes.map(a => a.name)))).slice(0, 5).map(attrName => {
-                 const ratings = MOCK_SCORECARDS.flatMap(sc => sc.attributes.filter(a => a.name === attrName).map(a => a.rating));
-                 return (
-                   <div key={attrName} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                     <span className="text-[13px] font-medium text-[#454f5b] dark:text-gray-300">{attrName}</span>
-                     <div className="flex gap-2">
-                       {ratings.map((r, i) => {
-                         let rEmoji = '➖';
-                         if (r === 'Strong Yes') rEmoji = '🌟';
-                         if (r === 'Yes') rEmoji = '👍';
-                         if (r === 'No') rEmoji = '👎';
-                         if (r === 'Strong No') rEmoji = '⛔';
-                         return <span key={i} title={r} className="text-[14px]">{rEmoji}</span>;
-                       })}
-                     </div>
-                   </div>
-                 )
+            <div className="space-y-3">
+              {['Personality Traits', 'Technical Competencies', 'Research & Problem Solving'].map(categoryName => {
+                const attrNames = Array.from(new Set(
+                  MOCK_SCORECARDS.flatMap(sc => 
+                    (sc.categories?.find(c => c.name === categoryName)?.attributes || [])
+                      .map(a => a.name)
+                  )
+                ));
+
+                if (attrNames.length === 0) return null;
+
+                return (
+                  <div key={categoryName} className="p-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">{categoryName}</div>
+                    <div className="space-y-1.5">
+                      {attrNames.map(attrName => {
+                        const aggRating = getAggregatedAttributeRating(categoryName, attrName);
+                        return (
+                          <div key={attrName} className="flex items-center justify-between p-1.5 px-2 hover:bg-white dark:hover:bg-gray-800/60 rounded-lg transition-colors">
+                            <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attrName}</span>
+                            <div className="shrink-0 flex items-center justify-center">
+                              {renderRatingCircle(aggRating, "w-3 h-3")}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
               })}
+            </div>
+
+            {/* Rating Scale Legend */}
+            <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
+                <span>Unassessed</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
+                <span>Beginner</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
+                <span>Competent</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
+                <span>Advanced</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1451,10 +1748,6 @@ export default function CandidateProfilePage() {
         <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-200 before:via-gray-200 before:to-transparent dark:before:from-gray-800 dark:before:via-gray-800 before:z-0">
           {MOCK_SCORECARDS.map(scorecard => {
             const isOpen = openScorecards.includes(scorecard.id);
-            const score = parseFloat(scorecard.score.split('/')[0]);
-            const scoreColor = score >= 8.0 ? 'text-[#00A76F]' : score >= 7.0 ? 'text-[#FFC107]' : 'text-[#FF5630]';
-            const borderScoreColor = score >= 8.0 ? 'border-[#00A76F]' : score >= 7.0 ? 'border-[#FFC107]' : 'border-[#FF5630]';
-
             return (
               <div key={scorecard.id} className="relative flex items-start gap-6 group z-10">
                 
@@ -1538,26 +1831,24 @@ export default function CandidateProfilePage() {
                     {/* Detailed Attributes Dropdown */}
                     <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
                       <div className="overflow-hidden">
-                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-1">
-                          {scorecard.attributes.map((attr, idx) => {
-                             let emoji = '➖';
-                             let textColor = 'text-gray-500';
-                             if (attr.rating === 'Strong Yes') { emoji = '🌟'; textColor = 'text-[#00A76F] font-bold'; }
-                             if (attr.rating === 'Yes') { emoji = '👍'; textColor = 'text-[#00A76F]'; }
-                             if (attr.rating === 'Mixed') { emoji = '➖'; textColor = 'text-[#FFC107]'; }
-                             if (attr.rating === 'No') { emoji = '👎'; textColor = 'text-[#FF5630]'; }
-                             if (attr.rating === 'Strong No') { emoji = '⛔'; textColor = 'text-[#FF5630] font-bold'; }
-
-                             return (
-                               <div key={idx} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
-                                 <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attr.name}</span>
-                                 <div className="shrink-0 flex items-center gap-2">
-                                   <span className="text-[12px]">{emoji}</span>
-                                   <span className={`text-[10px] uppercase tracking-wider ${textColor}`}>{attr.rating}</span>
-                                 </div>
-                               </div>
-                             )
-                          })}
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-3">
+                          {(scorecard.categories || []).map(cat => (
+                            <div key={cat.name} className="p-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800">
+                              <h6 className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">{cat.name}</h6>
+                              <div className="space-y-1.5">
+                                {cat.attributes.map((attr, idx) => {
+                                  return (
+                                    <div key={idx} className="flex items-center justify-between p-1.5 px-2 hover:bg-white dark:hover:bg-gray-800/60 rounded-lg transition-colors">
+                                      <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attr.name}</span>
+                                      <div className="shrink-0 flex items-center justify-center">
+                                        {renderRatingCircle(attr.rating, "w-3 h-3")}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
 
                           {/* Notes */}
                           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
@@ -1569,20 +1860,19 @@ export default function CandidateProfilePage() {
                         </div>
                       </div>
                     </div>
-
                   </div>
-                </div>
 
+                </div>
               </div>
             );
           })}
         </div>
       </div>
      )}
-  </div>
- )}
+    </div>
+  )}
 
- {activeTab === 'Activity Log' && (
+  {activeTab === 'Activity Log' && (
  <div className="space-y-6 animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 mb-6">
  <div className="mb-4">
