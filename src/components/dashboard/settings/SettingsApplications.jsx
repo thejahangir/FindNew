@@ -394,7 +394,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
 
  <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800/50 mt-auto shrink-0">
  <button 
- onClick={() => navigate('/dashboard/job-setup/pipeline', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav ? setSettingsActiveNav('Pipeline') : navigate('/dashboard/agencies', { state: { jobData, tab: 'Job Setup' } })}
  className="px-6 py-2.5 text-sm font-bold text-black bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
  >
  Previous: Back to Pipeline
@@ -407,7 +407,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
  Save and Exit
  </button>
  <button 
- onClick={() => navigate('/dashboard/job-setup/scorecards', { state: { jobData } })}
+ onClick={() => setSettingsActiveNav ? setSettingsActiveNav('Scorecards') : navigate('/dashboard/agencies', { state: { jobData, tab: 'Job Setup' } })}
  className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
  Save and Continue to 'Scorecards'

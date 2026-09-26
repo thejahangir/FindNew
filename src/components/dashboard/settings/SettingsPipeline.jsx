@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Columns, GitBranch, ArrowRight, Settings, Plus, Zap, Settings2, Trash2, GripVertical, Mail, Calendar, FileCheck, CheckCircle2, Circle, AlertCircle, Clock, Check, Edit2 } from 'lucide-react';
+import { 
+  GitBranch, ArrowRight, Plus, Zap, Trash2, GripVertical, 
+  Mail, Calendar, CheckCircle2, ChevronDown, Check, Edit2, 
+  Layers, ShieldCheck, Clock
+} from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -22,74 +26,106 @@ const getStageColor = (systemStage) => {
   }
 };
 
-const STAGE_CONFIGS = {
+const NOTIF_ICONS = {
+  sendEmail: Mail,
+  notifyTeam: Zap,
+  autoSchedule: Calendar,
+  triggerOnboarding: Zap
+};
+
+const DEFAULT_STAGE_CONFIGS = {
   'Applied': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Send Confirmation Email', desc: 'Thank candidate for applying', active: true },
-      { id: 'notifyTeam', icon: Zap, title: 'Notify Hiring Team', desc: 'Alert team of new application', active: true }
+      { id: 'sendEmail', title: 'Send Confirmation Email', desc: 'Thank candidate for applying', active: true },
+      { id: 'notifyTeam', title: 'Notify Hiring Team', desc: 'Alert team of new application', active: true }
     ],
     requirements: [
       'Resume uploaded & parsed',
       'Knockout screening questions passed'
     ],
-    guideline: 'Candidates in this stage should be reviewed within 24 hours to maintain engagement.'
+    guideline: 'Candidates in this stage should be reviewed within 24 hours to maintain engagement.',
+    sla: '24 Hours'
   },
   'Screening': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Send Assessment Link', desc: 'Email technical assessment link', active: true },
-      { id: 'autoSchedule', icon: Calendar, title: 'Schedule Recruiter Screen', desc: 'Send calendar for 15-min call', active: false }
+      { id: 'sendEmail', title: 'Send Assessment Link', desc: 'Email technical assessment link', active: true },
+      { id: 'autoSchedule', title: 'Schedule Recruiter Screen', desc: 'Send calendar for 15-min call', active: false }
     ],
     requirements: [
       'Preliminary phone screen completed',
       'Basic skill evaluation passed'
     ],
-    guideline: 'Keep screening calls brief (15-20 mins) to assess basic fit and communication skills.'
+    guideline: 'Keep screening calls brief (15-20 mins) to assess basic fit and communication skills.',
+    sla: '48 Hours'
   },
   'Interview': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Send Interview Details', desc: 'Send meeting link & agenda', active: true },
-      { id: 'autoSchedule', icon: Calendar, title: 'Auto-Schedule Interview', desc: 'Send calendar invite to candidate', active: true }
+      { id: 'sendEmail', title: 'Send Interview Details', desc: 'Send meeting link & agenda', active: true },
+      { id: 'autoSchedule', title: 'Auto-Schedule Interview', desc: 'Send calendar invite to candidate', active: true }
     ],
     requirements: [
       'Technical evaluation scorecard submitted',
       'Cultural alignment verified'
     ],
-    guideline: 'Scorecards should be filled out within 2 hours post-interview for accurate evaluation.'
+    guideline: 'Scorecards should be filled out within 2 hours post-interview for accurate evaluation.',
+    sla: '3 Days'
   },
   'Offer': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Send Offer Letter', desc: 'Email digital offer package', active: true },
-      { id: 'notifyTeam', icon: Zap, title: 'Notify HR & Finance', desc: 'Alert finance team for approval', active: true }
+      { id: 'sendEmail', title: 'Send Offer Letter', desc: 'Email digital offer package', active: true },
+      { id: 'notifyTeam', title: 'Notify HR & Finance', desc: 'Alert finance team for approval', active: true }
     ],
     requirements: [
       'Compensation package approved',
       'Reference checks completed'
     ],
-    guideline: 'Extend formal offers within 24 hours of decision to maximize acceptance rate.'
+    guideline: 'Extend formal offers within 24 hours of decision to maximize acceptance rate.',
+    sla: '24 Hours'
   },
   'Hired': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Welcome Email', desc: 'Send day 1 instructions', active: true },
-      { id: 'triggerOnboarding', icon: Zap, title: 'Trigger Onboarding Flow', desc: 'Initiate IT & HR setup', active: true }
+      { id: 'sendEmail', title: 'Welcome Email', desc: 'Send day 1 instructions', active: true },
+      { id: 'triggerOnboarding', title: 'Trigger Onboarding Flow', desc: 'Initiate IT & HR setup', active: true }
     ],
     requirements: [
       'Signed contract received',
       'Start date confirmed'
     ],
-    guideline: 'Ensure IT equipment is dispatched at least 3 business days before joining date.'
+    guideline: 'Ensure IT equipment is dispatched at least 3 business days before joining date.',
+    sla: 'Immediate'
   },
   'Rejected': {
     notifications: [
-      { id: 'sendEmail', icon: Mail, title: 'Send Rejection Email', desc: 'Polite personalized feedback', active: false }
+      { id: 'sendEmail', title: 'Send Rejection Email', desc: 'Polite personalized feedback', active: false }
     ],
     requirements: [
       'Rejection reason documented in audit log'
     ],
-    guideline: 'Keep candidate in talent pool for future relevant opportunities.'
+    guideline: 'Keep candidate in talent pool for future relevant opportunities.',
+    sla: '48 Hours'
   }
 };
 
-function SortableStageItem({ stage, index, totalStages, updateStage, removeStage, isSelected, onSelect, isEditing }) {
+const getInitialConfig = (systemStage) => {
+  const base = DEFAULT_STAGE_CONFIGS[systemStage] || DEFAULT_STAGE_CONFIGS['Interview'];
+  return {
+    ...base,
+    notifications: base.notifications.map(n => ({ ...n })),
+    requirements: [...base.requirements]
+  };
+};
+
+function SortableAccordionStageItem({ 
+  stage, 
+  index, 
+  totalStages, 
+  updateStage, 
+  removeStage, 
+  isExpanded, 
+  onToggle, 
+  onToggleNotification,
+  isEditing 
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stage.id });
   
   const style = {
@@ -98,79 +134,208 @@ function SortableStageItem({ stage, index, totalStages, updateStage, removeStage
     zIndex: isDragging ? 100 : 50 - index,
   };
 
-  const isTerminal = stage.isTerminal;
+  const stageConfig = stage.config || DEFAULT_STAGE_CONFIGS[stage.systemStage] || DEFAULT_STAGE_CONFIGS['Interview'];
+  const activeTriggersCount = (stageConfig.notifications || []).filter(n => n.active).length;
 
   return (
-    <div ref={setNodeRef} style={style} className="relative w-full group">
-      {index !== totalStages - 1 && (
-        <div className="absolute left-[24px] top-[48px] bottom-[-20px] w-0.5 bg-gray-200 dark:bg-gray-700 z-0"></div>
-      )}
-      
+    <div ref={setNodeRef} style={style} className="w-full">
       <div 
-        onClick={() => onSelect(stage.id)}
-        className={`relative z-10 flex flex-col bg-white dark:bg-[#161c24] rounded-xl border p-3.5 transition-all cursor-pointer ${
-          isSelected 
-            ? 'border-[#1890FF] shadow-sm ring-1 ring-[#1890FF]/30' 
-            : 'border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600'
+        className={`bg-white dark:bg-[#161c24] rounded-xl border transition-all overflow-hidden ${
+          isDragging
+            ? 'opacity-60 border-[#1890FF] shadow-lg scale-[1.01]'
+            : isExpanded
+              ? 'border-[#1890FF]/60 shadow-xs ring-1 ring-[#1890FF]/20'
+              : 'border-gray-200/90 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
         }`}
       >
-        <div className="flex items-center gap-3">
-          {isEditing && (
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1 shrink-0" onClick={e => e.stopPropagation()}>
-              <GripVertical size={16} />
-            </div>
-          )}
-
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${isSelected ? 'bg-[#1890FF] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}>
-            {index + 1}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            {isEditing ? (
-              <input 
-                type="text" 
-                value={stage.customName}
+        {/* Horizontal Accordion Header (Compact) */}
+        <div 
+          onClick={onToggle}
+          className={`flex items-center justify-between gap-3 px-3.5 py-2.5 sm:px-4 sm:py-2.5 cursor-pointer select-none transition-colors ${
+            isExpanded 
+              ? 'bg-blue-50/30 dark:bg-[#1890FF]/5 border-b border-gray-100 dark:border-gray-800/60' 
+              : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/30'
+          }`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {isEditing && (
+              <div 
+                {...attributes} 
+                {...listeners} 
+                className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-0.5 shrink-0 -ml-1" 
                 onClick={e => e.stopPropagation()}
-                onChange={(e) => updateStage(index, 'customName', e.target.value)}
-                className="w-full px-2 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-bold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
-              />
-            ) : (
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{stage.customName}</span>
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStageColor(stage.systemStage)}`}>
-                  {stage.systemStage}
-                </span>
+                title="Drag to reorder stage"
+              >
+                <GripVertical size={14} />
               </div>
             )}
+
+            {/* Step Number */}
+            <div className={`w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors ${
+              isExpanded 
+                ? 'bg-[#1890FF] text-white shadow-xs' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+            }`}>
+              {index + 1}
+            </div>
+
+            {/* Stage Title & Input */}
+            <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5">
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  value={stage.customName}
+                  onClick={e => e.stopPropagation()}
+                  onChange={(e) => updateStage(index, 'customName', e.target.value)}
+                  className="px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF] max-w-xs"
+                />
+              ) : (
+                <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
+                  {stage.customName}
+                </h3>
+              )}
+
+              {/* System Mapping Badge */}
+              <span className={`text-[9.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border w-fit ${getStageColor(stage.systemStage)}`}>
+                {stage.systemStage}
+              </span>
+            </div>
           </div>
 
-          {isEditing && (
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="w-28" onClick={e => e.stopPropagation()}>
-                <SearchableSelect 
-                  options={SYSTEM_STAGES.map(sys => ({ label: sys, value: sys }))}
-                  value={stage.systemStage}
-                  onChange={(value) => updateStage(index, 'systemStage', value)}
-                  showSearch={false}
-                  size="xs"
-                />
-              </div>
-              <button 
-                onClick={(e) => { e.stopPropagation(); removeStage(index); }}
-                className="p-1.5 text-gray-400 hover:text-[#FF5630] rounded-lg transition-colors cursor-pointer"
-                title="Delete stage"
-              >
-                <Trash2 size={14} />
-              </button>
+          {/* Quick Summary Chips (Horizontal) */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="hidden md:flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
+              <span className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800/60 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-800">
+                <Zap size={11} className="text-[#1890FF]" />
+                {activeTriggersCount} {activeTriggersCount === 1 ? 'Trigger' : 'Triggers'}
+              </span>
+              <span className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800/60 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-800">
+                <CheckCircle2 size={11} className="text-[#00A76F]" />
+                {(stageConfig.requirements || []).length} Exit Rules
+              </span>
+              <span className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800/60 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-800">
+                <Clock size={11} className="text-[#FFC107]" />
+                SLA: {stageConfig.sla}
+              </span>
             </div>
-          )}
 
-          {!isEditing && (
-            <div className="shrink-0 text-gray-400">
-              <ArrowRight size={14} className={isSelected ? 'text-[#1890FF] translate-x-0.5' : ''} />
+            {isEditing && (
+              <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                <div className="w-26">
+                  <SearchableSelect 
+                    options={SYSTEM_STAGES.map(sys => ({ label: sys, value: sys }))}
+                    value={stage.systemStage}
+                    onChange={(value) => updateStage(index, 'systemStage', value)}
+                    showSearch={false}
+                    size="xs"
+                  />
+                </div>
+                {totalStages > 2 && (
+                  <button 
+                    onClick={() => removeStage(index)}
+                    className="p-1 text-gray-400 hover:text-[#FF5630] rounded-lg transition-colors cursor-pointer"
+                    title="Delete stage"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Accordion Expand Icon */}
+            <div className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-all ${isExpanded ? 'rotate-180 text-[#1890FF] bg-blue-50/80 dark:bg-[#1890FF]/10' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+              <ChevronDown size={14} />
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Accordion Expanded Body (Compact) */}
+        {isExpanded && (
+          <div className="p-4 sm:p-4.5 bg-white dark:bg-[#161c24] space-y-4 animate-fade-in">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4.5 items-start">
+              
+              {/* Left Column: Automated Actions */}
+              <div className="lg:col-span-6 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Zap size={13} className="text-[#1890FF]" /> Automated Triggers
+                  </h4>
+                  <span className="text-[10.5px] font-bold text-gray-400">{activeTriggersCount} Active</span>
+                </div>
+
+                <div className="space-y-2">
+                  {(stageConfig.notifications || []).map((notif) => {
+                    const Icon = NOTIF_ICONS[notif.id] || Zap;
+                    return (
+                      <div 
+                        key={notif.id} 
+                        className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50/60 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2.5">
+                          <div className="w-7 h-7 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                            <Icon size={14} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[12.5px] font-bold text-[#212b36] dark:text-white truncate">{notif.title}</p>
+                            <p className="text-[10.5px] text-gray-400 truncate">{notif.desc}</p>
+                          </div>
+                        </div>
+
+                        {/* Standard Platform Compact Mini Toggle Switch */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider select-none ${notif.active ? 'text-[#1890FF]' : 'text-gray-400'}`}>
+                            {notif.active ? 'Active' : 'Off'}
+                          </span>
+                          <div
+                            role="switch"
+                            aria-checked={notif.active}
+                            onClick={() => onToggleNotification(stage.id, notif.id)}
+                            className={`relative inline-flex w-7 h-4 items-center rounded-full transition-colors duration-200 ease-in-out cursor-pointer select-none p-0.5 shadow-inner ${
+                              notif.active ? 'bg-[#1890FF]' : 'bg-gray-300 dark:bg-gray-700'
+                            }`}
+                          >
+                            <div 
+                              className={`w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out shadow-xs ${
+                                notif.active ? 'translate-x-3' : 'translate-x-0'
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column: Exit Requirements & Guidelines */}
+              <div className="lg:col-span-6 space-y-3">
+                <div>
+                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                    <ShieldCheck size={13} className="text-[#00A76F]" /> Exit Requirements
+                  </h4>
+                  <div className="space-y-1.5">
+                    {(stageConfig.requirements || []).map((req, i) => (
+                      <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50/60 dark:bg-gray-800/30 border border-gray-200/60 dark:border-gray-800">
+                        <CheckCircle2 size={14} className="text-[#00A76F] shrink-0" />
+                        <span className="text-[12px] text-[#454f5b] dark:text-gray-300 font-medium">{req}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Interviewer SLA & Guideline Callout */}
+                <div className="px-3 py-2 rounded-lg bg-blue-50/40 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 flex items-start gap-2">
+                  <Clock size={14} className="text-[#1890FF] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[11px] text-[#1890FF] font-bold mb-0.5">SLA Guideline ({stageConfig.sla})</p>
+                    <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">{stageConfig.guideline}</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -178,40 +343,117 @@ function SortableStageItem({ stage, index, totalStages, updateStage, removeStage
 
 export default function SettingsPipeline({ setSettingsActiveNav }) {
   const navigate = useNavigate();
-  const [editModes, setEditModes] = useState({
-    stages: false,
-    stageDetails: false
-  });
+  const [isEditing, setIsEditing] = useState(false);
 
   const [stages, setStages] = useState([
-    { id: '1', customName: 'Applied', systemStage: 'Applied', isTerminal: false },
-    { id: '2', customName: 'Screening', systemStage: 'Screening', isTerminal: false },
-    { id: '3', customName: 'Technical Interview', systemStage: 'Interview', isTerminal: false },
-    { id: '4', customName: 'Offer Extended', systemStage: 'Offer', isTerminal: false },
-    { id: '5', customName: 'Hired', systemStage: 'Hired', isTerminal: true },
-    { id: '6', customName: 'Rejected', systemStage: 'Rejected', isTerminal: true }
+    { 
+      id: '1', 
+      customName: 'Applied', 
+      systemStage: 'Applied', 
+      isTerminal: false,
+      config: getInitialConfig('Applied')
+    },
+    { 
+      id: '2', 
+      customName: 'Screening', 
+      systemStage: 'Screening', 
+      isTerminal: false,
+      config: getInitialConfig('Screening')
+    },
+    { 
+      id: '3', 
+      customName: 'Technical Interview', 
+      systemStage: 'Interview', 
+      isTerminal: false,
+      config: getInitialConfig('Interview')
+    },
+    { 
+      id: '4', 
+      customName: 'Offer Extended', 
+      systemStage: 'Offer', 
+      isTerminal: false,
+      config: getInitialConfig('Offer')
+    },
+    { 
+      id: '5', 
+      customName: 'Hired', 
+      systemStage: 'Hired', 
+      isTerminal: true,
+      config: getInitialConfig('Hired')
+    },
+    { 
+      id: '6', 
+      customName: 'Rejected', 
+      systemStage: 'Rejected', 
+      isTerminal: true,
+      config: getInitialConfig('Rejected')
+    }
   ]);
 
-  const [selectedStageId, setSelectedStageId] = useState('1');
+  // Track expanded accordion items
+  const [expandedIds, setExpandedIds] = useState(['1']);
+
+  const toggleAccordion = (id) => {
+    setExpandedIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id) 
+        : [...prev, id]
+    );
+  };
+
+  const expandAll = () => setExpandedIds(stages.map(s => s.id));
+  const collapseAll = () => setExpandedIds([]);
 
   const updateStage = (index, field, value) => {
     const newStages = [...stages];
-    newStages[index] = { ...newStages[index], [field]: value };
+    if (field === 'systemStage') {
+      newStages[index] = { 
+        ...newStages[index], 
+        [field]: value,
+        config: getInitialConfig(value)
+      };
+    } else {
+      newStages[index] = { ...newStages[index], [field]: value };
+    }
     setStages(newStages);
   };
 
+  const toggleNotification = (stageId, notifId) => {
+    setStages(prevStages => 
+      prevStages.map(stage => {
+        if (stage.id !== stageId) return stage;
+        const currentConfig = stage.config || getInitialConfig(stage.systemStage);
+        const updatedNotifs = currentConfig.notifications.map(n => 
+          n.id === notifId ? { ...n, active: !n.active } : n
+        );
+        return {
+          ...stage,
+          config: {
+            ...currentConfig,
+            notifications: updatedNotifs
+          }
+        };
+      })
+    );
+  };
+
   const removeStage = (index) => {
+    const removedId = stages[index]?.id;
     setStages(stages.filter((_, i) => i !== index));
-    if (selectedStageId === stages[index].id) {
-      setSelectedStageId(stages[0]?.id || null);
-    }
+    setExpandedIds(prev => prev.filter(id => id !== removedId));
   };
 
   const addStage = () => {
     const newId = (Math.max(...stages.map(s => parseInt(s.id) || 0), 0) + 1).toString();
-    const newStage = { id: newId, customName: 'New Round', systemStage: 'Interview', isTerminal: false };
+    const newStage = { 
+      id: newId, 
+      customName: 'New Round', 
+      systemStage: 'Interview', 
+      isTerminal: false,
+      config: getInitialConfig('Interview')
+    };
     setStages([...stages, newStage]);
-    setSelectedStageId(newId);
+    setExpandedIds(prev => [...prev, newId]);
   };
 
   const sensors = useSensors(
@@ -230,166 +472,138 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
     }
   };
 
-  const selectedStage = stages.find(s => s.id === selectedStageId) || stages[0];
-  const stageConfig = STAGE_CONFIGS[selectedStage?.systemStage] || STAGE_CONFIGS['Interview'];
-
   return (
-    <div className="flex flex-col animate-fade-in">
-      <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="flex flex-col animate-fade-in space-y-6">
+      <div className="w-full flex-1">
         
-        {/* Left Card: Hiring Stages */}
-        <div className="col-span-1 lg:col-span-5 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
-          <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
+        {/* Main Pipeline Card */}
+        <div className="bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all">
+          
+          {/* Card Header */}
+          <div className="flex items-center justify-between mb-4 pb-3.5 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
-                <GitBranch size={16} />
+              <div className="w-7.5 h-7.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                <GitBranch size={15} />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Pipeline Stages</h2>
-                <p className="text-xs text-gray-500">{stages.length} defined stages</p>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Recruitment Pipeline Stages</h2>
+                <p className="text-[11.5px] text-gray-500">Configure hiring stages, automated candidate notifications, and stage progression rules.</p>
               </div>
             </div>
 
-            {editModes.stages ? (
-              <button
-                onClick={() => setEditModes(prev => ({ ...prev, stages: false }))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
-                title="Done"
-              >
-                <Check size={12} className="text-white stroke-[2.5]" />
-                <span>Done</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setEditModes(prev => ({ ...prev, stages: true }))}
-                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
-                title="Edit"
-              >
-                <Edit2 size={11} className="text-white" />
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-gray-500">
+                <button 
+                  onClick={expandAll}
+                  className="hover:text-[#1890FF] transition-colors cursor-pointer"
+                >
+                  Expand All
+                </button>
+                <span>•</span>
+                <button 
+                  onClick={collapseAll}
+                  className="hover:text-[#1890FF] transition-colors cursor-pointer"
+                >
+                  Collapse All
+                </button>
+              </div>
+
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={addStage}
+                    className="px-2.5 py-1 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus size={13} /> Add Stage
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
+                    title="Done"
+                  >
+                    <Check size={11} className="text-white stroke-[2.5]" />
+                    <span>Done</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
+                  title="Edit Pipeline"
+                >
+                  <Edit2 size={11} className="text-white" />
+                </button>
+              )}
+            </div>
           </div>
 
+          {/* Top Visual Horizontal Stepper Track (Compact) */}
+          <div className="mb-4 p-2.5 bg-gray-50/70 dark:bg-gray-800/40 rounded-xl border border-gray-200/60 dark:border-gray-800 overflow-x-auto custom-scrollbar">
+            <div className="flex items-center gap-1.5 min-w-max">
+              {stages.map((stage, idx) => {
+                const isExpanded = expandedIds.includes(stage.id);
+                return (
+                  <React.Fragment key={stage.id}>
+                    <button
+                      onClick={() => toggleAccordion(stage.id)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11.5px] font-bold transition-all cursor-pointer ${
+                        isExpanded 
+                          ? 'bg-[#1890FF] text-white shadow-xs' 
+                          : 'bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-[#1890FF]/50'
+                      }`}
+                    >
+                      <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9.5px] font-black ${
+                        isExpanded ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+                      }`}>
+                        {idx + 1}
+                      </span>
+                      <span>{stage.customName}</span>
+                    </button>
+                    {idx < stages.length - 1 && (
+                      <ArrowRight size={12} className="text-gray-400 shrink-0" />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Horizontal Accordion Stage Items List (Compact Spacing) */}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={stages.map(s => s.id)} strategy={verticalListSortingStrategy}>
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {stages.map((stage, idx) => (
-                  <SortableStageItem 
+                  <SortableAccordionStageItem 
                     key={stage.id}
                     stage={stage}
                     index={idx}
                     totalStages={stages.length}
                     updateStage={updateStage}
                     removeStage={removeStage}
-                    isSelected={selectedStage?.id === stage.id}
-                    onSelect={setSelectedStageId}
-                    isEditing={editModes.stages}
+                    isExpanded={expandedIds.includes(stage.id)}
+                    onToggle={() => toggleAccordion(stage.id)}
+                    onToggleNotification={toggleNotification}
+                    isEditing={isEditing}
                   />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
 
-          {editModes.stages && (
+          {isEditing && (
             <button 
               onClick={addStage}
-              className="mt-5 w-full py-2.5 border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-[#1890FF] rounded-xl text-xs font-bold text-gray-500 hover:text-[#1890FF] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="mt-4 w-full py-3 border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-[#1890FF] rounded-xl text-xs font-bold text-gray-500 hover:text-[#1890FF] transition-all flex items-center justify-center gap-2 cursor-pointer bg-gray-50/40 dark:bg-gray-800/20"
             >
-              <Plus size={14} /> Add Stage
+              <Plus size={15} /> Add New Pipeline Stage
             </button>
           )}
+
         </div>
-
-        {/* Right Card: Stage Details & Automations */}
-        {selectedStage && (
-          <div className="col-span-1 lg:col-span-7 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
-            <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
-                  <Settings2 size={16} />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-[#212b36] dark:text-white">{selectedStage.customName}</h2>
-                  <p className="text-xs text-gray-500">Automations & Stage Settings</p>
-                </div>
-              </div>
-
-              {editModes.stageDetails ? (
-                <button
-                  onClick={() => setEditModes(prev => ({ ...prev, stageDetails: false }))}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
-                  title="Done"
-                >
-                  <Check size={12} className="text-white stroke-[2.5]" />
-                  <span>Done</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setEditModes(prev => ({ ...prev, stageDetails: true }))}
-                  className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
-                  title="Edit"
-                >
-                  <Edit2 size={11} className="text-white" />
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              {/* Automated Actions */}
-              <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Automated Triggers</h4>
-                <div className="space-y-2.5">
-                  {stageConfig.notifications.map((notif) => {
-                    const Icon = notif.icon;
-                    return (
-                      <div key={notif.id} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center">
-                            <Icon size={16} />
-                          </div>
-                          <div>
-                            <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{notif.title}</p>
-                            <p className="text-[11px] text-gray-400">{notif.desc}</p>
-                          </div>
-                        </div>
-                        {editModes.stageDetails ? (
-                          <input type="checkbox" defaultChecked={notif.active} className="w-4 h-4 accent-[#1890FF] cursor-pointer" />
-                        ) : (
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${notif.active ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-gray-100 text-gray-400'}`}>
-                            {notif.active ? 'Active' : 'Disabled'}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Stage Requirements */}
-              <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Exit Requirements</h4>
-                <div className="space-y-2">
-                  {stageConfig.requirements.map((req, i) => (
-                    <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800">
-                      <CheckCircle2 size={16} className="text-[#00A76F] shrink-0" />
-                      <span className="text-[13px] text-[#454f5b] dark:text-gray-300 font-medium">{req}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Guidelines */}
-              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
-                <p className="text-xs text-[#1890FF] font-bold mb-1">Interviewer SLA & Guideline</p>
-                <p className="text-[12px] text-gray-600 dark:text-gray-300 leading-relaxed">{stageConfig.guideline}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Bottom Navigation */}
-      <div className="max-w-6xl w-full mx-auto flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
+      <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
         <button 
           onClick={() => setSettingsActiveNav('Hiring Team')}
           className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"

@@ -18,7 +18,7 @@ export default function ApprovalsPage() {
  <p className="text-sm text-black dark:text-gray-400 mt-1">Review and approve pending requests.</p>
  </div>
  <button 
- onClick={() => navigate('/dashboard/job-setup/overview', { state: { jobData: { title: 'New Requisition' }, from: { name: 'Approvals', path: '/dashboard/approvals' } } })}
+ onClick={() => navigate('/dashboard/agencies', { state: { jobData: { title: 'New Requisition', status: 'Draft' }, tab: 'Job Setup' } })}
  className="px-4 py-2 text-sm font-bold text-white bg-[#212b36] dark:bg-white dark:text-[#212b36] rounded-xl hover:bg-black dark:hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-[0_2px_10px_rgb(0,0,0,0.08)] cursor-pointer"
  title="Create a new job"
  >

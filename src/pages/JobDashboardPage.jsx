@@ -1,3 +1,14 @@
+const getCurrencySymbol = (curr) => {
+  if (!curr) return '₹';
+  const c = String(curr).trim().toUpperCase();
+  if (c === 'INR' || c === 'RS' || c === 'RUPEE' || c === 'RUPEES' || c === '₹') return '₹';
+  if (c === 'USD' || c === '$') return '$';
+  if (c === 'EUR' || c === '€') return '€';
+  if (c === 'GBP' || c === '£') return '£';
+  if (c === 'JPY' || c === '¥') return '¥';
+  return curr;
+};
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2 } from 'lucide-react';
@@ -2037,9 +2048,9 @@ export default function JobDashboardPage() {
  {activeTab === 'Job Setup' && (
  <div className="flex min-h-[600px] bg-[#F9FAFB] dark:bg-[#11161d] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs mt-4 overflow-hidden">
  {/* Sidebar */}
- <div className="w-64 border-r border-gray-200 dark:border-gray-800 bg-[#F9FAFB] dark:bg-[#161c24]/50 py-6 shrink-0">
- <h3 className="text-xs font-bold text-gray-400 mb-4 px-6">Job Setup</h3>
- <div className="space-y-1 px-3">
+ <div className="w-56 border-r border-gray-200 dark:border-gray-800 bg-[#F9FAFB] dark:bg-[#161c24]/50 py-5 shrink-0">
+ <h3 className="text-xs font-bold text-gray-400 mb-3 px-4 uppercase tracking-wider">Job Setup</h3>
+ <div className="space-y-1 px-2.5">
  {[
  { name: 'Overview', icon: FileText },
  { name: 'Description & Skills', icon: ClipboardList },
@@ -2056,7 +2067,7 @@ export default function JobDashboardPage() {
  <div
  key={subItem.name}
  onClick={() => setSettingsActiveNav(subItem.name)}
- className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-colors cursor-pointer ${
+ className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors cursor-pointer ${
  isSubActive
  ? 'bg-[#00A76F]/10 text-[#00A76F] font-bold'
  : 'text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-[#212b36] dark:hover:text-white'
@@ -2071,8 +2082,8 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Content Area */}
- <div className="flex-1 bg-[#F9FAFB] dark:bg-[#11161d] p-6 lg:p-8">
- <div className="max-w-6xl mx-auto">
+ <div className="flex-1 bg-[#F9FAFB] dark:bg-[#11161d] p-4 sm:p-5 lg:p-6 min-w-0">
+ <div className="w-full">
 
  <JobSetupHeader 
  title={settingsActiveNav} 
@@ -2240,7 +2251,6 @@ export default function JobDashboardPage() {
  <div className="flex items-center gap-4 pt-2">
  <div className="w-1/3">
  <label className="block text-xs font-bold text-gray-500">Approved Salary Range</label>
- <span className="text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-md text-[11px] font-bold mt-1 inline-block">{setupJobData.currency}</span>
  </div>
  <div className="flex-1">
  {editModes.budget ? (
@@ -2255,7 +2265,7 @@ export default function JobDashboardPage() {
  />
  ) : (
  <div className="text-[13px] font-bold text-[#212b36] dark:text-white py-2">
- {setupJobData.currency} {Number(setupJobData.salaryMin || 50000).toLocaleString()} - {Number(setupJobData.salaryMax || 150000).toLocaleString()}
+ {getCurrencySymbol(setupJobData.currency)} {Number(setupJobData.salaryMin || 50000).toLocaleString()} - {getCurrencySymbol(setupJobData.currency)} {Number(setupJobData.salaryMax || 150000).toLocaleString()}
  </div>
  )}
  </div>
@@ -2432,10 +2442,12 @@ export default function JobDashboardPage() {
  </div>
  )}
 
- {isEditRankingModalOpen && (
+   {isEditRankingModalOpen && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[75vh] flex flex-col overflow-hidden">
- <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50 shrink-0">
+ <div className="bg-white dark:bg-[#161c24] rounded-3xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[88vh] flex flex-col overflow-hidden">
+ 
+ {/* Modal Header */}
+ <div className="p-6 pb-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50 shrink-0">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 bg-[#1890FF]/10 text-[#1890FF] rounded-xl flex items-center justify-center">
  <Settings2 size={20} />
@@ -2450,19 +2462,37 @@ export default function JobDashboardPage() {
  </button>
  </div>
  
- <div className="w-full flex-1 overflow-hidden flex flex-col mb-2">
+ {/* Modal Body (Scrollable) */}
+ <div className="p-6 py-4 w-full flex-1 overflow-y-auto custom-scrollbar flex flex-col">
   <SettingsRankingRules 
     hideFooter={true} 
     setSettingsActiveNav={() => {}} 
-    onCancel={() => setIsEditRankingModalOpen(false)}
-    onSave={() => { setIsEditRankingModalOpen(false); alert('AI Ranking Rules updated successfully.'); }}
   />
  </div>
+
+ {/* Modal Footer (Fixed at bottom outside scroll area) */}
+ <div className="p-4 px-6 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-end gap-3 bg-gray-50/50 dark:bg-[#161c24] shrink-0">
+  <button 
+    onClick={() => setIsEditRankingModalOpen(false)}
+    className="px-5 py-2.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+  >
+    Cancel
+  </button>
+  <button 
+    onClick={() => {
+      setIsEditRankingModalOpen(false);
+    }}
+    className="px-6 py-2.5 bg-[#1890FF] text-white rounded-xl text-xs font-bold hover:bg-[#0077e6] transition-colors shadow-[0_4px_12px_rgba(24,144,255,0.24)] cursor-pointer"
+  >
+    Save Changes
+  </button>
+ </div>
+
  </div>
  </div>
  )}
 
- {/* Floating Compare Panel at Bottom Center */}
+       {/* Floating Compare Panel at Bottom Center */}
       {selectedAppCandidates.length >= 2 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-[#161c24] text-white dark:bg-[#1E2732] border border-gray-700/70 shadow-[0_16px_40px_rgba(0,0,0,0.35)] rounded-2xl px-4 py-2.5 flex items-center gap-3.5 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200">
           <div className="flex items-center gap-2">

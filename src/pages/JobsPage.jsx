@@ -346,7 +346,7 @@ export default function JobsPage() {
  onClick={(e) => {
  e.stopPropagation();
  setOpenActionMenuId(null);
- navigate('/dashboard/job-setup/overview', { state: { jobData: job, from: { name: 'Job List', path: '/dashboard/jobs' } } });
+ navigate('/dashboard/agencies', { state: { jobData: job, tab: 'Job Setup' } });
  }}
  className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
  >
