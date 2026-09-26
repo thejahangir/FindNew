@@ -15,7 +15,7 @@ export default function AgencyLayout({ children }) {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${theme === 'dark' ? 'dark bg-[#161c24]' : 'bg-gray-100'}`}>
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${theme === 'dark' ? 'dark bg-[#0f141a]' : 'bg-[#E5E7EB]'}`}>
       <AgencyNavbar isSidebarCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
       
       <div className="flex flex-1 pt-16">

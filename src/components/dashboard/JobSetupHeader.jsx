@@ -6,7 +6,7 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
  const [showModal, setShowModal] = useState(false);
 
  return (
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3.5">
  <div>
  <h1 className="text-2xl font-bold text-[#212b36] dark:text-white">{title}</h1>
  <p className="text-sm text-black dark:text-gray-400 mt-1">{subtitle}</p>

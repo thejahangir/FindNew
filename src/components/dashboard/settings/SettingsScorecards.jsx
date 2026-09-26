@@ -133,18 +133,18 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
   const allAttributes = Array.from(new Set(categories.flatMap(c => c.attributes)));
 
   return (
-    <div className="p-8 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in">
-      <div className="max-w-6xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="flex flex-col animate-fade-in">
+      <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Card: Categories & Attributes */}
-        <div className="col-span-1 lg:col-span-6 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col">
+        <div className="col-span-1 lg:col-span-6 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
-                <LayoutTemplate size={20} />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                <LayoutTemplate size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">Scorecard Rubrics</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Scorecard Rubrics</h2>
                 <p className="text-xs text-gray-500">Evaluation categories and criteria.</p>
               </div>
             </div>
@@ -152,19 +152,19 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
             {editModes.categories ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, categories: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={12} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, categories: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>
@@ -249,14 +249,14 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
         </div>
 
         {/* Right Card: Interview Rounds Mapping */}
-        <div className="col-span-1 lg:col-span-6 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col">
+        <div className="col-span-1 lg:col-span-6 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] flex items-center justify-center shrink-0">
-                <Target size={20} />
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] flex items-center justify-center shrink-0">
+                <Target size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">Interview Focus Rounds</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Interview Focus Rounds</h2>
                 <p className="text-xs text-gray-500">Mapping rubrics to specific interview stages.</p>
               </div>
             </div>
@@ -264,19 +264,19 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
             {editModes.rounds ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, rounds: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={12} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, rounds: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>

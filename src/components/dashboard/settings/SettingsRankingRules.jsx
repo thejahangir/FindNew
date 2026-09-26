@@ -74,7 +74,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
   const [rules, setRules] = useState([
     { id: '1', skill: 'PyTorch & Deep Learning Foundations', weight: 1.8, color: '#1890FF', description: 'Candidates must possess foundational knowledge in distributed deep learning, loss formulations, and tensor manipulations.' },
     { id: '2', skill: 'Distributed LLM Training (DeepSpeed/Megatron)', weight: 1.6, color: '#00A76F', description: 'Proven hands-on experience scaling large model checkpoints across multi-node GPU clusters.' },
-    { id: '3', skill: 'Multimodal Architectures & Vision-Language', weight: 1.4, color: '#8A2BE2', description: 'Expertise in cross-attention, visual encoders, tokenization strategies, and multimodal alignment.' },
+    { id: '3', skill: 'Multimodal Architectures & Vision-Language', weight: 1.4, color: '#1890FF', description: 'Expertise in cross-attention, visual encoders, tokenization strategies, and multimodal alignment.' },
     { id: '4', skill: 'Top-tier Research Publications (NeurIPS/ICML)', weight: 1.2, color: '#FFC107', description: 'Authorship in peer-reviewed machine learning venues demonstrates theoretical rigor.' },
     { id: '5', skill: 'System Design & High-Performance Serving', weight: 1.0, color: '#FF5630', description: 'Ability to deploy and optimize low-latency inference runtimes using vLLM or TensorRT.' }
   ]);
@@ -125,18 +125,18 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
   };
 
   return (
-    <div className="p-8 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in">
-      <div className="max-w-6xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="flex flex-col animate-fade-in">
+      <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Card: AI Ranking Criteria */}
-        <div className="col-span-1 lg:col-span-5 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col">
+        <div className="col-span-1 lg:col-span-5 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
-                <BrainCircuit size={20} />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                <BrainCircuit size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">AI Ranking Rules</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">AI Ranking Rules</h2>
                 <p className="text-xs text-gray-500">Weight multipliers & evaluation priority.</p>
               </div>
             </div>
@@ -144,19 +144,19 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
             {editModes.criteria ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, criteria: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={11} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, criteria: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>
@@ -190,14 +190,14 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
 
         {/* Right Card: Rule Configuration */}
         {selectedRule && (
-          <div className="col-span-1 lg:col-span-7 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col">
+          <div className="col-span-1 lg:col-span-7 bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all flex flex-col">
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100 dark:border-gray-800/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-[#FFC107] flex items-center justify-center shrink-0">
-                  <Star size={20} />
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-[#FFC107] flex items-center justify-center shrink-0">
+                  <Star size={16} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#212b36] dark:text-white">Rule Configuration</h2>
+                  <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Rule Configuration</h2>
                   <p className="text-xs text-gray-500">Fine-tune weights and AI evaluation prompt criteria.</p>
                 </div>
               </div>
@@ -205,19 +205,19 @@ export default function SettingsRankingRules({ setSettingsActiveNav }) {
               {editModes.config ? (
                 <button
                   onClick={() => setEditModes(prev => ({ ...prev, config: false }))}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                  className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
                   title="Done"
                 >
-                  <Check size={14} className="text-white stroke-[2.5]" />
+                  <Check size={11} className="text-white stroke-[2.5]" />
                   <span>Done</span>
                 </button>
               ) : (
                 <button
                   onClick={() => setEditModes(prev => ({ ...prev, config: true }))}
-                  className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                  className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                   title="Edit"
                 >
-                  <Edit2 size={14} className="text-white" />
+                  <Edit2 size={11} className="text-white" />
                 </button>
               )}
             </div>

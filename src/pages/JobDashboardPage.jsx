@@ -2035,9 +2035,9 @@ export default function JobDashboardPage() {
 
  {/* SETTINGS TAB */}
  {activeTab === 'Job Setup' && (
- <div className="flex min-h-[600px] bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 mt-4">
+ <div className="flex min-h-[600px] bg-[#F9FAFB] dark:bg-[#11161d] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs mt-4 overflow-hidden">
  {/* Sidebar */}
- <div className="w-64 border-r border-gray-100 dark:border-gray-800/50 bg-gray-50 dark:bg-[#161c24]/50 py-6 shrink-0">
+ <div className="w-64 border-r border-gray-200 dark:border-gray-800 bg-[#F9FAFB] dark:bg-[#161c24]/50 py-6 shrink-0">
  <h3 className="text-xs font-bold text-gray-400 mb-4 px-6">Job Setup</h3>
  <div className="space-y-1 px-3">
  {[
@@ -2071,62 +2071,62 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Content Area */}
- <div className="flex-1 bg-white dark:bg-[#161c24]">
- <div className="p-8 pb-0">
+ <div className="flex-1 bg-[#F9FAFB] dark:bg-[#11161d] p-6 lg:p-8">
  <div className="max-w-6xl mx-auto">
+
  <JobSetupHeader 
  title={settingsActiveNav} 
  subtitle={`Configure ${settingsActiveNav.toLowerCase()} settings for this job`} 
  isConfidential={setupJobData.isConfidential} 
  onConfidentialChange={(val) => setSetupJobData(prev => ({...prev, isConfidential: val}))} 
  />
- </div>
- </div>
+
+
  {settingsActiveNav === 'Overview' && (
- <div className="p-8">
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start max-w-6xl mx-auto">
+ <div>
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
  {/* Left Column */}
  <div className="space-y-5">
  {/* Basic Information Card */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all">
  <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+ <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Basic Information</h2>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Basic Information</h2>
  </div>
  {editModes.basicInfo ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, basicInfo: false }))}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
     title="Done"
   >
-    <Check size={14} className="text-white stroke-[2.5]" />
+    <Check size={12} className="text-white stroke-[2.5]" />
     <span>Done</span>
   </button>
 ) : (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, basicInfo: true }))}
-    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
     title="Edit"
   >
-    <Edit2 size={14} className="text-white" />
+    <Edit2 size={11} className="text-white" />
   </button>
 )}
  </div>
  
  <div className="space-y-5">
  <div className="flex items-center gap-4">
- <div className="w-1/3">
- <label className="block text-xs font-bold text-gray-500 mb-1">Job Title</label>
- <div className="flex items-center gap-2">
- <span className="bg-[#00A76F]/10 text-[#00A76F] text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
- <span className="w-1.5 h-1.5 rounded-full bg-[#00A76F]"></span>
- Published
- </span>
- </div>
- </div>
+
+ <label className="w-1/3 text-xs font-bold text-gray-500">Job Title</label>
+
+
+
+
+
+
+
  <div className="flex-1">
  {editModes.basicInfo ? (
  <input 
@@ -2177,30 +2177,30 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Budget & Headcount Card */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all">
  <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+ <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Budget & Headcount</h2>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Budget & Headcount</h2>
  </div>
  {editModes.budget ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, budget: false }))}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
     title="Done"
   >
-    <Check size={14} className="text-white stroke-[2.5]" />
+    <Check size={12} className="text-white stroke-[2.5]" />
     <span>Done</span>
   </button>
 ) : (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, budget: true }))}
-    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
     title="Edit"
   >
-    <Edit2 size={14} className="text-white" />
+    <Edit2 size={11} className="text-white" />
   </button>
 )}
  </div>
@@ -2267,30 +2267,30 @@ export default function JobDashboardPage() {
  {/* Right Column */}
  <div className="space-y-5">
  {/* Logistics Card */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all">
  <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+ <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+ <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
  </div>
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Logistics</h2>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Logistics</h2>
  </div>
  {editModes.logistics ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, logistics: false }))}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
     title="Done"
   >
-    <Check size={14} className="text-white stroke-[2.5]" />
+    <Check size={12} className="text-white stroke-[2.5]" />
     <span>Done</span>
   </button>
 ) : (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, logistics: true }))}
-    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
     title="Edit"
   >
-    <Edit2 size={14} className="text-white" />
+    <Edit2 size={11} className="text-white" />
   </button>
 )}
  </div>
@@ -2355,30 +2355,30 @@ export default function JobDashboardPage() {
  </div>
 
  {/* Internal Notes Card */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 transition-all ">
+ <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all">
  <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+ <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+ <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
  </div>
- <h2 className="text-lg font-bold text-[#212b36] dark:text-white">Internal Notes</h2>
+ <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Internal Notes</h2>
  </div>
  {editModes.notes ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, notes: false }))}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
     title="Done"
   >
-    <Check size={14} className="text-white stroke-[2.5]" />
+    <Check size={12} className="text-white stroke-[2.5]" />
     <span>Done</span>
   </button>
 ) : (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, notes: true }))}
-    className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+    className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
     title="Edit"
   >
-    <Edit2 size={14} className="text-white" />
+    <Edit2 size={11} className="text-white" />
   </button>
 )}
  </div>
@@ -2427,6 +2427,7 @@ export default function JobDashboardPage() {
  {settingsActiveNav === 'Ranking Rules' && <SettingsRankingRules setSettingsActiveNav={setSettingsActiveNav} />}
  {settingsActiveNav === 'Agencies' && <SettingsAgencies setSettingsActiveNav={setSettingsActiveNav} />}
  {settingsActiveNav === 'Notifications' && <SettingsNotifications setSettingsActiveNav={setSettingsActiveNav} />}
+ </div>
  </div>
  </div>
  )}

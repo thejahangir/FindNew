@@ -67,18 +67,18 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
   };
 
   return (
-    <div className="p-8 flex flex-col min-h-[calc(100vh-100px)] animate-fade-in">
-      <div className="max-w-6xl w-full mx-auto flex-1 space-y-6">
+    <div className="flex flex-col animate-fade-in">
+      <div className="w-full flex-1 space-y-6">
         
         {/* Card 1: Scorecard Notifications */}
-        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800/50">
+        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all border border-gray-200/90 dark:border-gray-800">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
-                <FileSignature size={20} />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                <FileSignature size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">Scorecard & Evaluation Alerts</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Scorecard & Evaluation Alerts</h2>
                 <p className="text-xs text-gray-500">Automated reminder schedules and submission notices for interviewers.</p>
               </div>
             </div>
@@ -86,19 +86,19 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
             {editModes.scorecards ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, scorecards: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={11} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, scorecards: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>
@@ -187,14 +187,14 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
         </div>
 
         {/* Card 2: Candidate Notifications */}
-        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800/50">
+        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all border border-gray-200/90 dark:border-gray-800">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] flex items-center justify-center shrink-0">
-                <Users size={20} />
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] flex items-center justify-center shrink-0">
+                <Users size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">Candidate Inbound & Pipeline Alerts</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Candidate Inbound & Pipeline Alerts</h2>
                 <p className="text-xs text-gray-500">Configure recipient groups for new applicants, referrals, and agency submissions.</p>
               </div>
             </div>
@@ -202,19 +202,19 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
             {editModes.candidates ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, candidates: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={11} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, candidates: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>
@@ -262,14 +262,14 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
         </div>
 
         {/* Card 3: Other Notifications */}
-        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800/50">
+        <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-all border border-gray-200/90 dark:border-gray-800">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                <Activity size={20} />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0">
+                <Activity size={16} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">Periodic Reports & SLA Alerts</h2>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Periodic Reports & SLA Alerts</h2>
                 <p className="text-xs text-gray-500">Weekly recruiting summaries and candidate stagnation SLA warnings.</p>
               </div>
             </div>
@@ -277,19 +277,19 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
             {editModes.general ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, general: false }))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
-                <Check size={14} className="text-white stroke-[2.5]" />
+                <Check size={11} className="text-white stroke-[2.5]" />
                 <span>Done</span>
               </button>
             ) : (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, general: true }))}
-                className="w-8 h-8 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-sm cursor-pointer shrink-0"
+                className="w-6 h-6 rounded-full bg-[#1890FF] text-white flex items-center justify-center hover:bg-[#0077e6] transition-all shadow-xs cursor-pointer shrink-0"
                 title="Edit"
               >
-                <Edit2 size={14} className="text-white" />
+                <Edit2 size={11} className="text-white" />
               </button>
             )}
           </div>
@@ -309,7 +309,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
                         onClick={() => toggleRecipient('general', 'weeklyReport', opt)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           isSelected 
-                            ? 'bg-purple-600 text-white' 
+                            ? 'bg-[#1890FF] text-white' 
                             : 'bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
                         }`}
                       >
@@ -321,7 +321,7 @@ export default function SettingsNotifications({ setSettingsActiveNav }) {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {generalSettings.weeklyReport.map((rec, i) => (
-                    <span key={i} className="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs font-bold">
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-[#1890FF]/10 text-[#1890FF] text-xs font-bold">
                       {rec}
                     </span>
                   ))}

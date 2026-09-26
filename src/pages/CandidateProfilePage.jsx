@@ -617,7 +617,7 @@ const buildActivityFeed = (name) => [
  title: 'AI screening completed · 9.8/10 match',
  detail: 'Strong React/Node baseline. Limited AI research publications — probe in interview.',
  icon: Sparkles,
- tone: 'purple'
+ tone: 'blue'
  },
  {
  id: 15,
@@ -649,7 +649,7 @@ const TONE_STYLES = {
  blue: 'bg-[#1890FF]/10 text-[#1890FF]',
  green: 'bg-[#00A76F]/10 text-[#00A76F]',
  amber: 'bg-[#FFC107]/10 text-[#FFC107]',
- purple: 'bg-[#8E33FF]/10 text-[#8E33FF]',
+ purple: 'bg-[#1890FF]/10 text-[#1890FF]',
  gray: 'bg-gray-100 dark:bg-gray-800 text-gray-500'
 };
 
@@ -1407,7 +1407,7 @@ export default function CandidateProfilePage() {
 
       {scorecardView === 'option1' ? (
       <div className="space-y-6">
-        {/* OVERARCHING SUMMARY */}
+        {/* OVERARCHING SUMMARY (INTERVIEW SUMMARY & AGGREGATED ATTRIBUTES) - COMMENTED OUT TEMPORARILY
         <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-8 mt-6">
           <div>
             <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white uppercase tracking-wider mb-4">Interview Summary</h3>
@@ -1467,7 +1467,7 @@ export default function CandidateProfilePage() {
               })}
             </div>
 
-            {/* Rating Scale Legend */}
+            // Rating Scale Legend
             <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50/60 dark:bg-gray-800/30 p-3 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rating Scale Legend:</span>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
@@ -1491,6 +1491,7 @@ export default function CandidateProfilePage() {
             </div>
           </div>
         </div>
+        */}
 
         <div className="flex items-center justify-between mt-8 mb-4">
           <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
@@ -1657,7 +1658,7 @@ export default function CandidateProfilePage() {
       </div>
       ) : (
       <div className="space-y-6">
-        {/* OVERARCHING SUMMARY */}
+        {/* OVERARCHING SUMMARY (INTERVIEW SUMMARY & AGGREGATED ATTRIBUTES) - COMMENTED OUT TEMPORARILY
         <div className="bg-transparent rounded-none border-b border-gray-200 dark:border-gray-800 p-2 space-y-6 mt-6 pb-8">
           <div>
             <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Interview Summary</h3>
@@ -1711,7 +1712,7 @@ export default function CandidateProfilePage() {
               })}
             </div>
 
-            {/* Rating Scale Legend */}
+            // Rating Scale Legend
             <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
@@ -1732,6 +1733,7 @@ export default function CandidateProfilePage() {
             </div>
           </div>
         </div>
+        */}
 
         <div className="flex items-center justify-between mt-8 mb-4">
           <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
@@ -1849,6 +1851,29 @@ export default function CandidateProfilePage() {
                               </div>
                             </div>
                           ))}
+
+                          {/* Rating Scale Legend */}
+                          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
+                            <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
+                                <span>Unassessed</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
+                                <span>Beginner</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
+                                <span>Competent</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
+                                <span>Advanced</span>
+                              </div>
+                            </div>
+                          </div>
 
                           {/* Notes */}
                           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
