@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, MoreVertical, Briefcase, MapPin, 
  Users, Clock, CheckCircle, AlertCircle, Calendar, 
@@ -490,8 +491,8 @@ export default function JobsPage() {
  </div>
 
  {/* Send to Agency Modal */}
- {isSendAgencyModalOpen && (
- <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+ {isSendAgencyModalOpen && createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#212b36] rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col scale-in-center">
  
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10">
@@ -571,12 +572,13 @@ export default function JobsPage() {
  </button>
  </div>
  </div>
- </div>
+ </div>,
+ document.body
  )}
 
  {/* Custom Alert Modal */}
- {customAlert && (
- <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+ {customAlert && createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#212b36] rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col scale-in-center items-center text-center p-8 border border-gray-100 dark:border-gray-800/50">
  <div className="w-20 h-20 bg-[#00A76F]/10 text-[#00A76F] rounded-full flex items-center justify-center mb-6">
  <CheckCircle size={40} />
@@ -592,12 +594,13 @@ export default function JobsPage() {
  Done
  </button>
  </div>
- </div>
+ </div>,
+ document.body
  )}
 
  {/* Create Job Modal */}
- {isCreateModalOpen && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+ {isCreateModalOpen && createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] w-full max-w-lg rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800/50 flex flex-col max-h-[90vh]">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white">{editingJobId ? 'Edit Job' : 'Create New Job'}</h2>
@@ -874,14 +877,14 @@ export default function JobsPage() {
  </div>
  </>
  )}
- 
- </div>
- </div>
- )}
+            </div>
+          </div>,
+          document.body
+        )}
 
- {/* View Job Modal */}
- {isViewJobModalOpen && selectedJobToView && (
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      {/* View Job Modal */}
+ {isViewJobModalOpen && selectedJobToView && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
  <div>
@@ -901,12 +904,13 @@ export default function JobsPage() {
  </div>
  </div>
  </div>
- </div>
- )}
+        </div>,
+        document.body
+      )}
 
  {/* Toast Notification */}
- {successMessage && (
- <div className="fixed top-6 right-6 z-[60] bg-white dark:bg-[#161c24] border border-[#00A76F]/20 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl p-4 flex items-center gap-4 animate-fade-in transform transition-all">
+ {successMessage && createPortal(
+        <div className="fixed top-6 right-6 z-[9999] bg-white dark:bg-[#161c24] border border-[#00A76F]/20 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl p-4 flex items-center gap-4 animate-fade-in transform transition-all">
  <div className="w-10 h-10 rounded-full bg-[#00A76F]/10 flex items-center justify-center text-[#00A76F] shrink-0">
  <CheckCircle size={20} />
  </div>
@@ -917,8 +921,9 @@ export default function JobsPage() {
  <button onClick={() => setSuccessMessage(null)} className="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
  <X size={16} />
  </button>
- </div>
- )}
+ </div>,
+        document.body
+      )}
  </>
  );
 }

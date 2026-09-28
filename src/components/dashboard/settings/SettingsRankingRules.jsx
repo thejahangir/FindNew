@@ -57,7 +57,7 @@ function SortableRuleCard({ rule, idx, isEditing, onUpdate, onDelete }) {
             </div>
           )}
           
-          <span className="w-5 h-5 rounded-full bg-[#1890FF]/10 text-[#1890FF] text-[10.5px] font-bold flex items-center justify-center shrink-0">
+          <span className="w-5 h-5 rounded-full bg-[#1890FF]/10 text-[#1890FF] text-[11px] font-bold flex items-center justify-center shrink-0">
             {idx + 1}
           </span>
 
@@ -68,10 +68,10 @@ function SortableRuleCard({ rule, idx, isEditing, onUpdate, onDelete }) {
                 value={rule.skill}
                 onChange={(e) => onUpdate(rule.id, 'skill', e.target.value)}
                 placeholder="Criterion Name..."
-                className="w-full px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                className="w-full px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-bold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
               />
             ) : (
-              <h3 className="text-xs font-bold text-[#212b36] dark:text-white truncate">
+              <h3 className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
                 {rule.skill || 'Untitled Criterion'}
               </h3>
             )}
@@ -91,7 +91,7 @@ function SortableRuleCard({ rule, idx, isEditing, onUpdate, onDelete }) {
                 <Minus size={10} className="stroke-[3]" />
               </button>
               
-              <span className="w-10 text-center text-[11px] font-black text-[#1890FF] select-none">
+              <span className="w-10 text-center text-[12px] font-black text-[#1890FF] select-none">
                 {weightValue.toFixed(1)}x
               </span>
 
@@ -105,7 +105,7 @@ function SortableRuleCard({ rule, idx, isEditing, onUpdate, onDelete }) {
               </button>
             </div>
           ) : (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/20 text-[11px] font-bold">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/20 text-[12px] font-bold">
               {weightValue.toFixed(1)}x Weight
             </span>
           )}
@@ -132,10 +132,10 @@ function SortableRuleCard({ rule, idx, isEditing, onUpdate, onDelete }) {
             value={rule.description}
             onChange={(e) => onUpdate(rule.id, 'description', e.target.value)}
             placeholder="AI evaluation instructions for this criterion..."
-            className="w-full px-2.5 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF] resize-none"
+            className="w-full px-2.5 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF] resize-none"
           />
         ) : (
-          <p className="text-[11.5px] text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+          <p className="text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
             {rule.description || <span className="italic text-gray-400">No custom guideline specified.</span>}
           </p>
         )}
@@ -265,7 +265,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
                 <Loader2 size={24} className="animate-spin text-[#1890FF]" />
               </div>
               <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Parsing Job Description...</h3>
-              <p className="text-xs text-gray-500 mt-1">Extracting core competencies and generating weighted evaluation rules.</p>
+              <p className="text-[12px] text-gray-500 mt-1">Extracting core competencies and generating weighted evaluation rules.</p>
             </div>
           )}
 
@@ -277,7 +277,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
               </div>
               <div>
                 <h2 className="text-sm font-bold text-[#212b36] dark:text-white">AI Ranking Rules</h2>
-                <p className="text-[11.5px] text-gray-500">
+                <p className="text-[12px] text-gray-500">
                   Criteria prioritization, weight multipliers, and AI evaluation instructions arranged vertically by precedence.
                 </p>
               </div>
@@ -290,7 +290,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
                 {/* Re-upload / Change JD */}
                 <button
                   onClick={() => document.getElementById('change-jd-upload')?.click()}
-                  className="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                   title="Upload a different Job Description"
                 >
                   <input 
@@ -307,7 +307,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
                 {/* Add Criterion Button */}
                 <button 
                   onClick={handleAddRule}
-                  className="px-2.5 py-1 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-[13px] font-bold transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <Plus size={13} /> Add Criterion
                 </button>
@@ -316,7 +316,7 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
                 {isEditing ? (
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[13px] font-bold cursor-pointer shrink-0"
                     title="Done"
                   >
                     <Check size={11} className="text-white stroke-[2.5]" />
@@ -360,18 +360,18 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
                   <h4 className="text-sm font-bold text-[#212b36] dark:text-white mb-1">
                     Upload Job Description to Generate Rules
                   </h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto leading-relaxed">
+                  <p className="text-[12px] text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto leading-relaxed">
                     Upload your job description document (PDF, DOCX, or TXT) and AI will automatically extract key evaluation criteria and weights.
                   </p>
 
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1890FF] text-white text-xs font-bold hover:bg-[#0077e6] transition-all shadow-xs">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1890FF] text-white text-[13px] font-bold hover:bg-[#0077e6] transition-all shadow-xs">
                     <Sparkles size={13} />
                     Browse & Upload File
                   </div>
                 </div>
 
                 {/* Quick Action alternatives */}
-                <div className="mt-4 flex items-center justify-center gap-3 text-xs">
+                <div className="mt-4 flex items-center justify-center gap-3 text-[13px]">
                   <button
                     onClick={handleUseSampleJd}
                     className="text-gray-500 dark:text-gray-400 hover:text-[#1890FF] font-semibold transition-colors cursor-pointer flex items-center gap-1"
@@ -398,15 +398,15 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
             <>
               {/* Active Job Description Source Banner */}
               {jdFile && (
-                <div className="mb-3 px-3 py-2 rounded-xl bg-blue-50/40 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 flex items-center justify-between gap-3 text-xs">
+                <div className="mb-3 px-3 py-2 rounded-xl bg-blue-50/40 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 flex items-center justify-between gap-3 text-[13px]">
                   <div className="flex items-center gap-2 min-w-0">
                     <FileText size={13} className="text-[#1890FF] shrink-0" />
                     <span className="font-bold text-[#212b36] dark:text-white truncate">Source JD: {jdFile.name}</span>
-                    <span className="text-[10px] text-gray-400 font-medium hidden sm:inline">({jdFile.size})</span>
+                    <span className="text-[11px] text-gray-400 font-medium hidden sm:inline">({jdFile.size})</span>
                   </div>
                   <button
                     onClick={() => generateRulesFromJd(jdFile.name)}
-                    className="text-[11px] font-bold text-[#1890FF] hover:text-[#0077e6] flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
+                    className="text-[12px] font-bold text-[#1890FF] hover:text-[#0077e6] flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
                     title="Re-extract rules from current JD"
                   >
                     <RefreshCw size={11} /> Re-extract
@@ -443,20 +443,20 @@ export default function SettingsRankingRules({ setSettingsActiveNav, hideFooter,
         <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
           <button 
             onClick={() => setSettingsActiveNav('Scorecards')}
-            className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="px-6 py-2.5 text-[13px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
           >
             Previous: Back to Scorecards
           </button>
           <div className="flex gap-4">
             <button 
               onClick={() => navigate('/dashboard/jobs')}
-              className="px-6 py-3 text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+              className="px-6 py-3 text-[13px] text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
             >
               Save and Exit
             </button>
             <button 
               onClick={() => setSettingsActiveNav('Agencies')}
-              className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+              className="px-6 py-3 bg-[#1890FF] text-white rounded-xl text-[13px] font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
             >
               Save and Continue to 'Agencies'
             </button>

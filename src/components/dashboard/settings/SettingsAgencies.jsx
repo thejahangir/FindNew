@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Pause, Play, Trash2, X, Building2, Calendar, Check, Search, LayoutGrid, List, Edit2, Mail, ExternalLink } from 'lucide-react';
 
@@ -72,7 +73,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
               </div>
               <div>
                 <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Assigned Recruitment Agencies</h2>
-                <p className="text-xs text-gray-500">Manage external sourcing partners authorized to submit candidate profiles for this role.</p>
+                <p className="text-[12px] text-gray-500">Manage external sourcing partners authorized to submit candidate profiles for this role.</p>
               </div>
             </div>
 
@@ -98,13 +99,13 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="px-3 py-1.5 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-3 py-1.5 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-[13px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <Plus size={14} /> Add Agency
                   </button>
                   <button
                     onClick={() => setEditModes(prev => ({ ...prev, agencies: false }))}
-                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[11px] font-bold cursor-pointer shrink-0"
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[13px] font-bold cursor-pointer shrink-0"
                     title="Done"
                   >
                     <Check size={11} className="text-white stroke-[2.5]" />
@@ -138,12 +139,12 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                       </div>
                       <div>
                         <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{agency.name}</h4>
-                        <p className="text-[11px] text-gray-400">{agency.email}</p>
+                        <p className="text-[12px] text-gray-400">{agency.email}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-1.5 mb-4 text-xs text-gray-500">
+                  <div className="space-y-1.5 mb-4 text-[13px] text-gray-500">
                     <div className="flex items-center justify-between">
                       <span>Assigned:</span>
                       <span className="font-semibold text-[#212b36] dark:text-gray-300">{agency.assignedDate}</span>
@@ -155,7 +156,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                   </div>
 
                   <div className="mt-auto pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                    <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                       agency.status === 'Active' 
                         ? 'bg-[#00A76F]/10 text-[#00A76F]' 
                         : 'bg-[#FFC107]/10 text-[#b78103]'
@@ -167,7 +168,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                       <div className="flex items-center gap-2">
                         <button 
                           onClick={() => toggleAgencyStatus(agency.id)}
-                          className="px-2 py-1 text-[11px] font-bold rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-colors cursor-pointer"
+                          className="px-2 py-1 text-[12px] font-bold rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-colors cursor-pointer"
                         >
                           {agency.status === 'Active' ? 'Pause' : 'Resume'}
                         </button>
@@ -189,12 +190,12 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
-                    <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Agency Name</th>
-                    <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Contact Email</th>
-                    <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Assigned Date</th>
-                    <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Placement Fee</th>
-                    <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                    {editModes.agencies && <th className="py-3 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>}
+                    <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider">Agency Name</th>
+                    <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider">Contact Email</th>
+                    <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider">Assigned Date</th>
+                    <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider">Placement Fee</th>
+                    <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                    {editModes.agencies && <th className="py-3 px-4 text-[12px] font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -210,7 +211,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                       <td className="py-3 px-4 text-[13px] text-gray-500">{agency.assignedDate}</td>
                       <td className="py-3 px-4 text-[13px] font-bold text-[#00A76F]">{agency.fee}</td>
                       <td className="py-3 px-4">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        <span className={`text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                           agency.status === 'Active' 
                             ? 'bg-[#00A76F]/10 text-[#00A76F]' 
                             : 'bg-[#FFC107]/10 text-[#b78103]'
@@ -223,7 +224,7 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
                           <div className="flex items-center justify-end gap-2">
                             <button 
                               onClick={() => toggleAgencyStatus(agency.id)}
-                              className="px-2 py-1 text-[11px] font-bold rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-colors"
+                              className="px-2 py-1 text-[12px] font-bold rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-colors"
                             >
                               {agency.status === 'Active' ? 'Pause' : 'Resume'}
                             </button>
@@ -250,20 +251,20 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
       <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
         <button 
           onClick={() => setSettingsActiveNav('Ranking Rules')}
-          className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+          className="px-6 py-2.5 text-[13px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         >
           Previous: Back to Ranking Rules
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => navigate('/dashboard/jobs')}
-            className="px-6 py-3 text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+            className="px-6 py-3 text-[13px] text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
           >
             Save and Exit
           </button>
           <button 
             onClick={() => setSettingsActiveNav('Notifications')}
-            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl text-[13px] font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
           >
             Save and Continue to 'Notifications'
           </button>
@@ -271,22 +272,22 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
       </div>
 
       {/* Add Agency Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800">
+      {isAddModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 animate-scale-up">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
               <h3 className="text-base font-bold text-[#212b36] dark:text-white">Assign Recruitment Agency</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
                 <X size={18} />
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Select Agency Partner</label>
+                <label className="block text-[13px] font-bold text-gray-500 mb-1">Select Agency Partner</label>
                 <select 
                   value={selectedAgency}
                   onChange={(e) => setSelectedAgency(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                 >
                   <option value="">Choose an agency...</option>
                   {availableAgencies.map(a => (
@@ -298,47 +299,49 @@ export default function SettingsAgencies({ setSettingsActiveNav }) {
             <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
               <button 
                 onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-[13px] font-bold text-gray-600 hover:text-gray-800 cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleAddAgency}
                 disabled={!selectedAgency}
-                className="px-5 py-2 bg-[#1890FF] text-white text-xs font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors shadow-sm disabled:opacity-50"
+                className="px-5 py-2 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 Assign Agency
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirmation Modal */}
-      {confirmDeleteId && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center border border-gray-100 dark:border-gray-800">
+      {confirmDeleteId && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center border border-gray-100 dark:border-gray-800 animate-scale-up">
             <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-[#FF5630] rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={24} />
             </div>
             <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-2">Remove Agency Access?</h3>
-            <p className="text-xs text-gray-500 mb-6">This agency will no longer be able to submit candidates for this job opening.</p>
+            <p className="text-[12px] text-gray-500 mb-6">This agency will no longer be able to submit candidates for this job opening.</p>
             <div className="flex gap-3">
               <button 
                 onClick={() => setConfirmDeleteId(null)}
-                className="flex-1 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                className="flex-1 py-2 text-[13px] font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 onClick={confirmDelete}
-                className="flex-1 py-2 bg-[#FF5630] text-white text-xs font-bold rounded-lg hover:bg-[#FF5630]/90 transition-colors shadow-sm"
+                className="flex-1 py-2 bg-[#FF5630] text-white text-[13px] font-bold rounded-lg hover:bg-[#FF5630]/90 transition-colors shadow-sm cursor-pointer"
               >
                 Remove
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

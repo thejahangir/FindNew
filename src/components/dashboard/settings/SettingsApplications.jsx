@@ -417,7 +417,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
  
  {/* Confirm Draft Modal */}
  {isConfirmDraftModalOpen && createPortal(
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+ <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-sm flex flex-col shadow-2xl animate-scale-up overflow-hidden">
  <div className="p-6 text-center space-y-4">
  <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -461,7 +461,7 @@ export default function SettingsApplications({ setSettingsActiveNav }) {
 
  {/* Hidden Candidates Modal */}
  {hiddenCandidatesModal.isOpen && createPortal(
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4 animate-fade-in">
+ <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-lg flex flex-col shadow-2xl animate-scale-up overflow-hidden max-h-[80vh]">
  <div className="p-6 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50 dark:bg-gray-800/10">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">

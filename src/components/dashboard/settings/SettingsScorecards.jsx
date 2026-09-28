@@ -162,14 +162,14 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Scorecard Rubrics</h2>
-                  <p className="text-[11.5px] text-gray-500">Define traits, technical competencies, and qualifications.</p>
+                  <p className="text-[12px] text-gray-500">Define traits, technical competencies, and qualifications.</p>
                 </div>
               </div>
 
               {editModes.categories ? (
                 <button
                   onClick={() => setEditModes(prev => ({ ...prev, categories: false }))}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-xs font-bold cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[13px] font-bold cursor-pointer shrink-0"
                   title="Done"
                 >
                   <Check size={12} className="text-white stroke-[2.5]" />
@@ -191,8 +191,8 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                 <div key={cat.id} className="p-3.5 rounded-xl bg-gray-50/60 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{cat.name}</h4>
-                      <span className="text-[10px] font-semibold text-gray-400">({cat.attributes.length})</span>
+                      <h4 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{cat.name}</h4>
+                      <span className="text-[12px] font-semibold text-gray-400">({cat.attributes.length})</span>
                     </div>
                     {editModes.categories && (
                       <button 
@@ -209,7 +209,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                     {cat.attributes.map((attr, i) => (
                       <span 
                         key={i} 
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#161c24] border border-gray-200/80 dark:border-gray-700 text-xs font-semibold text-[#212b36] dark:text-white shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#161c24] border border-gray-200/80 dark:border-gray-700 text-[13px] font-semibold text-[#212b36] dark:text-white shadow-xs"
                       >
                         {attr}
                         {editModes.categories && (
@@ -224,7 +224,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                       </span>
                     ))}
                     {cat.attributes.length === 0 && (
-                      <span className="text-xs text-gray-400 italic">No attributes added yet.</span>
+                      <span className="text-[12px] text-gray-400 italic">No attributes added yet.</span>
                     )}
                   </div>
 
@@ -237,11 +237,11 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                         onChange={(e) => setNewAttributeInputs(prev => ({ ...prev, [cat.id]: e.target.value }))}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleAddAttribute(cat.id, newAttributeInputs[cat.id]); }}
                         placeholder="Add an attribute (press Enter)..."
-                        className="flex-1 px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                        className="flex-1 px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                       />
                       <button 
                         onClick={() => handleAddAttribute(cat.id, newAttributeInputs[cat.id])}
-                        className="px-2.5 py-1 bg-[#1890FF] text-white text-xs font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors cursor-pointer shrink-0"
+                        className="px-2.5 py-1 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors cursor-pointer shrink-0"
                       >
                         Add
                       </button>
@@ -259,11 +259,11 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                     onChange={(e) => setNewCategoryName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddCategory(); }}
                     placeholder="New Category Name..."
-                    className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                    className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                   />
                   <button 
                     onClick={handleAddCategory}
-                    className="px-3 py-1.5 bg-[#1890FF] text-white text-xs font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors flex items-center gap-1 shadow-sm cursor-pointer shrink-0"
+                    className="px-3 py-1.5 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors flex items-center gap-1 shadow-sm cursor-pointer shrink-0"
                   >
                     <Plus size={13} /> Add Category
                   </button>
@@ -281,14 +281,14 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Interview Rounds</h2>
-                  <p className="text-[11.5px] text-gray-500">Configure interview stages and attribute assignments.</p>
+                  <p className="text-[12px] text-gray-500">Configure interview stages and attribute assignments.</p>
                 </div>
               </div>
 
               {editModes.rounds ? (
                 <button
                   onClick={() => setEditModes(prev => ({ ...prev, rounds: false }))}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-xs font-bold cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[13px] font-bold cursor-pointer shrink-0"
                   title="Done"
                 >
                   <Check size={12} className="text-white stroke-[2.5]" />
@@ -310,10 +310,10 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                 <div key={round.id} className="p-3.5 rounded-xl bg-gray-50/60 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-[#1890FF]/10 text-[#1890FF] text-[10.5px] font-bold flex items-center justify-center">
+                      <span className="w-5 h-5 rounded-full bg-[#1890FF]/10 text-[#1890FF] text-[11px] font-bold flex items-center justify-center">
                         {idx + 1}
                       </span>
-                      <h4 className="text-[12.5px] font-bold text-[#212b36] dark:text-white">{round.name}</h4>
+                      <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{round.name}</h4>
                     </div>
                     {editModes.rounds && (
                       <button 
@@ -330,7 +330,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                     {round.focusAttributes.map((attr, i) => (
                       <span 
                         key={i}
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 text-[11px] font-bold"
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 text-[12px] font-bold"
                       >
                         {attr}
                         {editModes.rounds && (
@@ -345,7 +345,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                       </span>
                     ))}
                     {round.focusAttributes.length === 0 && (
-                      <span className="text-xs text-gray-400 italic">No focus attributes assigned. Use the table below to assign.</span>
+                      <span className="text-[12px] text-gray-400 italic">No focus attributes assigned. Use the table below to assign.</span>
                     )}
                   </div>
                 </div>
@@ -360,11 +360,11 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                     onChange={(e) => setNewRoundName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddRound(); }}
                     placeholder="New Interview Round Name..."
-                    className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                    className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                   />
                   <button 
                     onClick={handleAddRound}
-                    className="px-3 py-1.5 bg-[#1890FF] text-white text-xs font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors flex items-center gap-1 shadow-sm cursor-pointer shrink-0"
+                    className="px-3 py-1.5 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors flex items-center gap-1 shadow-sm cursor-pointer shrink-0"
                   >
                     <Plus size={13} /> Add Round
                   </button>
@@ -384,14 +384,14 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
               </div>
               <div>
                 <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Focus Attributes per Interview Matrix</h2>
-                <p className="text-[11.5px] text-gray-500">Ensure every critical attribute is evaluated across your interview rounds.</p>
+                <p className="text-[12px] text-gray-500">Ensure every critical attribute is evaluated across your interview rounds.</p>
               </div>
             </div>
 
             {editModes.matrix ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, matrix: false }))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-xs text-[13px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
                 <Check size={12} className="text-white stroke-[2.5]" />
@@ -412,7 +412,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
           <div className="overflow-x-auto rounded-xl border border-gray-200/80 dark:border-gray-800">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-gray-50 dark:bg-[#1a222c] border-b border-gray-200 dark:border-gray-700 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <tr className="bg-gray-50 dark:bg-[#1a222c] border-b border-gray-200 dark:border-gray-700 text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   <th className="py-3 px-4 w-[38%] min-w-[240px]">
                     Evaluation Criteria
                   </th>
@@ -420,7 +420,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                     <th key={round.id} className="py-3 px-4 border-l border-gray-200/80 dark:border-gray-700 text-center align-middle">
                       <div className="flex flex-col items-center justify-center gap-1">
                         <div className="flex items-center justify-center gap-1.5">
-                          <span className="text-[10px] font-semibold text-gray-400">Round {idx + 1}</span>
+                          <span className="text-[11px] font-semibold text-gray-400">Round {idx + 1}</span>
                           {editModes.matrix && (
                             <button
                               onClick={() => handleRemoveRound(round.id)}
@@ -431,7 +431,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                             </button>
                           )}
                         </div>
-                        <span className="font-bold text-xs text-[#212b36] dark:text-white text-center leading-snug">
+                        <span className="font-bold text-[13px] text-[#212b36] dark:text-white text-center leading-snug">
                           {round.name}
                         </span>
                       </div>
@@ -439,7 +439,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 text-xs">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 text-[13px]">
                 {categories.map(category => (
                   <React.Fragment key={category.id}>
                     {/* Category Header Row */}
@@ -451,10 +451,10 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <ChevronDown size={14} className="text-gray-400" />
-                            <span className="text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 font-bold">
+                            <span className="text-[13px] uppercase tracking-wider text-gray-700 dark:text-gray-300 font-bold">
                               {category.name}
                             </span>
-                            <span className="px-2 py-0.5 rounded-full bg-gray-200/80 dark:bg-gray-700 text-[10px] text-gray-600 dark:text-gray-300 font-medium">
+                            <span className="px-2 py-0.5 rounded-full bg-gray-200/80 dark:bg-gray-700 text-[11px] text-gray-600 dark:text-gray-300 font-medium">
                               {category.attributes.length} items
                             </span>
                           </div>
@@ -481,15 +481,15 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
                           {/* Attribute Name & Coverage Badge */}
                           <td className="py-3 px-4 bg-white dark:bg-[#161c24] group-hover:bg-transparent transition-colors">
                             <div className="flex items-center justify-between gap-3">
-                              <span className="text-xs font-semibold text-[#212b36] dark:text-gray-200">
+                              <span className="text-[13px] font-semibold text-[#212b36] dark:text-gray-200">
                                 {attr}
                               </span>
                               {isUncovered ? (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50 whitespace-nowrap">
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50 whitespace-nowrap">
                                   Unassigned
                                 </span>
                               ) : (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                   {roundsCovering} {roundsCovering === 1 ? 'Round' : 'Rounds'}
                                 </span>
                               )}
@@ -540,7 +540,7 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
 
                 {allDefinedAttributes.length === 0 && (
                   <tr>
-                    <td colSpan={rounds.length + 1} className="py-8 text-center text-gray-400 text-xs italic">
+                    <td colSpan={rounds.length + 1} className="py-8 text-center text-gray-400 text-[12px] italic">
                       Add categories and attributes above to build your interview focus matrix.
                     </td>
                   </tr>
@@ -556,20 +556,20 @@ export default function SettingsScorecards({ setSettingsActiveNav }) {
       <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
         <button 
           onClick={() => setSettingsActiveNav('Pipeline')}
-          className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+          className="px-6 py-2.5 text-[13px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         >
           Previous: Back to Pipeline
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => navigate('/dashboard/jobs')}
-            className="px-6 py-3 text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+            className="px-6 py-3 text-[13px] text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
           >
             Save and Exit
           </button>
           <button 
             onClick={() => setSettingsActiveNav('Ranking Rules')}
-            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl text-[13px] font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
           >
             Save and Continue to 'Ranking Rules'
           </button>

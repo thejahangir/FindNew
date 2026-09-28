@@ -68,7 +68,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
             {editModes.description ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, description: false }))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
                 <Check size={12} className="text-white stroke-[2.5]" />
@@ -87,7 +87,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
 
           <div className="flex flex-col flex-1">
             {editModes.description ? (
-              <div className="react-quill-container flex-1 mt-1">
+              <div className="react-quill-container flex-1 mt-1 text-[13px]">
                 <ReactQuill 
                   theme="snow"
                   value={jobData.jdText}
@@ -120,7 +120,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
             {editModes.skills ? (
               <button
                 onClick={() => setEditModes(prev => ({ ...prev, skills: false }))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
                 title="Done"
               >
                 <Check size={12} className="text-white stroke-[2.5]" />
@@ -140,10 +140,10 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
           {editModes.skills ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-gray-500">Skills List ({jobData.skills.length})</span>
+                <span className="text-[13px] font-bold text-gray-500">Skills List ({jobData.skills.length})</span>
                 <button 
                   onClick={addSkill}
-                  className="px-3 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 text-[13px] font-bold text-[#1890FF] bg-[#1890FF]/10 rounded-lg hover:bg-[#1890FF]/20 transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <Plus size={14} /> Add Skill
                 </button>
@@ -171,7 +171,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold text-gray-500">Min Exp:</span>
+                        <span className="text-[12px] font-bold text-gray-500">Min Exp:</span>
                         <div className="flex items-center bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-md p-0.5">
                           <button 
                             onClick={() => handleSkillChange(index, 'years', Math.max(0, Number(skill.years) - 1).toString())}
@@ -179,7 +179,7 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
                           >
                             <Minus size={12} />
                           </button>
-                          <span className="w-6 text-center text-xs font-bold text-[#212b36] dark:text-white">{skill.years}</span>
+                          <span className="w-6 text-center text-[13px] font-bold text-[#212b36] dark:text-white">{skill.years}</span>
                           <button 
                             onClick={() => handleSkillChange(index, 'years', (Number(skill.years) + 1).toString())}
                             className="w-5 h-5 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
@@ -187,19 +187,19 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
                             <Plus size={12} />
                           </button>
                         </div>
-                        <span className="text-[11px] font-medium text-gray-400">yrs</span>
+                        <span className="text-[12px] font-medium text-gray-400">yrs</span>
                       </div>
 
                       <div className="flex items-center gap-1 bg-white dark:bg-[#161c24] p-0.5 rounded-lg border border-gray-200 dark:border-gray-700">
                         <button 
                           onClick={() => handleSkillChange(index, 'required', true)}
-                          className={`px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${skill.required ? 'bg-[#00A76F] text-white' : 'text-gray-500 hover:text-gray-700'}`}
+                          className={`px-2 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${skill.required ? 'bg-[#00A76F] text-white' : 'text-gray-500 hover:text-gray-700'}`}
                         >
                           Must Have
                         </button>
                         <button 
                           onClick={() => handleSkillChange(index, 'required', false)}
-                          className={`px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${!skill.required ? 'bg-[#1890FF] text-white' : 'text-gray-500 hover:text-gray-700'}`}
+                          className={`px-2 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${!skill.required ? 'bg-[#1890FF] text-white' : 'text-gray-500 hover:text-gray-700'}`}
                         >
                           Nice to Have
                         </button>
@@ -218,8 +218,8 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800"
                   >
                     <span className="text-[13px] font-semibold text-[#212b36] dark:text-white">{skill.name}</span>
-                    <span className="text-[11px] text-gray-400 font-medium">• {skill.years} yrs</span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${skill.required ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-[#1890FF]/10 text-[#1890FF]'}`}>
+                    <span className="text-[12px] text-gray-400 font-medium">• {skill.years} yrs</span>
+                    <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded ${skill.required ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-[#1890FF]/10 text-[#1890FF]'}`}>
                       {skill.required ? 'Must Have' : 'Nice to Have'}
                     </span>
                   </div>
@@ -237,20 +237,20 @@ export default function SettingsDescriptionSkills({ setSettingsActiveNav }) {
       <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
         <button 
           onClick={() => setSettingsActiveNav('Overview')}
-          className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+          className="px-6 py-2.5 text-[13px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         >
           Previous: Back to Overview
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => navigate('/dashboard/jobs')}
-            className="px-6 py-3 text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+            className="px-6 py-3 text-[13px] text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
           >
             Save and Exit
           </button>
           <button 
             onClick={() => setSettingsActiveNav('Hiring Team')}
-            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+            className="px-6 py-3 text-[13px] bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
           >
             Save and Continue to 'Hiring Team'
           </button>

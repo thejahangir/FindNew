@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Building2, Check, Mail, Send, UserX, X } from 'lucide-react';
 
 const getInitials = (name = '') => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
@@ -73,8 +74,8 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
 
  return (
  <>
- {open && (
- <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+ {open && createPortal(
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
  <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/50 shrink-0">
  <div className="flex items-center gap-3">
@@ -185,18 +186,20 @@ export default function RejectAgencyModal({ open, candidates = [], onClose, onSe
  </div>
  </div>
  </div>
- </div>
+ </div>,
+ document.body
  )}
 
- {success && (
- <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 animate-fade-in border border-gray-700">
+ {success && createPortal(
+ <div className="fixed bottom-6 right-6 z-[9999] bg-[#212b36] text-white px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 animate-fade-in border border-gray-700">
  <div className="w-6 h-6 bg-[#00A76F]/20 text-[#00A76F] rounded-full flex items-center justify-center shrink-0">
  <Check size={14} strokeWidth={3} />
  </div>
  <div className="font-medium text-sm">
  Rejection {success.profiles === 1 ? 'email' : `${success.profiles} emails`} sent to {success.agencies === 1 ? 'the agency' : `${success.agencies} agencies`}.
  </div>
- </div>
+ </div>,
+ document.body
  )}
  </>
  );

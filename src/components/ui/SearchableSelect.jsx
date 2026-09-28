@@ -49,7 +49,7 @@ export default function SearchableSelect({
           isOpen ? 'border-[#1890FF] ring-2 ring-[#1890FF]/20 bg-white dark:bg-[#161c24]' : (hasError ? 'border-[#FF5630] bg-red-50 dark:bg-[#FF5630]/10' : 'border-gray-200 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700/50')
         }`}
       >
-        <span className={`${size === 'xs' ? 'text-[11.5px]' : 'text-sm'} font-semibold truncate ${selectedOption ? 'text-[#212b36] dark:text-white' : 'text-gray-400 dark:text-gray-400'}`}>
+        <span className={`${size === 'xs' ? 'text-[11.5px]' : 'text-[13px]'} font-semibold truncate ${selectedOption ? 'text-[#212b36] dark:text-white' : 'text-gray-400 dark:text-gray-400'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <span className={`text-gray-400 font-bold px-1 ${size === 'xs' ? 'text-[10px]' : 'text-xs'}`}>
@@ -71,7 +71,7 @@ export default function SearchableSelect({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-gray-800/50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white"
+                  className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-gray-800/50 border-none rounded-lg text-[13px] focus:ring-2 focus:ring-[#1890FF]/20 outline-none text-[#212b36] dark:text-white"
                 />
               </div>
             </div>
@@ -80,7 +80,7 @@ export default function SearchableSelect({
           {/* Options List */}
           <div className="max-h-48 overflow-y-auto custom-scrollbar p-1">
             {filteredOptions.length === 0 ? (
-              <div className="px-3 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              <div className="px-3 py-4 text-center text-[13px] text-gray-500 dark:text-gray-400">
                 No results found
               </div>
             ) : (
@@ -96,11 +96,11 @@ export default function SearchableSelect({
                   }`}
                 >
                   <div className="min-w-0 pr-2">
-                    <div className={`${size === 'xs' ? 'text-[11.5px]' : 'text-sm'} font-semibold truncate ${value === option.value ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover:text-[#1890FF]'}`}>
+                    <div className={`${size === 'xs' ? 'text-[11.5px]' : 'text-[13px]'} font-semibold truncate ${value === option.value ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover:text-[#1890FF]'}`}>
                       {option.label}
                     </div>
                     {option.description && (
-                      <div className={`text-[10.5px] mt-0.5 truncate ${value === option.value ? 'text-[#1890FF]/70' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <div className={`text-[12px] mt-0.5 truncate ${value === option.value ? 'text-[#1890FF]/70' : 'text-gray-500 dark:text-gray-400'}`}>
                         {option.description}
                       </div>
                     )}

@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 const getCurrencySymbol = (curr) => {
   if (!curr) return '₹';
   const c = String(curr).trim().toUpperCase();
@@ -1714,9 +1715,9 @@ export default function JobDashboardPage() {
  )}
 
   {/* Confirm Rejection Modal */}
-  {isConfirmRejectModalOpen && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-    <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800">
+  {isConfirmRejectModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800">
       <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/50">
         <h2 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
           <UserX size={20} className="text-[#FF5630]" /> Confirm Decision
@@ -1786,14 +1787,15 @@ export default function JobDashboardPage() {
           <UserX size={16} /> Yes, Pass
         </button>
       </div>
-    </div>
-  </div>
-  )}
+      </div>
+        </div>,
+        document.body
+      )}
 
   {/* Silent Reject Confirmation Alert */}
-  {isSilentRejectConfirmOpen && (
-  <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in">
-    <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800 text-center">
+  {isSilentRejectConfirmOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up border border-gray-100 dark:border-gray-800 text-center">
       <div className="p-6">
         <div className="w-12 h-12 rounded-full bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center mx-auto mb-4">
           <AlertCircle size={24} />
@@ -1824,9 +1826,10 @@ export default function JobDashboardPage() {
           </button>
         </div>
       </div>
-    </div>
-  </div>
-  )}
+      </div>
+        </div>,
+        document.body
+      )}
 
   {rejectSuccessAlert && (
     <div className="fixed bottom-6 right-6 z-[120] bg-[#212b36] text-white px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 animate-fade-in border border-gray-700">
@@ -1848,9 +1851,9 @@ export default function JobDashboardPage() {
  />
 
  {/* Schedule Interview Modal */}
- {isScheduleModalOpen && (
- <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
- <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+ {isScheduleModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
  <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/50">
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2"><Calendar size={20} className="text-[#1890FF]" /> Schedule Interview</h2>
  <button onClick={() => { setIsScheduleModalOpen(false); setScheduleErrors({}); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors cursor-pointer"><X size={20} /></button>
@@ -1907,14 +1910,15 @@ export default function JobDashboardPage() {
  <button type="submit" className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-colors shadow-md shadow-[#1890FF]/20 cursor-pointer">Send Invite</button>
  </div>
  </form>
- </div>
- </div>
- )}
+        </div>
+      </div>,
+      document.body
+    )}
 
  {/* Invite Modal */}
- {isInviteModalOpen && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
- <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+ {isInviteModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
  <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/50">
  <h2 className="text-lg font-bold text-[#212b36] dark:text-white ">Invite Team Member</h2>
  <button onClick={() => setIsInviteModalOpen(false)} className="text-gray-400 dark:text-white hover:text-gray-600 transition-colors cursor-pointer">
@@ -1947,11 +1951,12 @@ export default function JobDashboardPage() {
  </button>
  <button onClick={handleSendInvite} className="px-4 py-2 text-[13px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-lg transition-colors cursor-pointer">
  Send Invite
- </button>
- </div>
- </div>
- </div>
- )}
+  </button>
+  </div>
+  </div>
+  </div>,
+  document.body
+)}
 
  {/* Success Toast */}
  {showInviteSuccess && (
@@ -1966,9 +1971,9 @@ export default function JobDashboardPage() {
  )}
 
  {/* Side Panel: Candidate Review */}
- {selectedCandidate && (
- <div className="fixed inset-0 z-[100] flex justify-end bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedCandidate(null)}>
- <div className="w-full max-w-[450px] h-full bg-white dark:bg-[#161c24] shadow-2xl p-6 overflow-y-auto transform transition-transform duration-300 translate-x-0" onClick={e => e.stopPropagation()}>
+ {selectedCandidate && createPortal(
+        <div className="fixed inset-0 z-[9999] flex justify-end bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedCandidate(null)}>
+          <div className="w-full max-w-[450px] h-full bg-white dark:bg-[#161c24] shadow-2xl p-6 overflow-y-auto transform transition-transform duration-300 translate-x-0" onClick={e => e.stopPropagation()}>
  <div className="flex justify-between items-center mb-6">
  <h2 className="text-xl font-bold dark:text-white">Candidate Review</h2>
  <button onClick={() => setSelectedCandidate(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full cursor-pointer transition-colors"><X size={20}/></button>
@@ -2039,10 +2044,11 @@ export default function JobDashboardPage() {
  setSelectedCandidate(null);
  }} className="flex-1 py-2 bg-[#FF5630]/10 text-[#FF5630] text-[13px] font-bold rounded-lg hover:bg-[#FF5630]/20 transition-colors cursor-pointer">Reject</button>
  <button onClick={() => setSelectedCandidate(null)} className="flex-1 py-2 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 shadow-md shadow-[#1890FF]/20 transition-all cursor-pointer">Advance Candidate</button>
- </div>
- </div>
- </div>
- )}
+  </div>
+  </div>
+  </div>,
+  document.body
+)}
 
  {/* SETTINGS TAB */}
  {activeTab === 'Job Setup' && (
@@ -2110,7 +2116,7 @@ export default function JobDashboardPage() {
  {editModes.basicInfo ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, basicInfo: false }))}
-    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
     title="Done"
   >
     <Check size={12} className="text-white stroke-[2.5]" />
@@ -2130,7 +2136,7 @@ export default function JobDashboardPage() {
  <div className="space-y-5">
  <div className="flex items-center gap-4">
 
- <label className="w-1/3 text-xs font-bold text-gray-500">Job Title</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Job Title</label>
 
 
 
@@ -2153,7 +2159,7 @@ export default function JobDashboardPage() {
  </div>
  </div>
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Department</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Department</label>
  <div className="flex-1">
  {editModes.basicInfo ? (
  <input 
@@ -2169,7 +2175,7 @@ export default function JobDashboardPage() {
  </div>
  </div>
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Requisition Ref</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Requisition Ref</label>
  <div className="flex-1">
  {editModes.basicInfo ? (
  <input 
@@ -2199,7 +2205,7 @@ export default function JobDashboardPage() {
  {editModes.budget ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, budget: false }))}
-    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
     title="Done"
   >
     <Check size={12} className="text-white stroke-[2.5]" />
@@ -2218,7 +2224,7 @@ export default function JobDashboardPage() {
 
  <div className="space-y-5">
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Headcount Required</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Headcount Required</label>
  <div className="flex-1">
  {editModes.budget ? (
  <div className="flex items-center">
@@ -2250,7 +2256,7 @@ export default function JobDashboardPage() {
 
  <div className="flex items-center gap-4 pt-2">
  <div className="w-1/3">
- <label className="block text-xs font-bold text-gray-500">Approved Salary Range</label>
+ <label className="block text-[13px] font-bold text-gray-500">Approved Salary Range</label>
  </div>
  <div className="flex-1">
  {editModes.budget ? (
@@ -2288,7 +2294,7 @@ export default function JobDashboardPage() {
  {editModes.logistics ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, logistics: false }))}
-    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
     title="Done"
   >
     <Check size={12} className="text-white stroke-[2.5]" />
@@ -2307,7 +2313,7 @@ export default function JobDashboardPage() {
 
  <div className="space-y-5">
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Location</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Location</label>
  <div className="flex-1">
  {editModes.logistics ? (
  <input 
@@ -2323,7 +2329,7 @@ export default function JobDashboardPage() {
  </div>
  </div>
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Employment Type</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Employment Type</label>
  <div className="flex-1">
  {editModes.logistics ? (
  <SearchableSelect 
@@ -2343,7 +2349,7 @@ export default function JobDashboardPage() {
  </div>
  </div>
  <div className="flex items-center gap-4">
- <label className="w-1/3 text-xs font-bold text-gray-500">Work Mode</label>
+ <label className="w-1/3 text-[13px] font-bold text-gray-500">Work Mode</label>
  <div className="flex-1">
  {editModes.logistics ? (
  <SearchableSelect 
@@ -2376,7 +2382,7 @@ export default function JobDashboardPage() {
  {editModes.notes ? (
   <button
     onClick={() => setEditModes(prev => ({ ...prev, notes: false }))}
-    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
     title="Done"
   >
     <Check size={12} className="text-white stroke-[2.5]" />
@@ -2399,11 +2405,11 @@ export default function JobDashboardPage() {
  rows="5"
  value={setupJobData.internalNotes}
  onChange={(e) => setSetupJobData(prev => ({...prev, internalNotes: e.target.value}))}
- className="w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[13px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400"
+ className="w-full px-4 py-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-700/50 rounded-xl text-[12px] focus:bg-white dark:focus:bg-[#161c24] focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400/50 transition-all resize-y text-[#212b36] dark:text-white placeholder-gray-400"
  placeholder="Add any private notes, recruiter context, or approval chain details here. This will not be visible to candidates..."
  ></textarea>
  ) : (
- <div className="text-[13px] text-[#212b36] dark:text-white whitespace-pre-wrap py-3 min-h-[100px]">{setupJobData.internalNotes || '-'}</div>
+ <div className="text-[12px] text-[#212b36] dark:text-white whitespace-pre-wrap py-3 min-h-[100px]">{setupJobData.internalNotes || '-'}</div>
  )}
  </div>
  
@@ -2415,13 +2421,13 @@ export default function JobDashboardPage() {
  <div className="flex gap-4">
  <button 
  onClick={() => navigate('/dashboard/jobs')}
- className="px-6 py-3 text-black hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+ className="px-6 py-3 text-[13px] text-black hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
  >
  Save and Exit
  </button>
  <button 
  onClick={() => setSettingsActiveNav('Description & Skills')}
- className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+ className="px-6 py-3 text-[13px] bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
  >
  Save and Continue to 'Description & Skills'
  </button>
@@ -2442,9 +2448,9 @@ export default function JobDashboardPage() {
  </div>
  )}
 
-   {isEditRankingModalOpen && (
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
- <div className="bg-white dark:bg-[#161c24] rounded-3xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[88vh] flex flex-col overflow-hidden">
+   {isEditRankingModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-3xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 dark:border-gray-800 animate-scale-up max-h-[88vh] flex flex-col overflow-hidden">
  
  {/* Modal Header */}
  <div className="p-6 pb-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50 shrink-0">
@@ -2487,10 +2493,10 @@ export default function JobDashboardPage() {
     Save Changes
   </button>
  </div>
-
  </div>
- </div>
- )}
+        </div>,
+        document.body
+      )}
 
        {/* Floating Compare Panel at Bottom Center */}
       {selectedAppCandidates.length >= 2 && (

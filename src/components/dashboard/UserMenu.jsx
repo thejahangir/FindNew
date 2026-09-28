@@ -72,7 +72,7 @@ export default function UserMenu({ isSidebarCollapsed }) {
 
  {/* Logout Confirmation Modal */}
  {showLogoutConfirm && createPortal(
- <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+ <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#212b36] rounded-2xl shadow-xl w-full max-w-sm overflow-hidden text-center p-6 scale-in-center">
  <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-5">
  <LogOut size={28} className="text-[#FF5630]" />

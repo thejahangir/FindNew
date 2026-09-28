@@ -9,7 +9,7 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3.5">
       <div>
         <h1 className="text-2xl font-bold text-[#212b36] dark:text-white">{title}</h1>
-        <p className="text-sm text-black dark:text-gray-400 mt-1">{subtitle}</p>
+        <p className="text-[13px] text-black dark:text-gray-400 mt-1">{subtitle}</p>
       </div>
       
       <div 
@@ -41,14 +41,14 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
       </div>
 
       {showModal && createPortal(
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md flex flex-col shadow-2xl animate-scale-up overflow-hidden border border-gray-100 dark:border-gray-800">
             <div className="p-6 text-center space-y-4">
               <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <ShieldAlert size={32} />
               </div>
               <h3 className="text-xl font-bold text-[#212b36] dark:text-white">Mark Job as Confidential?</h3>
-              <p className="text-sm text-black dark:text-gray-400 px-4">
+              <p className="text-[13px] text-black dark:text-gray-400 px-4">
                 Are you sure you want to mark this <strong>entire job</strong> as confidential?
                 <br/><br/>
                 Only users with explicit permissions (like Admins or the assigned Hiring Manager) will be able to see this job and its candidates. It will be hidden from the general team dashboard.
@@ -60,7 +60,7 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
                   e.stopPropagation();
                   setShowModal(false);
                 }} 
-                className="flex-1 px-4 py-2.5 text-sm font-bold text-black hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded-xl transition-colors cursor-pointer"
+                className="flex-1 px-4 py-2.5 text-[13px] font-bold text-black hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -70,7 +70,7 @@ export default function JobSetupHeader({ title, subtitle, isConfidential, onConf
                   onConfidentialChange(true);
                   setShowModal(false);
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 text-[13px] font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
                 <Lock size={16} /> Confirm
               </button>

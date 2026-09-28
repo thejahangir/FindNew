@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Users, Plus, Mail, Trash2, Shield, Settings2, X, LayoutGrid, List, Check, Edit2 } from 'lucide-react';
 import SearchableSelect from '../../ui/SearchableSelect';
@@ -116,13 +117,13 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setIsAddMemberModalOpen(true)} 
-                    className="px-3 py-1.5 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-3 py-1.5 bg-[#1890FF]/10 text-[#1890FF] hover:bg-[#1890FF]/20 rounded-lg text-[13px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <Plus size={14} /> Add Member
                   </button>
                   <button
                     onClick={() => setEditModes(prev => ({ ...prev, team: false }))}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-xs font-bold cursor-pointer shrink-0"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1890FF] text-white hover:bg-[#0077e6] transition-all shadow-sm text-[13px] font-bold cursor-pointer shrink-0"
                     title="Done"
                   >
                     <Check size={12} className="text-white stroke-[2.5]" />
@@ -165,7 +166,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{member.name}</h4>
-                      <p className="text-[11px] text-gray-400 truncate">{member.email}</p>
+                      <p className="text-[12px] text-gray-400 truncate">{member.email}</p>
                     </div>
                   </div>
 
@@ -181,7 +182,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
                         />
                       </div>
                     ) : (
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md border ${getRoleBadgeStyle(member.role)}`}>
+                      <span className={`text-[12px] font-bold px-2.5 py-1 rounded-md border ${getRoleBadgeStyle(member.role)}`}>
                         {member.role}
                       </span>
                     )}
@@ -224,7 +225,7 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
                             />
                           </div>
                         ) : (
-                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md border ${getRoleBadgeStyle(member.role)}`}>
+                          <span className={`text-[12px] font-bold px-2.5 py-1 rounded-md border ${getRoleBadgeStyle(member.role)}`}>
                             {member.role}
                           </span>
                         )}
@@ -253,20 +254,20 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
       <div className="w-full flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-12">
         <button 
           onClick={() => setSettingsActiveNav('Description & Skills')}
-          className="px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+          className="px-6 py-2.5 text-[13px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         >
           Previous: Back to Description & Skills
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => navigate('/dashboard/jobs')}
-            className="px-6 py-3 text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
+            className="px-6 py-3 text-[13px] text-gray-600 hover:text-[#212b36] dark:hover:text-white dark:text-gray-300 font-bold transition-colors cursor-pointer"
           >
             Save and Exit
           </button>
           <button 
             onClick={() => setSettingsActiveNav('Pipeline')}
-            className="px-6 py-3 bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
+            className="px-6 py-3 text-[13px] bg-[#1890FF] text-white rounded-xl font-bold hover:bg-[#1890FF]/90 transition-colors shadow-[0_8px_16px_rgba(24,144,255,0.24)] cursor-pointer"
           >
             Save and Continue to 'Pipeline'
           </button>
@@ -274,39 +275,39 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
       </div>
 
       {/* Add Member Modal */}
-      {isAddMemberModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800">
+      {isAddMemberModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 animate-scale-up">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
               <h3 className="text-base font-bold text-[#212b36] dark:text-white">Add Team Member</h3>
-              <button onClick={() => setIsAddMemberModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsAddMemberModalOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
                 <X size={18} />
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Full Name</label>
+                <label className="block text-[13px] font-bold text-gray-500 mb-1">Full Name</label>
                 <input 
                   type="text" 
                   value={newMember.name}
                   onChange={(e) => setNewMember(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g. John Doe"
-                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                 />
                 {formErrors.name && <p className="text-xs text-[#FF5630] mt-1">{formErrors.name}</p>}
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Email Address</label>
+                <label className="block text-[13px] font-bold text-gray-500 mb-1">Email Address</label>
                 <input 
                   type="email" 
                   value={newMember.email}
                   onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="john.doe@company.com"
-                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-semibold text-[#212b36] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Role</label>
+                <label className="block text-[13px] font-bold text-gray-500 mb-1">Role</label>
                 <SearchableSelect 
                   options={roleOptions}
                   value={newMember.role}
@@ -318,25 +319,26 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
             <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
               <button 
                 onClick={() => setIsAddMemberModalOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-[13px] font-bold text-gray-600 hover:text-gray-800 cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleAddMember}
-                className="px-5 py-2 bg-[#1890FF] text-white text-xs font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors shadow-sm"
+                className="px-5 py-2 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 transition-colors shadow-sm cursor-pointer"
               >
                 Add Member
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirmMemberId && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center border border-gray-100 dark:border-gray-800">
+      {deleteConfirmMemberId && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center border border-gray-100 dark:border-gray-800 animate-scale-up">
             <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-[#FF5630] rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={24} />
             </div>
@@ -345,19 +347,20 @@ export default function SettingsHiringTeam({ setSettingsActiveNav }) {
             <div className="flex gap-3">
               <button 
                 onClick={() => setDeleteConfirmMemberId(null)}
-                className="flex-1 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                className="flex-1 py-2 text-[13px] font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 onClick={confirmDelete}
-                className="flex-1 py-2 bg-[#FF5630] text-white text-xs font-bold rounded-lg hover:bg-[#FF5630]/90 transition-colors shadow-sm"
+                className="flex-1 py-2 bg-[#FF5630] text-white text-[13px] font-bold rounded-lg hover:bg-[#FF5630]/90 transition-colors shadow-sm cursor-pointer"
               >
                 Remove
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
