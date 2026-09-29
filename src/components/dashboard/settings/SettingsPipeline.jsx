@@ -1963,11 +1963,7 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
 
                           <button
                             type="button"
-                            onClick={() => {
-                              setConfiguringAgent({ ...agent });
-                              setNewQuestionInput('');
-                            }}
-                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 transition-colors cursor-pointer border border-[#1890FF]/30 shrink-0"
+                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 active:scale-95 transition-all cursor-pointer border border-[#1890FF]/30 shrink-0"
                           >
                             <Settings2 size={13} />
                             <span>Configure</span>
@@ -1978,9 +1974,8 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
                     ))}
                   </div>
 
-                  {/* Redesigned "Create Agent" CTA Banner Card */}
+                  {/* "Create Agent" CTA Banner Card */}
                   <div 
-                    onClick={() => setIsCreatingAgent(true)}
                     className="p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700/80 hover:border-[#1890FF] dark:hover:border-[#1890FF] bg-gradient-to-r from-gray-50/60 via-white to-blue-50/20 dark:from-gray-800/20 dark:via-[#161c24] dark:to-blue-900/10 hover:shadow-xs transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="flex items-center gap-3">
@@ -2002,10 +1997,13 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[13px] font-bold text-[#1890FF] group-hover:border-[#1890FF] group-hover:bg-[#1890FF] group-hover:text-white transition-all shrink-0 self-start sm:self-auto shadow-2xs">
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[13px] font-bold text-[#1890FF] group-hover:border-[#1890FF] group-hover:bg-[#1890FF] group-hover:text-white hover:bg-[#1890FF] hover:text-white active:scale-95 transition-all shrink-0 self-start sm:self-auto shadow-2xs cursor-pointer"
+                    >
                       <Sparkles size={13} />
                       <span>+ Create Agent</span>
-                    </div>
+                    </button>
                   </div>
                 </div>
               )}
