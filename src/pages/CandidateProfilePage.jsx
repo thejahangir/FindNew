@@ -4,7 +4,7 @@ import {
  ArrowLeft, Briefcase, MapPin, Clock, FileText, MessageSquare,
  Mail, Copy, ArrowRightLeft, GitBranch, MoreVertical, ChevronDown, ChevronRight, Send,
  ChevronsRight, ChevronsLeft, Calendar, User, Star, Sparkles, UserPlus,
- CheckCircle, Check, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu, GripVertical
+ CheckCircle, Check, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu, GripVertical, X
 } from 'lucide-react';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
 import findNewIco from '../assets/findnew-ico.png';
@@ -203,6 +203,129 @@ const getAggregatedAttributeRating = (categoryName, attrName) => {
   if (avg >= 1.5) return 'Competent';
   if (avg >= 0.5) return 'Beginner';
   return 'Unassessed';
+};
+
+const getScorecardsSummaryData = () => {
+  const attributeMap = {};
+
+  MOCK_SCORECARDS.forEach(sc => {
+    (sc.categories || []).forEach(cat => {
+      (cat.attributes || []).forEach(attr => {
+        const key = `${cat.name}___${attr.name}`;
+        if (!attributeMap[key]) {
+          attributeMap[key] = {
+            name: attr.name,
+            category: cat.name,
+            ratings: []
+          };
+        }
+        attributeMap[key].ratings.push({
+          interviewer: sc.interviewer,
+          stage: sc.stage,
+          rating: attr.rating
+        });
+      });
+    });
+  });
+
+  const consensus = [];
+  const discrepancies = [];
+
+  const ratingWeight = { 'advanced': 3, 'competent': 2, 'beginner': 1 };
+
+  Object.values(attributeMap).forEach(item => {
+    const assessedRatings = item.ratings.filter(r => r.rating && r.rating.toLowerCase() !== 'unassessed');
+    if (assessedRatings.length === 0) return;
+
+    const weights = assessedRatings.map(r => ratingWeight[r.rating.toLowerCase()] || 2);
+    const minW = Math.min(...weights);
+    const maxW = Math.max(...weights);
+    const diff = maxW - minW;
+
+    if (diff >= 2) {
+      discrepancies.push(item);
+    } else {
+      consensus.push(item);
+    }
+  });
+
+  const getTopDiverse = (list, limit = 3) => {
+    const categoriesSeen = new Set();
+    const result = [];
+    for (const item of list) {
+      if (!categoriesSeen.has(item.category) && result.length < limit) {
+        result.push(item);
+        categoriesSeen.add(item.category);
+      }
+    }
+    for (const item of list) {
+      if (result.length >= limit) break;
+      if (!result.includes(item)) {
+        result.push(item);
+      }
+    }
+    return result;
+  };
+
+  return { 
+    consensus: getTopDiverse(consensus, 3), 
+    discrepancies: getTopDiverse(discrepancies, 3) 
+  };
+};
+
+const SCORECARD_SUMMARY_ATTRIBUTES = [
+  { name: 'Self-motivated & Ownership', category: 'Personality Traits' },
+  { name: 'Clear Communication', category: 'Personality Traits' },
+  { name: 'React & Node Ecosystems', category: 'Technical Competencies' },
+  { name: 'System Design & Concurrency', category: 'Technical Competencies' },
+  { name: 'Product Strategy & Tradeoffs', category: 'Research & Problem Solving' },
+  { name: 'Creative Problem Solving', category: 'Research & Problem Solving' },
+];
+
+const getRatingAvatarStyle = (rating) => {
+  switch (rating?.toLowerCase()) {
+    case 'advanced':
+    case 'exceeds expectations':
+    case 'advanced / exceeds expectations':
+    case 'strong yes':
+      return {
+        bg: 'bg-[#00A76F]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Advanced',
+      };
+    case 'competent':
+    case 'meets expectations':
+    case 'competent / meets expectations':
+    case 'yes':
+      return {
+        bg: 'bg-[#FFAB00]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Competent',
+      };
+    case 'beginner':
+    case 'below expectations':
+    case 'beginner / below expectations':
+    case 'no':
+    case 'strong no':
+      return {
+        bg: 'bg-[#FF5630]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Beginner',
+      };
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return {
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        text: 'text-gray-400 dark:text-gray-500',
+        border: 'border-2 border-dashed border-gray-300 dark:border-gray-600',
+        label: 'Unassessed',
+      };
+  }
 };
 
 const renderRatingCircle = (rating, size = "w-3.5 h-3.5") => {
@@ -692,10 +815,36 @@ export default function CandidateProfilePage() {
  const [openScorecards, setOpenScorecards] = useState(['sc-1']);
  const [expandedNotes, setExpandedNotes] = useState({});
  const [scorecardDesignMode, setScorecardDesignMode] = useState('option1');
- const [scorecardView, setScorecardView] = useState('option2');
+ const [scorecardView, setScorecardView] = useState('option1');
  const [selectedScorecardId, setSelectedScorecardId] = useState('sc-1');
+ const [option1SubTab, setOption1SubTab] = useState('Detailed Scorecards');
 
  const tabs = ['Overview', 'Stage', 'Scorecards', 'Activity Log'];
+
+ const [inspectorData, setInspectorData] = useState(null);
+
+ const openInspectorDrawer = (interviewerName, attributeName) => {
+   const scorecard = MOCK_SCORECARDS.find(sc => sc.interviewer === interviewerName);
+   if (!scorecard) return;
+   setInspectorData({
+     scorecard,
+     focusedAttributeName: attributeName,
+   });
+ };
+
+ const closeInspectorDrawer = () => {
+   setInspectorData(null);
+ };
+
+ useEffect(() => {
+   const handleKeyDown = (e) => {
+     if (e.key === 'Escape' && inspectorData) {
+       closeInspectorDrawer();
+     }
+   };
+   window.addEventListener('keydown', handleKeyDown);
+   return () => window.removeEventListener('keydown', handleKeyDown);
+ }, [inspectorData]);
 
  useEffect(() => {
  const close = () => setOpenMenu(null);
@@ -1387,7 +1536,7 @@ export default function CandidateProfilePage() {
   </div>
 
   {/* Expandable Scorecards */}
-           {/* Design Toggle */}
+  {/* Design Toggle (Option 2 Timeline commented out)
       <div className="flex justify-end mb-2">
          <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-full sm:w-auto mt-6 shadow-inner">
             <button 
@@ -1404,8 +1553,8 @@ export default function CandidateProfilePage() {
             </button>
          </div>
       </div>
+  */}
 
-      {scorecardView === 'option1' ? (
       <div className="space-y-6">
         {/* OVERARCHING SUMMARY (INTERVIEW SUMMARY & AGGREGATED ATTRIBUTES) - COMMENTED OUT TEMPORARILY
         <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-8 mt-6">
@@ -1485,7 +1634,6 @@ export default function CandidateProfilePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                  <span className="font-medium text-gray-600 dark:text-gray-300">Advanced / Exceeds Expectations</span>
                 </div>
               </div>
             </div>
@@ -1493,367 +1641,182 @@ export default function CandidateProfilePage() {
         </div>
         */}
 
-        <div className="flex items-center justify-between mt-8 mb-4">
-          <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
-            <FileText size={16} className="text-[#1890FF]" /> Detailed Scorecards
-          </h2>
-          <button 
-            onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
-            className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#1890FF]/20 bg-[#1890FF]/5"
-          >
-            {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-0 mt-6 mb-5">
+          <div className="flex items-center gap-6">
+            <button
+              type="button"
+              onClick={() => setOption1SubTab('Detailed Scorecards')}
+              className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors flex items-center gap-2 ${
+                option1SubTab === 'Detailed Scorecards'
+                  ? 'text-[#1890FF]'
+                  : 'text-gray-500 hover:text-[#212b36] dark:hover:text-white'
+              }`}
+            >
+              <FileText size={16} className={option1SubTab === 'Detailed Scorecards' ? 'text-[#1890FF]' : 'text-gray-400'} />
+              <span>Detailed Scorecards</span>
+              {option1SubTab === 'Detailed Scorecards' && (
+                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#1890FF] rounded-full" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setOption1SubTab('Scorecard Analysis')}
+              className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors flex items-center gap-2 ${
+                option1SubTab === 'Scorecard Analysis'
+                  ? 'text-[#1890FF]'
+                  : 'text-gray-500 hover:text-[#212b36] dark:hover:text-white'
+              }`}
+            >
+              <Sparkles size={16} className={option1SubTab === 'Scorecard Analysis' ? 'text-[#1890FF]' : 'text-gray-400'} />
+              <span>Scorecard Analysis</span>
+              {option1SubTab === 'Scorecard Analysis' && (
+                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#1890FF] rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {option1SubTab === 'Detailed Scorecards' && (
+            <button 
+              onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
+              className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#1890FF]/20 bg-[#1890FF]/5 shrink-0 self-start sm:self-auto mb-2"
+            >
+              {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
+            </button>
+          )}
         </div>
 
-        <div className="space-y-4">
-          {MOCK_SCORECARDS.map(scorecard => {
-            const isOpen = openScorecards.includes(scorecard.id);
-            return (
-              <div key={scorecard.id} className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 shadow-sm overflow-hidden transition-colors hover:border-[#1890FF]/30">
-                <button 
-                  onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
-                  className={`w-full flex items-center justify-between p-5 cursor-pointer transition-colors ${isOpen ? 'bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50' : 'hover:bg-gray-50 dark:hover:bg-gray-800/20'}`}
+        {option1SubTab === 'Detailed Scorecards' ? (
+          <div className="space-y-4">
+            {MOCK_SCORECARDS.map(scorecard => {
+              const isOpen = openScorecards.includes(scorecard.id);
+              return (
+                <div 
+                  id={`scorecard-card-${scorecard.id}`}
+                  key={scorecard.id} 
+                  className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 shadow-sm overflow-hidden transition-colors hover:border-[#1890FF]/30"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
-                      {getInitials(scorecard.interviewer)}
+                  <button 
+                    onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
+                    className={`w-full flex items-center justify-between p-5 cursor-pointer transition-colors ${isOpen ? 'bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50' : 'hover:bg-gray-50 dark:hover:bg-gray-800/20'}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+                        {getInitials(scorecard.interviewer)}
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
+                        <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
-                      <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+                    <div className="flex items-center gap-6">
+                       {(() => {
+                         const recStyle = getRecBadge(scorecard.recommendation);
+                         return (
+                           <div className="text-right hidden sm:block">
+                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
+                             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
+                               <span>{recStyle.emoji}</span>
+                               <span>{recStyle.label}</span>
+                             </div>
+                           </div>
+                         );
+                       })()}
+                       <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                     {(() => {
-                       const recStyle = getRecBadge(scorecard.recommendation);
-                       return (
-                         <div className="text-right hidden sm:block">
-                           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
-                           <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
-                             <span>{recStyle.emoji}</span>
-                             <span>{recStyle.label}</span>
-                           </div>
-                         </div>
-                       );
-                     })()}
-                     <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </button>
+                  </button>
 
-                <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
-                  <div className="overflow-hidden">
-                    <div className="p-6 space-y-8">
-                      
-                      {/* Top Row: Key Takeaways (80%) & Core Metrics (20%) */}
-                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
-                          <div className="lg:col-span-4 flex flex-col">
-                           <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Key Takeaways</h5>
-                           <div className="bg-gradient-to-br from-[#1890FF]/10 to-transparent border border-[#1890FF]/20 rounded-xl p-4 relative overflow-hidden flex-1 flex items-center">
-                             <div className="absolute top-0 right-0 p-3 opacity-10"><FileText size={40} className="text-[#1890FF]" /></div>
-                             <p className="text-[13px] text-[#212b36] dark:text-gray-200 font-semibold leading-relaxed relative z-10 italic">
-                               "{scorecard.takeaways}"
-                             </p>
+                  <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+                    <div className="overflow-hidden">
+                      <div className="p-6 space-y-8">
+                        
+                        {/* Top Row: Key Takeaways (80%) & Core Metrics (20%) */}
+                          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
+                            <div className="lg:col-span-4 flex flex-col">
+                             <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Key Takeaways</h5>
+                             <div className="bg-gradient-to-br from-[#1890FF]/10 to-transparent border border-[#1890FF]/20 rounded-xl p-4 relative overflow-hidden flex-1 flex items-center">
+                               <div className="absolute top-0 right-0 p-3 opacity-10"><FileText size={40} className="text-[#1890FF]" /></div>
+                               <p className="text-[13px] text-[#212b36] dark:text-gray-200 font-semibold leading-relaxed relative z-10 italic">
+                                 "{scorecard.takeaways}"
+                               </p>
+                             </div>
                            </div>
-                         </div>
-                          <div className="lg:col-span-1 flex flex-col justify-between">
-                           <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Core Metrics</h5>
-                           <div className="grid gap-2 flex-1">
-                             {[
-                                { label: 'Hard Skills', value: scorecard.hardSkills },
-                                { label: 'Soft Skills', value: scorecard.softSkills },
-                                { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
-                              ].map(metric => {
-                                 const isHigh = metric.value >= 8.0;
-                                 const isMed = metric.value >= 5.0 && metric.value < 8.0;
-                                 const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
-                                 return (
-                                   <div key={metric.label} className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
-                                     <span className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{metric.label}</span>
-                                     <span className={`text-[14px] font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</span>
-                                   </div>
-                                 );
-                              })}
-                           </div>
-                         </div>
-                       </div>
-
-                       {/* Interviewer Notes (Full Width 100%) */}
-                       <div className="w-full bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
-                         <div className="flex items-center gap-2 mb-2">
-                           <FileText size={14} className="text-[#1890FF]" />
-                           <h5 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Interviewer Notes</h5>
-                         </div>
-                         <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed w-full">
-                           {expandedNotes[scorecard.id] || scorecard.notes.length <= 250 
-                             ? scorecard.notes 
-                             : `${scorecard.notes.slice(0, 250).trim()}...`}
-                           {scorecard.notes.length > 250 && (
-                             <button
-                               type="button"
-                               onClick={(e) => { e.stopPropagation(); setExpandedNotes(prev => ({...prev, [scorecard.id]: !prev[scorecard.id]})) }}
-                               className="ml-2 font-bold text-[#1890FF] hover:underline cursor-pointer focus:outline-none inline-flex"
-                             >
-                               {expandedNotes[scorecard.id] ? 'Read Less' : 'Read More'}
-                             </button>
-                           )}
-                         </p>
-                       </div>
-
-                       {/* Detailed Attributes (Categorized) */}
-                      <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-8">
-                        <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">Detailed Attributes Evaluated</h5>
-                        <div className="space-y-4">
-                          {(scorecard.categories || []).map(cat => (
-                            <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
-                              <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
-                                <span>{cat.name}</span>
-                                <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
-                              </h6>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                                {cat.attributes.map((attr, idx) => {
+                            <div className="lg:col-span-1 flex flex-col justify-between">
+                             <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Core Metrics</h5>
+                             <div className="grid gap-2 flex-1">
+                               {[
+                                  { label: 'Hard Skills', value: scorecard.hardSkills },
+                                  { label: 'Soft Skills', value: scorecard.softSkills },
+                                  { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
+                                ].map(metric => {
+                                   const isHigh = metric.value >= 8.0;
+                                   const isMed = metric.value >= 5.0 && metric.value < 8.0;
+                                   const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
                                    return (
-                                     <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-                                       <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>{attr.name}</span>
-                                       <div className="shrink-0 flex items-center justify-center">
-                                         {renderRatingCircle(attr.rating, "w-3.5 h-3.5")}
-                                       </div>
+                                     <div key={metric.label} className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
+                                       <span className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{metric.label}</span>
+                                       <span className={`text-[14px] font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</span>
                                      </div>
                                    );
                                 })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Rating Scale Legend */}
-                        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
-                          <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
-                              <span>Unassessed</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
-                              <span>Beginner</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
-                              <span>Competent</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                              <span>Advanced</span>
-                            </div>
-                          </div>
-                        </div>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      ) : (
-      <div className="space-y-6">
-        {/* OVERARCHING SUMMARY (INTERVIEW SUMMARY & AGGREGATED ATTRIBUTES) - COMMENTED OUT TEMPORARILY
-        <div className="bg-transparent rounded-none border-b border-gray-200 dark:border-gray-800 p-2 space-y-6 mt-6 pb-8">
-          <div>
-            <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Interview Summary</h3>
-            <div className="flex flex-wrap gap-3">
-              {MOCK_SCORECARDS.map(sc => {
-                 const recStyle = getRecBadge(sc.recommendation);
-                 return (
-                   <div key={`summary-${sc.id}`} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/30 p-2.5 px-3 rounded-xl border border-gray-100 dark:border-gray-800">
-                      <div className="text-xl">{recStyle.emoji}</div>
-                      <div>
-                        <p className="text-[12px] font-bold text-[#212b36] dark:text-gray-200">{sc.stage}</p>
-                        <p className="text-[11px] text-gray-500">{sc.interviewer} • <span className={`font-semibold ${recStyle.text}`}>{recStyle.label}</span></p>
-                      </div>
-                   </div>
-                 )
-              })}
-            </div>
-          </div>
-          
-          <div className="pt-4 border-t border-gray-100 dark:border-gray-800/50">
-            <h3 className="text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Aggregated Attributes</h3>
-            <div className="space-y-3">
-              {['Personality Traits', 'Technical Competencies', 'Research & Problem Solving'].map(categoryName => {
-                const attrNames = Array.from(new Set(
-                  MOCK_SCORECARDS.flatMap(sc => 
-                    (sc.categories?.find(c => c.name === categoryName)?.attributes || [])
-                      .map(a => a.name)
-                  )
-                ));
-
-                if (attrNames.length === 0) return null;
-
-                return (
-                  <div key={categoryName} className="p-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">{categoryName}</div>
-                    <div className="space-y-1.5">
-                      {attrNames.map(attrName => {
-                        const aggRating = getAggregatedAttributeRating(categoryName, attrName);
-                        return (
-                          <div key={attrName} className="flex items-center justify-between p-1.5 px-2 hover:bg-white dark:hover:bg-gray-800/60 rounded-lg transition-colors">
-                            <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attrName}</span>
-                            <div className="shrink-0 flex items-center justify-center">
-                              {renderRatingCircle(aggRating, "w-3 h-3")}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            // Rating Scale Legend
-            <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-gray-500 dark:text-gray-400">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
-                <span>Unassessed</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
-                <span>Beginner</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
-                <span>Competent</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                <span>Advanced</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        */}
-
-        <div className="flex items-center justify-between mt-8 mb-4">
-          <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
-            <FileText size={16} className="text-[#1890FF]" /> Detailed Scorecards
-          </h2>
-          <button 
-            onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
-            className="text-[12px] font-bold text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer"
-          >
-            {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
-          </button>
-        </div>
-
-        <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-200 before:via-gray-200 before:to-transparent dark:before:from-gray-800 dark:before:via-gray-800 before:z-0">
-          {MOCK_SCORECARDS.map(scorecard => {
-            const isOpen = openScorecards.includes(scorecard.id);
-            return (
-              <div key={scorecard.id} className="relative flex items-start gap-6 group z-10">
-                
-                {/* Timeline Node */}
-                {(() => {
-                  const recStyle = getRecBadge(scorecard.recommendation);
-                  return (
-                    <div className={`absolute -left-6 w-[18px] h-[18px] rounded-full border-[3px] border-white dark:border-[#161c24] bg-white shadow-sm flex items-center justify-center -translate-x-[4px] mt-4 z-10 ${recStyle.borderNode}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${recStyle.dot}`} />
-                    </div>
-                  );
-                })()}
-
-                {/* Content Bubble */}
-                <div className="w-full bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700">
-                  <div className="p-5">
-                    
-                    {/* Header: Interviewer info + score */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
-                          {getInitials(scorecard.interviewer)}
-                        </div>
-                        <div>
-                           <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-1.5">
-                             {scorecard.interviewer}
-                             <span className="text-[10px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md uppercase tracking-wider">{scorecard.stage}</span>
-                           </h4>
-                           <p className="text-[11px] text-gray-500 mt-0.5">{scorecard.date}</p>
-                        </div>
-                      </div>
-                      {(() => {
-                        const recStyle = getRecBadge(scorecard.recommendation);
-                        return (
-                          <div className="text-right">
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
-                              <span>{recStyle.emoji}</span>
-                              <span>{recStyle.label}</span>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Quick Takeaways */}
-                    <div className="mb-5">
-                      <p className="text-[14px] text-[#212b36] dark:text-gray-300 font-medium leading-relaxed italic border-l-2 border-gray-200 dark:border-gray-700 pl-3">
-                        "{scorecard.takeaways}"
-                      </p>
-                    </div>
-
-                    {/* Core Metrics Grid */}
-                    <div className="grid grid-cols-3 gap-2 mb-4 bg-gray-50/50 dark:bg-[#161c24]/50 rounded-xl p-3 border border-gray-50 dark:border-gray-800/50">
-                      {[
-                        { label: 'Hard Skills', value: scorecard.hardSkills },
-                        { label: 'Soft Skills', value: scorecard.softSkills },
-                        { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
-                      ].map(metric => {
-                         const isHigh = metric.value >= 8.0;
-                         const isMed = metric.value >= 5.0 && metric.value < 8.0;
-                         const mColorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
-                         return (
-                           <div key={metric.label} className="text-center">
-                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
-                             <div className={`text-[14px] font-black ${mColorText}`}>{Number(metric.value).toFixed(1)}</div>
+                             </div>
                            </div>
-                         );
-                      })}
-                    </div>
+                         </div>
 
-                    {/* Toggle Detailed Attributes */}
-                    <button 
-                      onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold text-gray-500 hover:text-[#1890FF] bg-gray-50 hover:bg-[#1890FF]/5 dark:bg-gray-800/30 dark:hover:bg-[#1890FF]/10 rounded-lg transition-colors"
-                    >
-                      {isOpen ? 'Hide Detailed Rubric' : 'Show Detailed Rubric'}
-                      <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                    </button>
+                         {/* Interviewer Notes (Full Width 100%) */}
+                         <div className="w-full bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
+                           <div className="flex items-center gap-2 mb-2">
+                             <FileText size={14} className="text-[#1890FF]" />
+                             <h5 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Interviewer Notes</h5>
+                           </div>
+                           <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed w-full">
+                             {expandedNotes[scorecard.id] || scorecard.notes.length <= 250 
+                               ? scorecard.notes 
+                               : `${scorecard.notes.slice(0, 250).trim()}...`}
+                             {scorecard.notes.length > 250 && (
+                               <button
+                                 type="button"
+                                 onClick={(e) => { e.stopPropagation(); setExpandedNotes(prev => ({...prev, [scorecard.id]: !prev[scorecard.id]})) }}
+                                 className="ml-2 font-bold text-[#1890FF] hover:underline cursor-pointer focus:outline-none inline-flex"
+                               >
+                                 {expandedNotes[scorecard.id] ? 'Read Less' : 'Read More'}
+                               </button>
+                             )}
+                           </p>
+                         </div>
 
-                    {/* Detailed Attributes Dropdown */}
-                    <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
-                      <div className="overflow-hidden">
-                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-3">
-                          {(scorecard.categories || []).map(cat => (
-                            <div key={cat.name} className="p-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800">
-                              <h6 className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">{cat.name}</h6>
-                              <div className="space-y-1.5">
-                                {cat.attributes.map((attr, idx) => {
-                                  return (
-                                    <div key={idx} className="flex items-center justify-between p-1.5 px-2 hover:bg-white dark:hover:bg-gray-800/60 rounded-lg transition-colors">
-                                      <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attr.name}</span>
-                                      <div className="shrink-0 flex items-center justify-center">
-                                        {renderRatingCircle(attr.rating, "w-3 h-3")}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                         {/* Detailed Attributes (Categorized) */}
+                        <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-8">
+                          <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">Detailed Attributes Evaluated</h5>
+                          <div className="space-y-4">
+                            {(scorecard.categories || []).map(cat => (
+                              <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
+                                <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
+                                  <span>{cat.name}</span>
+                                  <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
+                                </h6>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                  {cat.attributes.map((attr, idx) => {
+                                     const sanitizedAttrName = attr.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                                     return (
+                                       <div 
+                                         id={`attr-${scorecard.id}-${sanitizedAttrName}`}
+                                         key={idx} 
+                                         className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300"
+                                       >
+                                         <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>{attr.name}</span>
+                                         <div className="shrink-0 flex items-center justify-center">
+                                           {renderRatingCircle(attr.rating, "w-3.5 h-3.5")}
+                                         </div>
+                                       </div>
+                                     );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
 
                           {/* Rating Scale Legend */}
-                          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
+                          <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
                             <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                               <div className="flex items-center gap-1.5">
@@ -1874,8 +1837,326 @@ export default function CandidateProfilePage() {
                               </div>
                             </div>
                           </div>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Scorecard Ratings Section */}
+            <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 p-5 sm:p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+                    <Star size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Scorecard Ratings</h3>
+                    <p className="text-[11px] text-gray-500">Key competency attributes rated across interviewers</p>
+                  </div>
+                </div>
+                
+                {/* Rating Color Code Legend */}
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F]" />
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Advanced</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00]" />
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Competent</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630]" />
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Beginner</span>
+                  </div>
+                </div>
+              </div>
 
-                          {/* Notes */}
+              <div className="grid grid-cols-1 gap-2.5">
+                {SCORECARD_SUMMARY_ATTRIBUTES.map((attr, idx) => {
+                  return (
+                    <div 
+                      key={idx} 
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50/60 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                            {attr.category}
+                          </span>
+                        </div>
+                        <h4 className="text-[13px] font-semibold text-[#212b36] dark:text-white truncate">
+                          {attr.name}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        {MOCK_SCORECARDS.map(sc => {
+                          const rating = sc.categories
+                            ?.flatMap(c => c.attributes)
+                            ?.find(a => a.name === attr.name)?.rating || 'Unassessed';
+                          const style = getRatingAvatarStyle(rating);
+                          const initials = getInitials(sc.interviewer);
+
+                          return (
+                            <button 
+                              key={sc.id} 
+                              type="button"
+                              onClick={() => openInspectorDrawer(sc.interviewer, attr.name)}
+                              className="group relative cursor-pointer"
+                            >
+                              <div 
+                                className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shadow-xs transition-transform group-hover:scale-110 ${style.bg} ${style.text} ${style.border}`}
+                              >
+                                {initials}
+                              </div>
+                              
+                              {/* Hover tooltip */}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-30 pointer-events-none">
+                                <div className="bg-[#212b36] dark:bg-gray-900 text-white text-[11px] py-1.5 px-3 rounded-lg shadow-xl whitespace-nowrap border border-gray-700/50">
+                                  <div className="font-bold">{sc.interviewer}</div>
+                                  <div className="text-[10px] text-gray-300 mt-0.5">
+                                    {sc.stage} • <span className={`font-semibold ${rating.toLowerCase() === 'advanced' ? 'text-[#00A76F]' : rating.toLowerCase() === 'competent' ? 'text-[#FFAB00]' : rating.toLowerCase() === 'beginner' ? 'text-[#FF5630]' : 'text-gray-400'}`}>{rating}</span>
+                                  </div>
+                                  <div className="text-[9px] text-[#1890FF] font-medium mt-0.5">Click to inspect scorecard details →</div>
+                                </div>
+                                <div className="w-2 h-2 bg-[#212b36] dark:bg-gray-900 rotate-45 -mt-1" />
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* AI Summary (2/3 lines) */}
+            <div className="rounded-2xl border border-[#1890FF]/25 bg-gradient-to-br from-[#1890FF]/5 via-purple-500/5 to-transparent p-5 sm:p-6 shadow-sm relative overflow-hidden">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+                  <Sparkles size={16} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-[#212b36] dark:text-white">AI Summary</h3>
+                    <span className="text-[10px] font-bold text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Synthesis</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300">
+                The evaluation panel demonstrates strong consensus on core technical capabilities, distributed systems fundamentals, and hands-on execution across all technical interview rounds. However, notable discrepancies emerged between engineering and executive reviewers regarding strategic product tradeoffs, high-stakes communication, and leadership presence under ambiguity.
+              </p>
+            </div>
+
+            {/* Consensus & Discrepancies Sections */}
+            {(() => {
+              const summaryData = getScorecardsSummaryData();
+              return (
+                <div className="space-y-8">
+                  {/* Consensus Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#00A76F]/10 text-[#00A76F] flex items-center justify-center">
+                          <CheckCircle size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Consensus</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with aligned evaluations across interviewers</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-2.5 py-0.5 rounded-full">
+                        {summaryData.consensus.length} Attributes
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      {summaryData.consensus.map((item, idx) => (
+                        <div key={`cons-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#00A76F]/40 transition-colors shadow-xs">
+                          <div className="mb-3">
+                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.name}</h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            {item.ratings.map((r, rIdx) => (
+                              <button 
+                                key={rIdx} 
+                                type="button"
+                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
+                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
+                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
+                                  {getInitials(r.interviewer)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
+                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
+                                  </div>
+                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Discrepancies Section */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center">
+                          <ArrowRightLeft size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Discrepancies</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with divergent ratings or conflicting viewpoints</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-2.5 py-0.5 rounded-full">
+                        {summaryData.discrepancies.length} Attributes
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      {summaryData.discrepancies.map((item, idx) => (
+                        <div key={`diss-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#FF5630]/40 transition-colors shadow-xs">
+                          <div className="mb-3">
+                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+                              <span>{item.name}</span>
+                              <span className="text-[10px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-1.5 py-0.5 rounded border border-[#FF5630]/20">Divergence</span>
+                            </h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            {item.ratings.map((r, rIdx) => (
+                              <button 
+                                key={rIdx} 
+                                type="button"
+                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
+                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
+                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
+                                  {getInitials(r.interviewer)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
+                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
+                                  </div>
+                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </div>
+
+      {/* OPTION 2 (TIMELINE) - COMMENTED OUT (CAN BE RESTORED IF NEEDED)
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mt-8 mb-4">
+          <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+            <FileText size={16} className="text-[#1890FF]" /> Detailed Scorecards
+          </h2>
+          <button 
+            onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
+            className="text-[12px] font-bold text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer"
+          >
+            {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
+          </button>
+        </div>
+
+        <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-200 before:via-gray-200 before:to-transparent dark:before:from-gray-800 dark:before:via-gray-800 before:z-0">
+          {MOCK_SCORECARDS.map(scorecard => {
+            const isOpen = openScorecards.includes(scorecard.id);
+            return (
+              <div key={scorecard.id} className="relative flex items-start gap-6 group z-10">
+                
+                <div className="absolute -left-6 w-[18px] h-[18px] rounded-full border-[3px] border-white dark:border-[#161c24] bg-white shadow-sm flex items-center justify-center -translate-x-[4px] mt-4 z-10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#1890FF]" />
+                </div>
+
+                <div className="w-full bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700">
+                  <div className="p-5">
+                    
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+                          {getInitials(scorecard.interviewer)}
+                        </div>
+                        <div>
+                           <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-1.5">
+                             {scorecard.interviewer}
+                             <span className="text-[10px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md uppercase tracking-wider">{scorecard.stage}</span>
+                           </h4>
+                           <p className="text-[11px] text-gray-500 mt-0.5">{scorecard.date}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-5">
+                      <p className="text-[14px] text-[#212b36] dark:text-gray-300 font-medium leading-relaxed italic border-l-2 border-gray-200 dark:border-gray-700 pl-3">
+                        "{scorecard.takeaways}"
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 mb-4 bg-gray-50/50 dark:bg-[#161c24]/50 rounded-xl p-3 border border-gray-50 dark:border-gray-800/50">
+                      {[
+                        { label: 'Hard Skills', value: scorecard.hardSkills },
+                        { label: 'Soft Skills', value: scorecard.softSkills },
+                        { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
+                      ].map(metric => (
+                         <div key={metric.label} className="text-center">
+                           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
+                           <div className="text-[14px] font-black">{Number(metric.value).toFixed(1)}</div>
+                         </div>
+                      ))}
+                    </div>
+
+                    <button 
+                      onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold text-gray-500 hover:text-[#1890FF] bg-gray-50 hover:bg-[#1890FF]/5 dark:bg-gray-800/30 dark:hover:bg-[#1890FF]/10 rounded-lg transition-colors"
+                    >
+                      {isOpen ? 'Hide Detailed Rubric' : 'Show Detailed Rubric'}
+                      <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+                      <div className="overflow-hidden">
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-3">
+                          {(scorecard.categories || []).map(cat => (
+                            <div key={cat.name} className="p-2.5 rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800">
+                              <h6 className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">{cat.name}</h6>
+                              <div className="space-y-1.5">
+                                {cat.attributes.map((attr, idx) => (
+                                  <div key={idx} className="flex items-center justify-between p-1.5 px-2 hover:bg-white dark:hover:bg-gray-800/60 rounded-lg transition-colors">
+                                    <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300">{attr.name}</span>
+                                    <div className="shrink-0 flex items-center justify-center">
+                                      {renderRatingCircle(attr.rating, "w-3 h-3")}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+
                           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                             <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Private Notes</h5>
                             <p className="text-[12px] text-gray-500 leading-relaxed bg-gray-50 dark:bg-[#161c24] p-3 rounded-lg border border-gray-100 dark:border-gray-800">
@@ -1893,7 +2174,7 @@ export default function CandidateProfilePage() {
           })}
         </div>
       </div>
-     )}
+      */}
     </div>
   )}
 
@@ -2153,6 +2434,194 @@ export default function CandidateProfilePage() {
  {toast}
  </div>
  )}
+
+{/* Slide-Over Detail Inspector Drawer (Right Panel) */}
+{inspectorData && (
+  <div className="fixed inset-0 z-[150] overflow-hidden">
+    {/* Backdrop Overlay */}
+    <div 
+      className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in cursor-pointer"
+      onClick={closeInspectorDrawer}
+    />
+
+    <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="w-screen max-w-md md:max-w-lg bg-white dark:bg-[#161c24] shadow-2xl flex flex-col border-l border-gray-200 dark:border-gray-800 animate-slide-in-right overflow-hidden">
+        
+        {/* Drawer Header */}
+        <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/40 flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-sm font-bold text-[#212b36] dark:text-white shadow-xs shrink-0">
+              {getInitials(inspectorData.scorecard.interviewer)}
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                  {inspectorData.scorecard.interviewer}
+                </h3>
+                {(() => {
+                  const recStyle = getRecBadge(inspectorData.scorecard.recommendation);
+                  return (
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
+                      <span>{recStyle.emoji}</span>
+                      <span>{recStyle.label}</span>
+                    </span>
+                  );
+                })()}
+              </div>
+              <p className="text-[12px] text-gray-500 mt-0.5">
+                {inspectorData.scorecard.stage} • {inspectorData.scorecard.date}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={closeInspectorDrawer}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-200/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer shrink-0"
+            aria-label="Close panel"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Drawer Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+          
+          {/* Pinned Focused Attribute Card */}
+          {(() => {
+            const focusedAttr = inspectorData.scorecard.categories
+              ?.flatMap(c => c.attributes.map(a => ({ ...a, category: c.name })))
+              ?.find(a => a.name === inspectorData.focusedAttributeName);
+            
+            const ratingStyle = getRatingAvatarStyle(focusedAttr?.rating || 'Unassessed');
+
+            return (
+              <div className="rounded-2xl p-4 bg-gradient-to-br from-[#1890FF]/10 via-[#1890FF]/5 to-transparent border-2 border-[#1890FF]/30 shadow-xs relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded">
+                    {focusedAttr?.category || 'Competency Attribute'}
+                  </span>
+                  <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                    <Sparkles size={12} className="text-[#1890FF]" /> Target Attribute
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 mt-1">
+                  <h4 className="text-sm sm:text-base font-bold text-[#212b36] dark:text-white">
+                    {inspectorData.focusedAttributeName}
+                  </h4>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`w-3.5 h-3.5 rounded-full ${ratingStyle.bg} shadow-xs`} />
+                    <span className={`text-[13px] font-bold ${focusedAttr?.rating?.toLowerCase() === 'advanced' ? 'text-[#00A76F]' : focusedAttr?.rating?.toLowerCase() === 'competent' ? 'text-[#FFAB00]' : focusedAttr?.rating?.toLowerCase() === 'beginner' ? 'text-[#FF5630]' : 'text-gray-400'}`}>
+                      {focusedAttr?.rating || 'Unassessed'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Quick Key Takeaway Quote */}
+          <div>
+            <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+              Key Takeaways
+            </h5>
+            <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-3.5 border border-gray-100 dark:border-gray-800">
+              <p className="text-[13px] text-[#212b36] dark:text-gray-200 italic font-medium leading-relaxed">
+                "{inspectorData.scorecard.takeaways}"
+              </p>
+            </div>
+          </div>
+
+          {/* Core Metrics Grid */}
+          <div>
+            <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+              Evaluation Metrics
+            </h5>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: 'Hard Skills', value: inspectorData.scorecard.hardSkills },
+                { label: 'Soft Skills', value: inspectorData.scorecard.softSkills },
+                { label: 'Culture Fit', value: inspectorData.scorecard.cultureFit || 8.0 }
+              ].map(metric => {
+                const isHigh = metric.value >= 8.0;
+                const isMed = metric.value >= 5.0 && metric.value < 8.0;
+                const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFAB00]' : 'text-[#FF5630]';
+                return (
+                  <div key={metric.label} className="p-3 text-center rounded-xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
+                    <div className={`text-base font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Interviewer Private Notes */}
+          <div>
+            <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <FileText size={13} className="text-[#1890FF]" /> Notes & Observations
+            </h5>
+            <div className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50/70 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+              {inspectorData.scorecard.notes}
+            </div>
+          </div>
+
+          {/* Categorized Attributes Breakdown */}
+          <div>
+            <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+              Full Rubric for this Round
+            </h5>
+            <div className="space-y-3">
+              {(inspectorData.scorecard.categories || []).map(cat => (
+                <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3 border border-gray-100 dark:border-gray-800">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">
+                    {cat.name}
+                  </div>
+                  <div className="space-y-1.5">
+                    {cat.attributes.map((attr, idx) => {
+                      const isFocused = attr.name === inspectorData.focusedAttributeName;
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                            isFocused 
+                              ? 'bg-[#1890FF]/10 border border-[#1890FF]/40 font-semibold shadow-xs' 
+                              : 'hover:bg-white dark:hover:bg-gray-800/60'
+                          }`}
+                        >
+                          <span className={`text-[12px] truncate pr-2 ${isFocused ? 'text-[#1890FF] font-bold' : 'text-[#454f5b] dark:text-gray-300'}`}>
+                            {attr.name}
+                          </span>
+                          <div className="shrink-0 flex items-center gap-1.5">
+                            {renderRatingCircle(attr.rating, "w-3 h-3")}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Drawer Footer */}
+        <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex items-center justify-end">
+          <button
+            type="button"
+            onClick={closeInspectorDrawer}
+            className="px-4 py-2 text-xs font-bold text-[#212b36] dark:text-white bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer shadow-xs"
+          >
+            Close
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
 
  <RejectAgencyModal
  open={isRejectModalOpen}
