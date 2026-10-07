@@ -8,7 +8,7 @@ import {
   FileCheck, HelpCircle, FileText, Bot, Video, Users, User,
   Globe, PhoneCall, AlertTriangle, MessageSquare, Sliders,
   X, Mic, Volume2, Settings2, Play, Pause, ChevronRight,
-  ArrowLeft, Shield, AlertCircle, AudioLines, Copy
+  ArrowLeft, Shield, AlertCircle, AudioLines, Copy, Search, UserPlus
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
@@ -124,6 +124,21 @@ const NOTIF_ICONS = {
   notifRejectHiringTeam: Users
 };
 
+const MOCK_TEAM_MEMBERS = [
+  { id: 'tm-1', name: 'Priya Sharma', role: 'Tech Lead', department: 'Engineering', email: 'priya.sharma@talentflow.ai' },
+  { id: 'tm-2', name: 'Amit Verma', role: 'Senior Architect', department: 'Systems Architecture', email: 'amit.verma@talentflow.ai' },
+  { id: 'tm-3', name: 'Rahul Sen', role: 'Staff Frontend Engineer', department: 'Frontend Core', email: 'rahul.sen@talentflow.ai' },
+  { id: 'tm-4', name: 'Sneha Patel', role: 'Engineering Manager', department: 'Platform Engineering', email: 'sneha.patel@talentflow.ai' },
+  { id: 'tm-5', name: 'David Chen', role: 'VP of Engineering', department: 'Executive Leadership', email: 'david.chen@talentflow.ai' },
+  { id: 'tm-6', name: 'Anita Roy', role: 'Principal Scientist', department: 'AI Research', email: 'anita.roy@talentflow.ai' },
+  { id: 'tm-7', name: 'Vikram Malhotra', role: 'Senior Product Manager', department: 'Product Management', email: 'vikram.m@talentflow.ai' },
+];
+
+const getMemberInitials = (name) => {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+};
+
 const HIRED_TEMPLATE_OPTIONS = {
   notifHiringTeam: [
     { label: 'Hiring Team - New Hire Confirmation Template', value: 'Hiring Team - New Hire Confirmation Template' },
@@ -173,11 +188,7 @@ const DEFAULT_STAGE_CONFIGS = {
       { id: 'sendEmail', title: 'Send Confirmation Email', desc: 'Send confirmation email acknowledging receipt of application', active: true },
       { id: 'notifyTeam', title: 'Notify Hiring Team', desc: 'Alert hiring team & recruiters of new candidate submission', active: true }
     ],
-    validations: [
-      { id: 'resumeParsed', title: 'Resume Parsed', desc: 'Candidate resume parsed & parsed data populated', required: true },
-      { id: 'knockoutQuestions', title: 'Knockout Questions Passed', desc: 'All mandatory screening knockout questions passed', required: true }
-    ],
-    validationSubtitle: 'The candidate cannot move to the next stage unless:',
+    validations: [],
     guideline: 'Candidates in this stage should be reviewed within 24 hours to maintain engagement.',
     sla: '24 Hours'
   },
@@ -195,7 +206,6 @@ const DEFAULT_STAGE_CONFIGS = {
     ],
     notifications: [],
     validations: [
-      { id: 'assessmentCompleted', title: 'Assessment Completed', desc: 'Pre-screen evaluation test completed', required: true },
       { id: 'screeningCompleted', title: 'Screening Completed', desc: 'Initial recruiter screening call recorded', required: true }
     ],
     validationSubtitle: 'The candidate cannot move to the next stage unless:',
@@ -208,11 +218,9 @@ const DEFAULT_STAGE_CONFIGS = {
     interviewConfig: {
       interviewMode: 'Online', // 'Face to face' | 'Online'
       scheduleAutomatically: true,
-      aiConducted: 'Yes', // 'Yes' | 'No'
-      interviewers: ['Priya Sharma (Tech Lead)', 'Amit Verma (Senior Architect)'],
-      duration: '45 Minutes',
-      interviewLink: 'https://meet.google.com/talentflow-interview',
-      sendInterviewLink: true
+      aiConducted: 'No', // 'Yes' | 'No'
+      interviewers: [],
+      duration: '45 Minutes'
     },
     notificationsSectionTitle: 'Notifications / Reminders',
     notifications: [
@@ -224,12 +232,6 @@ const DEFAULT_STAGE_CONFIGS = {
       { id: 'interviewCompleted', title: 'Interview Completed', required: true },
       { id: 'scorecardCompleted', title: 'Scorecard Completed', required: true }
     ],
-    backgroundCheck: {
-      required: true,
-      passed: true,
-      sendEmailReferences: true,
-      emailTemplate: 'Standard Reference Check Request Template'
-    },
     validationSubtitle: 'The candidate cannot move to the next stage unless:',
     guideline: 'Scorecards should be filled out within 2 hours post-interview for accurate evaluation.',
     sla: '3 Days'
@@ -239,34 +241,15 @@ const DEFAULT_STAGE_CONFIGS = {
     actions: [],
     notificationsSectionTitle: 'Notifications',
     notifications: [
-      { id: 'alertOfferAcceptance', title: 'Alert on Offer Acceptance', active: true },
       { id: 'alertOfferDelayed', title: 'Alert when Offer Acceptance is Delayed', active: true }
     ],
-    validations: [
-      { id: 'offerLetterGenerated', title: 'Offer Letter Generated', required: true },
-      { id: 'offerLetterSigned', title: 'Offer Letter Signed', required: true },
-      { id: 'referencesChecked', title: 'References Checked', required: true },
-      { id: 'backgroundCheckCleared', title: 'Background Check Cleared', required: true }
-    ],
-    validationSubtitle: 'The candidate cannot move to the next stage unless:',
+    validations: [],
     guideline: 'Extend formal offers within 24 hours of decision to maximize acceptance rate.',
     sla: '24 Hours'
   },
   'Hired': {
     description: 'Hired is a terminal stage. Once an application reaches Hired, the hiring workflow for that application is completed.',
-    actionsSectionTitle: 'Actions',
-    actions: [
-      {
-        id: 'markHired',
-        title: 'Mark candidate/application as Hired',
-        active: true
-      },
-      {
-        id: 'triggerOnboardingProcess',
-        title: 'Trigger relevant downstream hiring/onboarding process, if configured',
-        active: true
-      }
-    ],
+    actions: [],
     notificationsSectionTitle: 'Notifications',
     notificationsSubtitle: 'Send notification to:',
     notifications: [
@@ -275,7 +258,6 @@ const DEFAULT_STAGE_CONFIGS = {
       { id: 'notifCandidate', title: 'Candidate', active: true, template: 'Candidate - Formal Welcome & Next Steps Packet' }
     ],
     validations: [],
-    validationSubtitle: 'The candidate cannot move to the next stage unless:',
     guideline: 'Ensure all onboarding workflows and team announcements are scheduled.',
     sla: 'Immediate'
   },
@@ -307,8 +289,7 @@ const DEFAULT_STAGE_CONFIGS = {
     ],
     validationsSectionTitle: 'Validations Before Rejection',
     validations: [
-      { id: 'scorecardCompleted', title: 'Scorecard Completed', required: true },
-      { id: 'hiringManagerApproval', title: 'Hiring Manager Approval', required: true }
+      { id: 'scorecardCompleted', title: 'Scorecard Completed', required: false }
     ],
     validationSubtitle: 'Before the candidate can be rejected:',
     guideline: 'Keep candidate in talent pool for future relevant opportunities.',
@@ -373,6 +354,8 @@ function SortableAccordionStageItem({
   onToggleValidation,
   isEditing,
   onOpenAiAgentModal,
+  onOpenAddInterviewerModal,
+  onRemoveInterviewer,
   aiAgents
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stage.id });
@@ -548,13 +531,10 @@ function SortableAccordionStageItem({
               {/* Section 1: Actions on Entry / Offer Actions */}
               {hasActions && (
                 <div className="space-y-3 bg-gray-50/50 dark:bg-gray-800/20 p-3.5 rounded-xl border border-gray-200/60 dark:border-gray-800/80">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-200/50 dark:border-gray-800">
+                  <div className="pb-2 border-b border-gray-200/50 dark:border-gray-800">
                     <h4 className="text-[12px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                       <Zap size={13} className="text-[#1890FF]" /> {stageConfig.actionsSectionTitle || 'Actions on Entry'}
                     </h4>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] border border-[#1890FF]/20">
-                      {activeActionsCount} Active
-                    </span>
                   </div>
 
                 {/* Specific Layout for Technical Interview Stage */}
@@ -651,14 +631,56 @@ function SortableAccordionStageItem({
                               </button>
                             ) : (
                               /* If No: Assign Interviewer(s) */
-                              <div className="space-y-1">
-                                <label className="text-[12px] font-bold text-gray-600 dark:text-gray-400">
-                                  Assign Interviewer(s)
-                                </label>
-                                <div className="p-2 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800 text-[13px] font-semibold text-[#212b36] dark:text-white flex items-center gap-1.5">
-                                  <Users size={12} className="text-[#1890FF] shrink-0" />
-                                  <span>Priya Sharma (Tech Lead), Amit Verma (Architect)</span>
+                              <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-[12px] font-bold text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                    <Users size={12} className="text-[#1890FF]" /> Assign Interviewer(s)
+                                  </label>
+                                  {(stageConfig.interviewConfig?.interviewers || []).length > 0 && (
+                                    <span className="text-[11px] font-bold text-[#1890FF]">
+                                      {(stageConfig.interviewConfig?.interviewers || []).length} assigned
+                                    </span>
+                                  )}
                                 </div>
+
+                                {(stageConfig.interviewConfig?.interviewers || []).length === 0 ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => onOpenAddInterviewerModal && onOpenAddInterviewerModal(stage.id)}
+                                    className="w-full py-2.5 px-3 border border-dashed border-gray-300 dark:border-gray-700 hover:border-[#1890FF] dark:hover:border-[#1890FF] rounded-lg text-[13px] font-bold text-gray-600 hover:text-[#1890FF] dark:text-gray-300 dark:hover:text-[#1890FF] bg-gray-50/60 dark:bg-gray-800/30 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                  >
+                                    <Plus size={14} className="text-[#1890FF]" /> Add Interviewer
+                                  </button>
+                                ) : (
+                                  <div className="space-y-2 p-2 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800">
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {(stageConfig.interviewConfig?.interviewers || []).map((interviewer, iIdx) => (
+                                        <span 
+                                          key={iIdx}
+                                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[12px] font-semibold text-[#212b36] dark:text-gray-200 shadow-2xs"
+                                        >
+                                          <User size={12} className="text-[#1890FF]" />
+                                          <span>{interviewer}</span>
+                                          <button 
+                                            type="button"
+                                            onClick={() => onRemoveInterviewer && onRemoveInterviewer(stage.id, interviewer)}
+                                            className="text-gray-400 hover:text-red-500 cursor-pointer ml-0.5 p-0.5 transition-colors"
+                                            title="Remove interviewer"
+                                          >
+                                            <X size={12} />
+                                          </button>
+                                        </span>
+                                      ))}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => onOpenAddInterviewerModal && onOpenAddInterviewerModal(stage.id)}
+                                      className="text-[12px] font-bold text-[#1890FF] hover:underline flex items-center gap-1 cursor-pointer pt-0.5"
+                                    >
+                                      <Plus size={13} /> Add another interviewer
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
 
@@ -670,28 +692,6 @@ function SortableAccordionStageItem({
                               <span className="text-[13px] font-bold text-[#1890FF] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md">
                                 {stageConfig.interviewConfig?.duration || '45 Minutes'}
                               </span>
-                            </div>
-
-                            {/* Interview Link */}
-                            <div className="space-y-1">
-                              <label className="text-[12px] font-bold text-gray-600 dark:text-gray-400">
-                                Interview Link
-                              </label>
-                              <div className="p-2 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800 text-[13px] font-semibold text-[#1890FF] truncate">
-                                {stageConfig.interviewConfig?.interviewLink || 'https://meet.google.com/talentflow-interview'}
-                              </div>
-                            </div>
-
-                            {/* Send Interview Link Toggle */}
-                            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800">
-                              <span className="text-[13px] font-medium text-[#212b36] dark:text-white">
-                                Send Interview Link
-                              </span>
-                              <MiniToggle 
-                                checked={stageConfig.interviewConfig?.sendInterviewLink ?? true} 
-                                onChange={() => updateInterviewConfig(stage.id, 'sendInterviewLink', !stageConfig.interviewConfig?.sendInterviewLink)}
-                                label="Send Interview Link"
-                              />
                             </div>
 
                           </div>
@@ -785,14 +785,11 @@ function SortableAccordionStageItem({
             {/* Section 2: Notifications / Reminders */}
               {hasNotifications && (
                 <div className="space-y-3 bg-gray-50/50 dark:bg-gray-800/20 p-3.5 rounded-xl border border-gray-200/60 dark:border-gray-800/80">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-200/50 dark:border-gray-800">
+                  <div className="pb-2 border-b border-gray-200/50 dark:border-gray-800">
                     <h4 className="text-[12px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                       <Mail size={13} className="text-[#1890FF]" /> 
                       {stageConfig.notificationsSectionTitle || 'Notifications on Entry'}
                     </h4>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] border border-[#1890FF]/20">
-                      {activeNotifsCount} Active
-                    </span>
                   </div>
 
                   {stageConfig.notificationsSubtitle && (
@@ -862,13 +859,10 @@ function SortableAccordionStageItem({
               {/* Section 3: Validations Before Next Stage */}
               {hasValidations && (
                 <div className="space-y-3 bg-gray-50/50 dark:bg-gray-800/20 p-3.5 rounded-xl border border-gray-200/60 dark:border-gray-800/80">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-200/50 dark:border-gray-800">
+                  <div className="pb-2 border-b border-gray-200/50 dark:border-gray-800">
                     <h4 className="text-[12px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                       <ShieldCheck size={13} className="text-[#00A76F]" /> {stageConfig.validationsSectionTitle || 'Validations Before Next Stage'}
                     </h4>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/30 text-[#00A76F] border border-[#00A76F]/20">
-                      {activeValidationsCount} Required
-                    </span>
                   </div>
 
                   <p className="text-[12px] text-gray-500 dark:text-gray-400 font-medium">
@@ -907,96 +901,6 @@ function SortableAccordionStageItem({
                       </div>
                     ))}
 
-                    {/* Interview Stage Specific Background Check & References Section */}
-                    {isInterview && (
-                      <div className="p-3 rounded-lg bg-white dark:bg-[#161c24] border border-gray-200/70 dark:border-gray-800 space-y-3 pt-3 mt-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] flex items-center justify-center shrink-0">
-                            <ShieldCheck size={13} />
-                          </div>
-                          <span className="text-[13px] font-bold text-[#212b36] dark:text-white">
-                            Background Check
-                          </span>
-                        </div>
-
-                        {/* Is Background Check Required to Move Forward? */}
-                        <div className="space-y-1.5">
-                          <label className="text-[13px] font-bold text-gray-700 dark:text-gray-300 block">
-                            Is Background Check Required to Move Forward?
-                          </label>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {['Yes', 'No'].map(ans => {
-                              const isSelected = ans === 'Yes' 
-                                ? (stageConfig.backgroundCheck?.required ?? true)
-                                : !(stageConfig.backgroundCheck?.required ?? true);
-                              return (
-                                <button
-                                  key={ans}
-                                  type="button"
-                                  onClick={() => updateBackgroundCheck(stage.id, 'required', ans === 'Yes')}
-                                  className={`py-1 px-2.5 rounded-lg text-[13px] font-bold transition-all cursor-pointer text-center ${
-                                    isSelected
-                                      ? 'bg-[#00A76F] text-white shadow-2xs'
-                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                                  }`}
-                                >
-                                  {ans}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* If Yes / No status */}
-                        {(stageConfig.backgroundCheck?.required ?? true) ? (
-                          <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/60 dark:border-emerald-800/40">
-                            <span className="text-[13px] font-medium text-[#212b36] dark:text-white">
-                              Background Check Passed
-                            </span>
-                            <MiniToggle 
-                              checked={stageConfig.backgroundCheck?.passed ?? true} 
-                              onChange={() => updateBackgroundCheck(stage.id, 'passed', !stageConfig.backgroundCheck?.passed)}
-                              activeColor="bg-[#00A76F]"
-                              label="Background Check Passed"
-                            />
-                          </div>
-                        ) : (
-                          <div className="px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200/60 dark:border-gray-800 text-[13px] font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                            <CheckCircle2 size={13} className="text-gray-400" />
-                            <span>Background Check Not Required</span>
-                          </div>
-                        )}
-
-                        {/* Send email to references */}
-                        <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800">
-                          <span className="text-[13px] font-medium text-[#212b36] dark:text-white">
-                            Send email to references
-                          </span>
-                          <MiniToggle 
-                            checked={stageConfig.backgroundCheck?.sendEmailReferences ?? true} 
-                            onChange={() => updateBackgroundCheck(stage.id, 'sendEmailReferences', !stageConfig.backgroundCheck?.sendEmailReferences)}
-                            activeColor="bg-[#00A76F]"
-                            label="Send email to references"
-                          />
-                        </div>
-
-                        {/* Select email template */}
-                        <div className="space-y-1">
-                          <label className="text-[12px] font-bold text-gray-600 dark:text-gray-400">
-                            Select email template
-                          </label>
-                          <SearchableSelect
-                            options={EMAIL_TEMPLATE_OPTIONS}
-                            value={stageConfig.backgroundCheck?.emailTemplate || 'Standard Reference Check Request Template'}
-                            onChange={(val) => updateBackgroundCheck(stage.id, 'emailTemplate', val)}
-                            showSearch={false}
-                            size="xs"
-                            placement="bottom"
-                          />
-                        </div>
-
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -1344,6 +1248,41 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
     setIsCreatingAgent(false);
   };
 
+  const [isInterviewerModalOpen, setIsInterviewerModalOpen] = useState(false);
+  const [activeInterviewerStageId, setActiveInterviewerStageId] = useState(null);
+  const [interviewerSearchQuery, setInterviewerSearchQuery] = useState('');
+  const [selectedInterviewers, setSelectedInterviewers] = useState([]);
+  const [customInterviewerName, setCustomInterviewerName] = useState('');
+  const [customInterviewerRole, setCustomInterviewerRole] = useState('');
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+
+  const handleOpenAddInterviewerModal = (stageId) => {
+    setActiveInterviewerStageId(stageId);
+    const stage = stages.find(s => s.id === stageId);
+    const currentInterviewers = stage?.config?.interviewConfig?.interviewers || [];
+    setSelectedInterviewers([...currentInterviewers]);
+    setInterviewerSearchQuery('');
+    setIsAddingCustom(false);
+    setCustomInterviewerName('');
+    setCustomInterviewerRole('');
+    setIsInterviewerModalOpen(true);
+  };
+
+  const handleSaveInterviewers = () => {
+    if (activeInterviewerStageId) {
+      updateInterviewConfig(activeInterviewerStageId, 'interviewers', selectedInterviewers);
+    }
+    setIsInterviewerModalOpen(false);
+    setActiveInterviewerStageId(null);
+  };
+
+  const handleRemoveInterviewer = (stageId, interviewerName) => {
+    const stage = stages.find(s => s.id === stageId);
+    const currentInterviewers = stage?.config?.interviewConfig?.interviewers || [];
+    const updated = currentInterviewers.filter(name => name !== interviewerName);
+    updateInterviewConfig(stageId, 'interviewers', updated);
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -1488,6 +1427,8 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
                     onToggleValidation={toggleValidation}
                     isEditing={isEditing}
                     onOpenAiAgentModal={handleOpenAiAgentModal}
+                    onOpenAddInterviewerModal={handleOpenAddInterviewerModal}
+                    onRemoveInterviewer={handleRemoveInterviewer}
                     aiAgents={aiAgents}
                   />
                 ))}
@@ -1530,6 +1471,217 @@ export default function SettingsPipeline({ setSettingsActiveNav }) {
           </button>
         </div>
       </div>
+
+      {/* Assign Interviewer Modal */}
+      {isInterviewerModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-xl w-full border border-gray-100 dark:border-gray-800 overflow-hidden max-h-[90vh] flex flex-col animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-gray-800 shrink-0 gap-4">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center shrink-0 mt-0.5">
+                  <UserPlus size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    Assign Interviewer(s)
+                  </h3>
+                  <p className="text-[13px] text-gray-500 mt-0.5 leading-relaxed">
+                    Select team members or add interviewers responsible for evaluating candidates in this stage.
+                  </p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => {
+                  setIsInterviewerModalOpen(false);
+                  setActiveInterviewerStageId(null);
+                }} 
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
+                title="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Search & Content */}
+            <div className="p-5 overflow-y-auto max-h-[calc(90vh-140px)] custom-scrollbar space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text"
+                  placeholder="Search team members by name, role or email..."
+                  value={interviewerSearchQuery}
+                  onChange={(e) => setInterviewerSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3.5 py-2 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-semibold text-[#212b36] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF]"
+                />
+              </div>
+
+              {/* Team Members List */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    Company Team Directory
+                  </span>
+                  <span className="text-[11px] font-bold text-[#1890FF]">
+                    {selectedInterviewers.length} Selected
+                  </span>
+                </div>
+
+                <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                  {MOCK_TEAM_MEMBERS
+                    .filter(tm => 
+                      !interviewerSearchQuery || 
+                      tm.name.toLowerCase().includes(interviewerSearchQuery.toLowerCase()) || 
+                      tm.role.toLowerCase().includes(interviewerSearchQuery.toLowerCase()) ||
+                      tm.email.toLowerCase().includes(interviewerSearchQuery.toLowerCase())
+                    )
+                    .map(member => {
+                      const displayLabel = `${member.name} (${member.role})`;
+                      const isSelected = selectedInterviewers.includes(displayLabel);
+                      return (
+                        <div 
+                          key={member.id}
+                          onClick={() => {
+                            setSelectedInterviewers(prev => 
+                              isSelected 
+                                ? prev.filter(name => name !== displayLabel) 
+                                : [...prev, displayLabel]
+                            );
+                          }}
+                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                            isSelected 
+                              ? 'bg-blue-50/60 dark:bg-blue-900/20 border-[#1890FF]/60 shadow-xs' 
+                              : 'bg-white dark:bg-[#161c24] border-gray-200/70 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                              isSelected ? 'bg-[#1890FF] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                            }`}>
+                              {getMemberInitials(member.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">
+                                {member.name}
+                              </p>
+                              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                                {member.role} • {member.department}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors shrink-0 ${
+                            isSelected 
+                              ? 'bg-[#1890FF] border-[#1890FF] text-white' 
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-[#161c24]'
+                          }`}>
+                            {isSelected && <Check size={12} className="stroke-[3]" />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Add Custom / External Interviewer */}
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+                {!isAddingCustom ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingCustom(true)}
+                    className="text-[12px] font-bold text-[#1890FF] hover:underline flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus size={14} /> Add new interviewer not in directory
+                  </button>
+                ) : (
+                  <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 space-y-2.5 animate-fade-in">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12px] font-bold text-gray-700 dark:text-gray-300">
+                        Add New Interviewer
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingCustom(false);
+                          setCustomInterviewerName('');
+                          setCustomInterviewerRole('');
+                        }}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-[11px] font-semibold"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input 
+                        type="text"
+                        placeholder="Full Name (e.g. John Doe)"
+                        value={customInterviewerName}
+                        onChange={(e) => setCustomInterviewerName(e.target.value)}
+                        className="px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[12px] font-semibold text-[#212b36] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                      />
+                      <input 
+                        type="text"
+                        placeholder="Role / Title (e.g. Lead Engineer)"
+                        value={customInterviewerRole}
+                        onChange={(e) => setCustomInterviewerRole(e.target.value)}
+                        className="px-3 py-1.5 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-[12px] font-semibold text-[#212b36] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={!customInterviewerName.trim()}
+                      onClick={() => {
+                        if (!customInterviewerName.trim()) return;
+                        const label = customInterviewerRole.trim() 
+                          ? `${customInterviewerName.trim()} (${customInterviewerRole.trim()})` 
+                          : customInterviewerName.trim();
+                        if (!selectedInterviewers.includes(label)) {
+                          setSelectedInterviewers(prev => [...prev, label]);
+                        }
+                        setCustomInterviewerName('');
+                        setCustomInterviewerRole('');
+                        setIsAddingCustom(false);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-[#1890FF] text-white text-[12px] font-bold hover:bg-[#0077e6] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      Add to List
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex items-center justify-end gap-2.5 shrink-0">
+              <button 
+                type="button"
+                onClick={() => {
+                  setIsInterviewerModalOpen(false);
+                  setActiveInterviewerStageId(null);
+                }} 
+                className="px-4 py-2 rounded-xl text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleSaveInterviewers} 
+                className="px-5 py-2 rounded-xl text-[13px] font-bold bg-[#1890FF] text-white hover:bg-[#0077e6] transition-colors shadow-[0_4px_12px_rgba(24,144,255,0.25)] cursor-pointer flex items-center gap-1.5"
+              >
+                <Check size={14} className="stroke-[2.5]" />
+                <span>Save Interviewers ({selectedInterviewers.length})</span>
+              </button>
+            </div>
+
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Configure AI Agent Modal */}
       {isAiAgentModalOpen && createPortal(

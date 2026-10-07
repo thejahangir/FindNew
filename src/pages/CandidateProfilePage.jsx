@@ -1660,16 +1660,16 @@ export default function CandidateProfilePage() {
             </button>
             <button
               type="button"
-              onClick={() => setOption1SubTab('Scorecard Analysis')}
+              onClick={() => setOption1SubTab('Consolidated Scorecard Analysis')}
               className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors flex items-center gap-2 ${
-                option1SubTab === 'Scorecard Analysis'
+                option1SubTab === 'Consolidated Scorecard Analysis'
                   ? 'text-[#1890FF]'
                   : 'text-gray-500 hover:text-[#212b36] dark:hover:text-white'
               }`}
             >
-              <Sparkles size={16} className={option1SubTab === 'Scorecard Analysis' ? 'text-[#1890FF]' : 'text-gray-400'} />
-              <span>Scorecard Analysis</span>
-              {option1SubTab === 'Scorecard Analysis' && (
+              <Sparkles size={16} className={option1SubTab === 'Consolidated Scorecard Analysis' ? 'text-[#1890FF]' : 'text-gray-400'} />
+              <span>Consolidated Scorecard Analysis</span>
+              {option1SubTab === 'Consolidated Scorecard Analysis' && (
                 <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#1890FF] rounded-full" />
               )}
             </button>
@@ -1847,6 +1847,153 @@ export default function CandidateProfilePage() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* AI Summary (2/3 lines) */}
+            <div className="rounded-2xl border border-[#1890FF]/25 bg-gradient-to-br from-[#1890FF]/5 via-purple-500/5 to-transparent p-5 sm:p-6 shadow-sm relative overflow-hidden">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+                  <Sparkles size={16} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-[#212b36] dark:text-white">AI Summary</h3>
+                    <span className="text-[10px] font-bold text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Synthesis</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300">
+                The evaluation panel demonstrates strong consensus on core technical capabilities, distributed systems fundamentals, and hands-on execution across all technical interview rounds. However, notable discrepancies emerged between engineering and executive reviewers regarding strategic product tradeoffs, high-stakes communication, and leadership presence under ambiguity.
+              </p>
+            </div>
+
+            {/* Consensus & Discrepancies Sections */}
+            {(() => {
+              const summaryData = getScorecardsSummaryData();
+              return (
+                <div className="space-y-8">
+                  {/* Consensus Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#00A76F]/10 text-[#00A76F] flex items-center justify-center">
+                          <CheckCircle size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Consensus</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with aligned evaluations across interviewers</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-2.5 py-0.5 rounded-full">
+                        0 Attributes
+                      </span>
+                    </div>
+
+                    <div className="w-full py-8 px-4 flex flex-col items-center justify-center text-center rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-dashed border-gray-200 dark:border-gray-800">
+                      <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-200">No consensus attributes identified yet</p>
+                      <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+                        Consensus insights will appear once multiple interviewers evaluate and align on the same competency attributes.
+                      </p>
+                    </div>
+
+                    {/*
+                    <div className="grid grid-cols-1 gap-3">
+                      {summaryData.consensus.map((item, idx) => (
+                        <div key={`cons-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#00A76F]/40 transition-colors shadow-xs">
+                          <div className="mb-3">
+                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.name}</h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            {item.ratings.map((r, rIdx) => (
+                              <button 
+                                key={rIdx} 
+                                type="button"
+                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
+                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
+                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
+                                  {getInitials(r.interviewer)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
+                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
+                                  </div>
+                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    */}
+                  </div>
+
+                  {/* Discrepancies Section */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center">
+                          <ArrowRightLeft size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Discrepancies</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with divergent ratings or conflicting viewpoints</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-2.5 py-0.5 rounded-full">
+                        0 Attributes
+                      </span>
+                    </div>
+
+                    <div className="w-full py-8 px-4 flex flex-col items-center justify-center text-center rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-dashed border-gray-200 dark:border-gray-800">
+                      <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-200">No rating discrepancies found</p>
+                      <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+                        Attributes with divergent evaluations or conflicting viewpoints across interview stages will be highlighted here.
+                      </p>
+                    </div>
+
+                    {/*
+                    <div className="grid grid-cols-1 gap-3">
+                      {summaryData.discrepancies.map((item, idx) => (
+                        <div key={`diss-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#FF5630]/40 transition-colors shadow-xs">
+                          <div className="mb-3">
+                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
+                              <span>{item.name}</span>
+                              <span className="text-[10px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-1.5 py-0.5 rounded border border-[#FF5630]/20">Divergence</span>
+                            </h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            {item.ratings.map((r, rIdx) => (
+                              <button 
+                                key={rIdx} 
+                                type="button"
+                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
+                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
+                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
+                                  {getInitials(r.interviewer)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
+                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
+                                  </div>
+                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    */}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Scorecard Ratings Section */}
             <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-200 dark:border-gray-800/80 p-5 sm:p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
@@ -1936,135 +2083,6 @@ export default function CandidateProfilePage() {
                 })}
               </div>
             </div>
-
-            {/* AI Summary (2/3 lines) */}
-            <div className="rounded-2xl border border-[#1890FF]/25 bg-gradient-to-br from-[#1890FF]/5 via-purple-500/5 to-transparent p-5 sm:p-6 shadow-sm relative overflow-hidden">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
-                  <Sparkles size={16} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-[#212b36] dark:text-white">AI Summary</h3>
-                    <span className="text-[10px] font-bold text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Synthesis</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300">
-                The evaluation panel demonstrates strong consensus on core technical capabilities, distributed systems fundamentals, and hands-on execution across all technical interview rounds. However, notable discrepancies emerged between engineering and executive reviewers regarding strategic product tradeoffs, high-stakes communication, and leadership presence under ambiguity.
-              </p>
-            </div>
-
-            {/* Consensus & Discrepancies Sections */}
-            {(() => {
-              const summaryData = getScorecardsSummaryData();
-              return (
-                <div className="space-y-8">
-                  {/* Consensus Section */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-[#00A76F]/10 text-[#00A76F] flex items-center justify-center">
-                          <CheckCircle size={15} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Consensus</h3>
-                          <p className="text-[11px] text-gray-500">Attributes with aligned evaluations across interviewers</p>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-2.5 py-0.5 rounded-full">
-                        {summaryData.consensus.length} Attributes
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3">
-                      {summaryData.consensus.map((item, idx) => (
-                        <div key={`cons-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#00A76F]/40 transition-colors shadow-xs">
-                          <div className="mb-3">
-                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.name}</h4>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                            {item.ratings.map((r, rIdx) => (
-                              <button 
-                                key={rIdx} 
-                                type="button"
-                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
-                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
-                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
-                              >
-                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
-                                  {getInitials(r.interviewer)}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
-                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
-                                  </div>
-                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Discrepancies Section */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center">
-                          <ArrowRightLeft size={15} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Discrepancies</h3>
-                          <p className="text-[11px] text-gray-500">Attributes with divergent ratings or conflicting viewpoints</p>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-2.5 py-0.5 rounded-full">
-                        {summaryData.discrepancies.length} Attributes
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3">
-                      {summaryData.discrepancies.map((item, idx) => (
-                        <div key={`diss-${idx}`} className="bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-800/80 p-4 hover:border-[#FF5630]/40 transition-colors shadow-xs">
-                          <div className="mb-3">
-                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white flex items-center gap-2">
-                              <span>{item.name}</span>
-                              <span className="text-[10px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-1.5 py-0.5 rounded border border-[#FF5630]/20">Divergence</span>
-                            </h4>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                            {item.ratings.map((r, rIdx) => (
-                              <button 
-                                key={rIdx} 
-                                type="button"
-                                onClick={() => openInspectorDrawer(r.interviewer, item.name)}
-                                title={`Click to inspect ${r.interviewer}'s feedback for "${item.name}"`}
-                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-left hover:border-[#1890FF]/50 hover:bg-[#1890FF]/5 hover:shadow-xs transition-all cursor-pointer group"
-                              >
-                                <div className="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-[10px] font-bold text-[#212b36] dark:text-gray-200 shrink-0 group-hover:scale-105 group-hover:border-[#1890FF]/40 transition-all">
-                                  {getInitials(r.interviewer)}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <p className="text-[12px] font-semibold text-[#212b36] dark:text-gray-200 truncate group-hover:text-[#1890FF] transition-colors">{r.interviewer}</p>
-                                    <ChevronRight size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-[#1890FF] transition-all shrink-0" />
-                                  </div>
-                                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{r.stage}</p>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
           </div>
         )}
       </div>
