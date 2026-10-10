@@ -49,6 +49,7 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  { name: 'Candidates', path: '/dashboard/candidates', icon: Users },
  { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },
  { name: 'Approvals', path: '/dashboard/approvals', icon: CheckSquare },
+ { name: 'Interview Kits', path: '/dashboard/interview-kits', icon: ClipboardList },
  { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 }
  ];
 

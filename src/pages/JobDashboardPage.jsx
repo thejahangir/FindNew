@@ -508,73 +508,82 @@ export default function JobDashboardPage() {
  return (
  <div className="p-6 space-y-5 relative">
  
- {/* HEADER */}
- <div className="mb-2">
- <div className="flex items-center gap-2 text-[13px] font-bold mb-4">
- <button onClick={() => navigate('/dashboard/jobs')} className="text-gray-500 hover:text-[#1890FF] transition-colors cursor-pointer">
- Jobs
- </button>
- <ChevronRight size={14} className="text-gray-400 shrink-0" />
- <span className="text-[#212b36] dark:text-white truncate max-w-[300px]" title={setupJobData.title}>{setupJobData.title}</span>
- </div>
- <div className="flex items-center justify-between">
- <div>
- <div className="flex items-center gap-3">
- <h1 className="text-2xl font-bold text-[#212b36] dark:text-white ">{setupJobData.title}</h1>
- <span className={`text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1 ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]/10 text-[#b78103] dark:text-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]/10 text-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]/10 text-[#1890FF]' : 'bg-[#00A76F]/10 text-[#00A76F]'}`}>
- <span className={`w-1.5 h-1.5 rounded-full ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]' : 'bg-[#00A76F]'}`}></span>
- {setupJobData.status}
- </span>
- </div>
- <p className="text-[13px] text-black dark:text-white mt-1 flex items-center gap-1.5 font-medium">
- <MapPin size={16} className="text-[#00A76F]" />
- {setupJobData.location} • {setupJobData.workMode}
- </p>
- </div>
- <div className="flex items-center gap-3">
- <div className="flex -space-x-2">
- {hiringTeam.map(member => (
- <div key={member.id} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer ${member.color}`} title={member.name}>
- {member.initials}
- </div>
- ))}
- </div>
- <button 
- onClick={() => setIsInviteModalOpen(true)}
- className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
- title="Invite Team Member"
- >
- <Plus size={14} />
- </button>
- </div>
- </div>
- </div>
+ {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <button onClick={() => navigate('/dashboard/jobs')} className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Jobs
+        </button>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white truncate max-w-[300px]" title={setupJobData.title}>{setupJobData.title}</span>
+      </nav>
 
- {/* JOB NAVIGATION TABS */}
- <div className="flex flex-wrap items-center gap-5 border-b border-gray-200 dark:border-gray-800/50 mt-4 pb-px">
- {tabs.map((tab) => {
- const isDisabled = isDraft && tab !== 'Job Setup';
- return (
- <button
- key={tab}
- onClick={() => !isDisabled && setActiveTab(tab)}
- disabled={isDisabled}
- className={`pb-3 text-[13px] font-bold transition-colors whitespace-nowrap relative ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} ${
- activeTab === tab 
- ? 'text-[#1890FF] dark:text-[#1890FF]' 
- : (isDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-black hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white')
- }`}
- >
- {tab}
- {activeTab === tab && (
- <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#1890FF] rounded-t-full"></span>
- )}
- </button>
- );
- })}
- </div>
+      {/* JOB HEADER CARD (MATCHING INTERVIEW & CANDIDATE PAGES) */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white truncate tracking-tight leading-none">
+                {setupJobData.title}
+              </h1>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]/10 text-[#b78103] dark:text-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]/10 text-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]/10 text-[#1890FF]' : 'bg-[#00A76F]/10 text-[#00A76F]'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]' : 'bg-[#00A76F]'}`}></span>
+                {setupJobData.status}
+              </span>
+            </div>
 
- {/* OVERVIEW TAB */}
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-[13px] text-[#212b36] dark:text-gray-300 font-medium">
+              <div className="flex items-center gap-1.5">
+                <MapPin size={15} className="text-gray-500 dark:text-gray-400" />
+                <span className="font-bold">{setupJobData.location}</span>
+                <span className="text-gray-400 font-medium ml-1">• {setupJobData.workMode}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="flex -space-x-2">
+              {hiringTeam.map(member => (
+                <div key={member.id} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer ${member.color}`} title={member.name}>
+                  {member.initials}
+                </div>
+              ))}
+            </div>
+            <button 
+              onClick={() => setIsInviteModalOpen(true)}
+              className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
+              title="Invite Team Member"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* JOB NAVIGATION TABS */}
+      <div className="flex flex-wrap items-center gap-6 border-b border-gray-200 dark:border-gray-800 pb-0 !mt-7">
+        {tabs.map((tab) => {
+          const isDisabled = isDraft && tab !== 'Job Setup';
+          return (
+            <button
+              key={tab}
+              onClick={() => !isDisabled && setActiveTab(tab)}
+              disabled={isDisabled}
+              className={`pb-2.5 text-[13px] font-bold transition-colors whitespace-nowrap relative ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} ${
+                activeTab === tab 
+                  ? 'text-[#1890FF] dark:text-[#1890FF]' 
+                  : (isDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white')
+              }`}
+            >
+              <span>{tab}</span>
+              {activeTab === tab && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#1890FF] rounded-t-full"></span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* OVERVIEW TAB */}
  {activeTab === 'Overview' && (
  <div className="space-y-5 animate-fade-in">
  {/* METRICS ROW */}

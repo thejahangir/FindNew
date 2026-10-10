@@ -170,6 +170,80 @@ export default function FindNeoAIAssistant() {
               );
             }
 
+            if (msg.type === 'interview-prep') {
+              return (
+                <div key={msg.id} className="flex flex-col gap-2 items-start w-full">
+                  <div className="w-full bg-white dark:bg-[#1E2732] border border-[#1890FF]/30 rounded-2xl p-4 shadow-sm space-y-3">
+                    {/* Header */}
+                    <div className="flex items-center gap-2 pb-2.5 border-b border-gray-100 dark:border-gray-700/60">
+                      <div className="w-6 h-6 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center">
+                        <Sparkles size={14} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">Round Brief: {msg.candidateName}</h4>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#1890FF]/10 text-[#1890FF] shrink-0">{msg.duration}</span>
+                        </div>
+                        <p className="text-[10px] text-gray-400 truncate">{msg.roundName}</p>
+                      </div>
+                    </div>
+
+                    {/* Why this round exists */}
+                    <div className="bg-blue-50/50 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/40 space-y-1">
+                      <div className="text-[11px] font-bold text-[#1890FF]">1. Why This Round Exists</div>
+                      <p className="text-[11px] text-gray-700 dark:text-gray-300 leading-relaxed">{msg.whyThisRoundExists}</p>
+                    </div>
+
+                    {/* Signals to extract */}
+                    <div className="space-y-1.5">
+                      <div className="text-[11px] font-bold text-[#212b36] dark:text-white">2. Signals To Extract</div>
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {msg.signalsToExtract?.map((sig, i) => (
+                          <div key={i} className="bg-gray-50 dark:bg-black/20 p-2 rounded-lg border border-gray-200/70 dark:border-gray-700/50 text-[11px]">
+                            <span className="font-bold text-[#212b36] dark:text-white">• {sig.title}: </span>
+                            <span className="text-gray-500 dark:text-gray-400">{sig.detail}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Shape of the hour */}
+                    <div className="space-y-1.5">
+                      <div className="text-[11px] font-bold text-[#212b36] dark:text-white">3. Shape of the Hour</div>
+                      <div className="space-y-1">
+                        {msg.shapeOfHour?.map((step, i) => (
+                          <div key={i} className="flex items-start gap-2 text-[11px] bg-gray-50 dark:bg-black/20 p-1.5 rounded-lg border border-gray-100 dark:border-gray-800">
+                            <span className="px-1.5 py-0.2 rounded font-mono font-bold text-[10px] bg-[#1890FF]/15 text-[#1890FF] shrink-0">{step.time}</span>
+                            <div className="min-w-0 flex-1">
+                              <span className="font-bold text-[#212b36] dark:text-white">{step.title} — </span>
+                              <span className="text-gray-500 dark:text-gray-400">{step.desc}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* High signal questions */}
+                    <div className="space-y-1.5">
+                      <div className="text-[11px] font-bold text-[#212b36] dark:text-white">4. High-Signal Questions</div>
+                      <div className="space-y-1.5">
+                        {msg.questions?.map((q, i) => (
+                          <div key={i} className="p-2 rounded-lg bg-gray-50 dark:bg-black/20 border border-gray-200/70 dark:border-gray-700/50 text-[11px] italic text-gray-700 dark:text-gray-300">
+                            "{q}"
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-[11px] text-gray-400">
+                      <span>Synthesized from Job Spec & Previous Rounds</span>
+                      <span className="text-[#1890FF] font-medium flex items-center gap-1">FindNeo AI Engine</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div key={msg.id} className="flex flex-col gap-1 items-start max-w-[90%]">
                 <div className="bg-gray-100 dark:bg-gray-800 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-[13px] text-[#212b36] dark:text-white leading-relaxed whitespace-pre-line">
