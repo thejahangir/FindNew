@@ -7,6 +7,7 @@ import {
  CheckCircle, Check, Video, StickyNote, Phone, Globe, BookOpen, Bookmark, Bell, Bot, Cpu, GripVertical, X
 } from 'lucide-react';
 import RejectAgencyModal from '../components/dashboard/RejectAgencyModal';
+import FeedScorecardModal from '../components/dashboard/FeedScorecardModal';
 import findNewIco from '../assets/findnew-ico.png';
 import { useChatbot } from '../contexts/ChatbotContext';
 
@@ -29,28 +30,28 @@ const MOCK_SCORECARDS = [
       {
         name: 'Personality Traits',
         attributes: [
-          { name: 'Self-motivated & Ownership', rating: 'Advanced' },
-          { name: 'Team Player & Empathy', rating: 'Competent' },
-          { name: 'Clear Communication', rating: 'Competent' },
-          { name: 'Disciplined & Adaptable', rating: 'Advanced' },
+          { name: 'Self-motivated & Ownership', rating: 'Strong Yes' },
+          { name: 'Team Player & Empathy', rating: 'Yes' },
+          { name: 'Clear Communication', rating: 'Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Strong Yes' },
         ]
       },
       {
         name: 'Technical Competencies',
         attributes: [
-          { name: 'Distributed Systems Architecture', rating: 'Advanced' },
-          { name: 'React & Node Ecosystems', rating: 'Advanced' },
-          { name: 'System Design & Concurrency', rating: 'Advanced' },
-          { name: 'API Design & Scalability', rating: 'Advanced' },
+          { name: 'Distributed Systems Architecture', rating: 'Strong Yes' },
+          { name: 'React & Node Ecosystems', rating: 'Strong Yes' },
+          { name: 'System Design & Concurrency', rating: 'Strong Yes' },
+          { name: 'API Design & Scalability', rating: 'Strong Yes' },
         ]
       },
       {
         name: 'Research & Problem Solving',
         attributes: [
-          { name: 'Algorithmic Rigor & Optimization', rating: 'Advanced' },
-          { name: 'Product Strategy & Tradeoffs', rating: 'Competent' },
-          { name: 'Creative Problem Solving', rating: 'Advanced' },
-          { name: 'Analytical Thinking', rating: 'Advanced' },
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Strong Yes' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Yes' },
+          { name: 'Creative Problem Solving', rating: 'Strong Yes' },
+          { name: 'Analytical Thinking', rating: 'Strong Yes' },
         ]
       }
     ]
@@ -71,18 +72,18 @@ const MOCK_SCORECARDS = [
       {
         name: 'Personality Traits',
         attributes: [
-          { name: 'Self-motivated & Ownership', rating: 'Advanced' },
-          { name: 'Team Player & Empathy', rating: 'Advanced' },
-          { name: 'Clear Communication', rating: 'Advanced' },
-          { name: 'Disciplined & Adaptable', rating: 'Competent' },
+          { name: 'Self-motivated & Ownership', rating: 'Strong Yes' },
+          { name: 'Team Player & Empathy', rating: 'Strong Yes' },
+          { name: 'Clear Communication', rating: 'Strong Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Yes' },
         ]
       },
       {
         name: 'Technical Competencies',
         attributes: [
           { name: 'Distributed Systems Architecture', rating: 'Unassessed' },
-          { name: 'React & Node Ecosystems', rating: 'Competent' },
-          { name: 'System Design & Concurrency', rating: 'Competent' },
+          { name: 'React & Node Ecosystems', rating: 'Yes' },
+          { name: 'System Design & Concurrency', rating: 'Yes' },
           { name: 'API Design & Scalability', rating: 'Unassessed' },
         ]
       },
@@ -90,9 +91,9 @@ const MOCK_SCORECARDS = [
         name: 'Research & Problem Solving',
         attributes: [
           { name: 'Algorithmic Rigor & Optimization', rating: 'Unassessed' },
-          { name: 'Product Strategy & Tradeoffs', rating: 'Competent' },
-          { name: 'Creative Problem Solving', rating: 'Competent' },
-          { name: 'Analytical Thinking', rating: 'Competent' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Yes' },
+          { name: 'Creative Problem Solving', rating: 'Yes' },
+          { name: 'Analytical Thinking', rating: 'Yes' },
         ]
       }
     ]
@@ -113,28 +114,28 @@ const MOCK_SCORECARDS = [
       {
         name: 'Personality Traits',
         attributes: [
-          { name: 'Self-motivated & Ownership', rating: 'Competent' },
-          { name: 'Team Player & Empathy', rating: 'Beginner' },
-          { name: 'Clear Communication', rating: 'Competent' },
-          { name: 'Disciplined & Adaptable', rating: 'Competent' },
+          { name: 'Self-motivated & Ownership', rating: 'Yes' },
+          { name: 'Team Player & Empathy', rating: 'No' },
+          { name: 'Clear Communication', rating: 'Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Yes' },
         ]
       },
       {
         name: 'Technical Competencies',
         attributes: [
-          { name: 'Distributed Systems Architecture', rating: 'Competent' },
-          { name: 'React & Node Ecosystems', rating: 'Competent' },
-          { name: 'System Design & Concurrency', rating: 'Beginner' },
-          { name: 'API Design & Scalability', rating: 'Competent' },
+          { name: 'Distributed Systems Architecture', rating: 'Yes' },
+          { name: 'React & Node Ecosystems', rating: 'Yes' },
+          { name: 'System Design & Concurrency', rating: 'No' },
+          { name: 'API Design & Scalability', rating: 'Yes' },
         ]
       },
       {
         name: 'Research & Problem Solving',
         attributes: [
-          { name: 'Algorithmic Rigor & Optimization', rating: 'Competent' },
-          { name: 'Product Strategy & Tradeoffs', rating: 'Beginner' },
-          { name: 'Creative Problem Solving', rating: 'Beginner' },
-          { name: 'Analytical Thinking', rating: 'Competent' },
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Yes' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'No' },
+          { name: 'Creative Problem Solving', rating: 'No' },
+          { name: 'Analytical Thinking', rating: 'Yes' },
         ]
       }
     ]
@@ -155,28 +156,28 @@ const MOCK_SCORECARDS = [
       {
         name: 'Personality Traits',
         attributes: [
-          { name: 'Self-motivated & Ownership', rating: 'Beginner' },
-          { name: 'Team Player & Empathy', rating: 'Beginner' },
-          { name: 'Clear Communication', rating: 'Beginner' },
-          { name: 'Disciplined & Adaptable', rating: 'Beginner' },
+          { name: 'Self-motivated & Ownership', rating: 'Strong No' },
+          { name: 'Team Player & Empathy', rating: 'Strong No' },
+          { name: 'Clear Communication', rating: 'Strong No' },
+          { name: 'Disciplined & Adaptable', rating: 'Strong No' },
         ]
       },
       {
         name: 'Technical Competencies',
         attributes: [
-          { name: 'Distributed Systems Architecture', rating: 'Beginner' },
-          { name: 'React & Node Ecosystems', rating: 'Beginner' },
-          { name: 'System Design & Concurrency', rating: 'Beginner' },
+          { name: 'Distributed Systems Architecture', rating: 'Strong No' },
+          { name: 'React & Node Ecosystems', rating: 'Strong No' },
+          { name: 'System Design & Concurrency', rating: 'Strong No' },
           { name: 'API Design & Scalability', rating: 'Unassessed' },
         ]
       },
       {
         name: 'Research & Problem Solving',
         attributes: [
-          { name: 'Algorithmic Rigor & Optimization', rating: 'Beginner' },
-          { name: 'Product Strategy & Tradeoffs', rating: 'Beginner' },
-          { name: 'Creative Problem Solving', rating: 'Beginner' },
-          { name: 'Analytical Thinking', rating: 'Beginner' },
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Strong No' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Strong No' },
+          { name: 'Creative Problem Solving', rating: 'Strong No' },
+          { name: 'Analytical Thinking', rating: 'Strong No' },
         ]
       }
     ]
@@ -195,13 +196,14 @@ const getAggregatedAttributeRating = (categoryName, attrName) => {
   
   if (ratings.length === 0) return 'Unassessed';
   
-  const weights = { 'advanced': 3, 'competent': 2, 'beginner': 1, 'unassessed': 0 };
+  const weights = { 'strong yes': 4, 'yes': 3, 'no': 2, 'strong no': 1, 'unassessed': 0 };
   const validWeights = ratings.map(r => weights[r.toLowerCase()] ?? 0);
   const avg = validWeights.reduce((a, b) => a + b, 0) / validWeights.length;
   
-  if (avg >= 2.3) return 'Advanced';
-  if (avg >= 1.5) return 'Competent';
-  if (avg >= 0.5) return 'Beginner';
+  if (avg >= 3.4) return 'Strong Yes';
+  if (avg >= 2.4) return 'Yes';
+  if (avg >= 1.4) return 'No';
+  if (avg >= 0.5) return 'Strong No';
   return 'Unassessed';
 };
 
@@ -231,7 +233,7 @@ const getScorecardsSummaryData = () => {
   const consensus = [];
   const discrepancies = [];
 
-  const ratingWeight = { 'advanced': 3, 'competent': 2, 'beginner': 1 };
+  const ratingWeight = { 'strong yes': 4, 'yes': 3, 'no': 2, 'strong no': 1 };
 
   Object.values(attributeMap).forEach(item => {
     const assessedRatings = item.ratings.filter(r => r.rating && r.rating.toLowerCase() !== 'unassessed');
@@ -284,36 +286,36 @@ const SCORECARD_SUMMARY_ATTRIBUTES = [
 
 const getRatingAvatarStyle = (rating) => {
   switch (rating?.toLowerCase()) {
-    case 'advanced':
-    case 'exceeds expectations':
-    case 'advanced / exceeds expectations':
     case 'strong yes':
+    case 'advanced':
       return {
         bg: 'bg-[#00A76F]',
         text: 'text-white',
         border: 'border-2 border-white dark:border-[#161c24]',
-        label: 'Advanced',
+        label: 'Strong Yes',
       };
-    case 'competent':
-    case 'meets expectations':
-    case 'competent / meets expectations':
     case 'yes':
+    case 'competent':
+      return {
+        bg: 'bg-[#1890FF]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Yes',
+      };
+    case 'no':
       return {
         bg: 'bg-[#FFAB00]',
         text: 'text-white',
         border: 'border-2 border-white dark:border-[#161c24]',
-        label: 'Competent',
+        label: 'No',
       };
-    case 'beginner':
-    case 'below expectations':
-    case 'beginner / below expectations':
-    case 'no':
     case 'strong no':
+    case 'beginner':
       return {
         bg: 'bg-[#FF5630]',
         text: 'text-white',
         border: 'border-2 border-white dark:border-[#161c24]',
-        label: 'Beginner',
+        label: 'Strong No',
       };
     case 'unassessed':
     case 'insufficient data':
@@ -330,22 +332,17 @@ const getRatingAvatarStyle = (rating) => {
 
 const renderRatingCircle = (rating, size = "w-3.5 h-3.5") => {
   switch (rating?.toLowerCase()) {
-    case 'advanced':
-    case 'exceeds expectations':
-    case 'advanced / exceeds expectations':
     case 'strong yes':
-      return <span title="Advanced / Exceeds Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#00A76F] shadow-xs`} />;
-    case 'competent':
-    case 'meets expectations':
-    case 'competent / meets expectations':
+    case 'advanced':
+      return <span title="Strong Yes" className={`inline-block shrink-0 ${size} rounded-full bg-[#00A76F] shadow-xs`} />;
     case 'yes':
-      return <span title="Competent / Meets Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#FFAB00] shadow-xs`} />;
-    case 'beginner':
-    case 'below expectations':
-    case 'beginner / below expectations':
+    case 'competent':
+      return <span title="Yes" className={`inline-block shrink-0 ${size} rounded-full bg-[#1890FF] shadow-xs`} />;
     case 'no':
+      return <span title="No" className={`inline-block shrink-0 ${size} rounded-full bg-[#FFAB00] shadow-xs`} />;
     case 'strong no':
-      return <span title="Beginner / Below Expectations" className={`inline-block shrink-0 ${size} rounded-full bg-[#FF5630] shadow-xs`} />;
+    case 'beginner':
+      return <span title="Strong No" className={`inline-block shrink-0 ${size} rounded-full bg-[#FF5630] shadow-xs`} />;
     case 'unassessed':
     case 'insufficient data':
     case 'unassessed / insufficient data':
@@ -356,22 +353,17 @@ const renderRatingCircle = (rating, size = "w-3.5 h-3.5") => {
 
 const getRatingLabel = (rating) => {
   switch (rating?.toLowerCase()) {
-    case 'advanced':
-    case 'exceeds expectations':
-    case 'advanced / exceeds expectations':
     case 'strong yes':
-      return { label: 'Advanced', text: 'text-[#00A76F]' };
-    case 'competent':
-    case 'meets expectations':
-    case 'competent / meets expectations':
+    case 'advanced':
+      return { label: 'Strong Yes', text: 'text-[#00A76F]' };
     case 'yes':
-      return { label: 'Competent', text: 'text-[#FFAB00]' };
-    case 'beginner':
-    case 'below expectations':
-    case 'beginner / below expectations':
+    case 'competent':
+      return { label: 'Yes', text: 'text-[#1890FF]' };
     case 'no':
+      return { label: 'No', text: 'text-[#FFAB00]' };
     case 'strong no':
-      return { label: 'Beginner', text: 'text-[#FF5630]' };
+    case 'beginner':
+      return { label: 'Strong No', text: 'text-[#FF5630]' };
     case 'unassessed':
     case 'insufficient data':
     case 'unassessed / insufficient data':
@@ -810,6 +802,7 @@ export default function CandidateProfilePage() {
  const [openMenu, setOpenMenu] = useState(null);
  const [toast, setToast] = useState(null);
  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+ const [isFeedScorecardModalOpen, setIsFeedScorecardModalOpen] = useState(false);
  const [profileStage, setProfileStage] = useState(candidate.stage);
  const [activityFilter, setActivityFilter] = useState('All');
  const [openScorecards, setOpenScorecards] = useState(['sc-1']);
@@ -1529,9 +1522,14 @@ export default function CandidateProfilePage() {
  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-gray-200/40 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full mb-1">
   Yet to be done
   </span>
- <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 mt-1">
-    <Calendar size={12} /> Schedule Now
-  </button>
+ <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+    <button onClick={() => showToast('Opening scheduler...')} className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer">
+      <Calendar size={12} /> Schedule Now
+    </button>
+    <button onClick={() => setIsFeedScorecardModalOpen(true)} className="text-[11px] font-bold text-[#1890FF] bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 shadow-2xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer">
+      <FileText size={12} /> Feed Scorecard
+    </button>
+  </div>
   </div>
   </div>
 
@@ -1825,15 +1823,19 @@ export default function CandidateProfilePage() {
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
-                                <span>Beginner</span>
+                                <span>Strong No</span>
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
-                                <span>Competent</span>
+                                <span>No</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#1890FF] shrink-0" />
+                                <span>Yes</span>
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                                <span>Advanced</span>
+                                <span>Strong Yes</span>
                               </div>
                             </div>
                           </div>
@@ -2011,15 +2013,19 @@ export default function CandidateProfilePage() {
                 <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F]" />
-                    <span className="font-medium text-[#212b36] dark:text-gray-300">Advanced</span>
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Strong Yes</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#1890FF]" />
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Yes</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00]" />
-                    <span className="font-medium text-[#212b36] dark:text-gray-300">Competent</span>
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">No</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630]" />
-                    <span className="font-medium text-[#212b36] dark:text-gray-300">Beginner</span>
+                    <span className="font-medium text-[#212b36] dark:text-gray-300">Strong No</span>
                   </div>
                 </div>
               </div>
@@ -2068,7 +2074,7 @@ export default function CandidateProfilePage() {
                                 <div className="bg-[#212b36] dark:bg-gray-900 text-white text-[11px] py-1.5 px-3 rounded-lg shadow-xl whitespace-nowrap border border-gray-700/50">
                                   <div className="font-bold">{sc.interviewer}</div>
                                   <div className="text-[10px] text-gray-300 mt-0.5">
-                                    {sc.stage} • <span className={`font-semibold ${rating.toLowerCase() === 'advanced' ? 'text-[#00A76F]' : rating.toLowerCase() === 'competent' ? 'text-[#FFAB00]' : rating.toLowerCase() === 'beginner' ? 'text-[#FF5630]' : 'text-gray-400'}`}>{rating}</span>
+                                    {sc.stage} • <span className={`font-semibold ${rating.toLowerCase() === 'strong yes' ? 'text-[#00A76F]' : rating.toLowerCase() === 'yes' ? 'text-[#1890FF]' : rating.toLowerCase() === 'no' ? 'text-[#FFAB00]' : rating.toLowerCase() === 'strong no' ? 'text-[#FF5630]' : 'text-gray-400'}`}>{rating}</span>
                                   </div>
                                   <div className="text-[9px] text-[#1890FF] font-medium mt-0.5">Click to inspect scorecard details →</div>
                                 </div>
@@ -2530,7 +2536,7 @@ export default function CandidateProfilePage() {
                   </h4>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={`w-3.5 h-3.5 rounded-full ${ratingStyle.bg} shadow-xs`} />
-                    <span className={`text-[13px] font-bold ${focusedAttr?.rating?.toLowerCase() === 'advanced' ? 'text-[#00A76F]' : focusedAttr?.rating?.toLowerCase() === 'competent' ? 'text-[#FFAB00]' : focusedAttr?.rating?.toLowerCase() === 'beginner' ? 'text-[#FF5630]' : 'text-gray-400'}`}>
+                    <span className={`text-[13px] font-bold ${focusedAttr?.rating?.toLowerCase() === 'strong yes' ? 'text-[#00A76F]' : focusedAttr?.rating?.toLowerCase() === 'yes' ? 'text-[#1890FF]' : focusedAttr?.rating?.toLowerCase() === 'no' ? 'text-[#FFAB00]' : focusedAttr?.rating?.toLowerCase() === 'strong no' ? 'text-[#FF5630]' : 'text-gray-400'}`}>
                       {focusedAttr?.rating || 'Unassessed'}
                     </span>
                   </div>
@@ -2650,6 +2656,17 @@ export default function CandidateProfilePage() {
  }]}
  onClose={() => setIsRejectModalOpen(false)}
  onSent={() => setProfileStage('Reject')}
+ />
+
+ <FeedScorecardModal
+   open={isFeedScorecardModalOpen}
+   onClose={() => setIsFeedScorecardModalOpen(false)}
+   onSubmit={(data) => {
+     showToast('Scorecard submitted successfully!');
+   }}
+   candidateName={candidate.name}
+   roundName="Technical Interview (Round 1)"
+   roleName={location.state?.jobTitle || 'Senior AI Research Scientist'}
  />
  </div>
  );

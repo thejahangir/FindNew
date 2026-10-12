@@ -37,11 +37,441 @@ import {
   Users,
   Save,
   Award,
-  Edit3
+  Edit3,
+  Lock,
+  Star,
+  CheckCircle,
+  ArrowRightLeft,
+  Cpu,
+  X
 } from 'lucide-react';
 import { useChatbot } from '../contexts/ChatbotContext';
+import FeedScorecardModal from '../components/dashboard/FeedScorecardModal';
 
-const TABS = ['Interview Prep', 'Job Description', 'Resume', 'Scorecard'];
+const TABS = ['Interview Prep', 'Job Description', 'Resume', 'Scorecard', 'Feed Scorecard'];
+
+const getInitials = (name = '') => name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+const MOCK_SCORECARDS = [
+  {
+    id: 'sc-1',
+    interviewer: 'Amit Sharma',
+    stage: 'Technical Interview',
+    date: '10 Mar 2026',
+    score: '9.4/10',
+    recommendation: 'Strong Hire',
+    takeaways: 'Strong technical foundation. Cleared the system design and distributed locking questions with ease.',
+    notes: 'I asked about handling race conditions in distributed systems. Candidate mapped out a robust distributed lock mechanism using Redis. We discussed edge cases like clock drift and network partitions. The candidate also correctly identified potential bottlenecks in the API gateway layer and proposed an elegant rate-limiting strategy using token buckets. Overall, highly impressed with their depth of knowledge and practical experience in scaling systems.',
+    softSkills: 8.8,
+    hardSkills: 9.8,
+    cultureFit: 9.2,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Strong Yes' },
+          { name: 'Team Player & Empathy', rating: 'Yes' },
+          { name: 'Clear Communication', rating: 'Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Strong Yes' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Strong Yes' },
+          { name: 'React & Node Ecosystems', rating: 'Strong Yes' },
+          { name: 'System Design & Concurrency', rating: 'Strong Yes' },
+          { name: 'API Design & Scalability', rating: 'Strong Yes' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Strong Yes' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Yes' },
+          { name: 'Creative Problem Solving', rating: 'Strong Yes' },
+          { name: 'Analytical Thinking', rating: 'Strong Yes' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sc-2',
+    interviewer: 'Priya Patel',
+    stage: 'Culture Fit',
+    date: '12 Mar 2026',
+    score: '8.4/10',
+    recommendation: 'Leaning Yes',
+    takeaways: 'Great alignment with our core values. Shows high ownership, good communication, and bias for action.',
+    notes: 'Candidate discussed their experience leading a cross-functional team under a tight deadline. Exhibited strong empathy and pragmatism. They gave a great example of resolving a conflict between engineering and product by relying on data-driven metrics rather than opinions. Would fit well into our culture with quick onboarding.',
+    softSkills: 8.8,
+    hardSkills: 8.2,
+    cultureFit: 8.6,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Strong Yes' },
+          { name: 'Team Player & Empathy', rating: 'Strong Yes' },
+          { name: 'Clear Communication', rating: 'Strong Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Yes' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Unassessed' },
+          { name: 'React & Node Ecosystems', rating: 'Yes' },
+          { name: 'System Design & Concurrency', rating: 'Yes' },
+          { name: 'API Design & Scalability', rating: 'Unassessed' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Unassessed' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Yes' },
+          { name: 'Creative Problem Solving', rating: 'Yes' },
+          { name: 'Analytical Thinking', rating: 'Yes' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sc-3',
+    interviewer: 'David Chen',
+    stage: 'Product Sense',
+    date: '14 Mar 2026',
+    score: '6.2/10',
+    recommendation: 'Leaning No',
+    takeaways: 'Good overall grasp of product lifecycle but struggled to prioritize features under resource constraints.',
+    notes: 'Asked about launching a hypothetical feature in an emerging market. Candidate identified key user pain points but over-indexed on engineering complexity rather than time-to-market. Their initial instinct was to over-engineer rather than iterate through MVPs. Will require heavy guidance on product tradeoffs.',
+    softSkills: 6.8,
+    hardSkills: 7.2,
+    cultureFit: 6.5,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Yes' },
+          { name: 'Team Player & Empathy', rating: 'No' },
+          { name: 'Clear Communication', rating: 'Yes' },
+          { name: 'Disciplined & Adaptable', rating: 'Yes' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Yes' },
+          { name: 'React & Node Ecosystems', rating: 'Yes' },
+          { name: 'System Design & Concurrency', rating: 'No' },
+          { name: 'API Design & Scalability', rating: 'Yes' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Yes' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'No' },
+          { name: 'Creative Problem Solving', rating: 'No' },
+          { name: 'Analytical Thinking', rating: 'Yes' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sc-4',
+    interviewer: 'Sarah Jenkins',
+    stage: 'Executive Review',
+    date: '15 Mar 2026',
+    score: '4.8/10',
+    recommendation: 'Strong Reject',
+    takeaways: 'Did not meet the senior leadership bar. Lacked clarity on multi-year technical vision and executive communication.',
+    notes: 'Discussed long-term technical roadmap and leading organizational transformations. Candidate was unable to articulate a structured framework for managing technical debt vs business velocity. Struggled with high-level stakeholder alignment and showed defensiveness when questioned on past project setbacks.',
+    softSkills: 4.8,
+    hardSkills: 5.4,
+    cultureFit: 4.2,
+    categories: [
+      {
+        name: 'Personality Traits',
+        attributes: [
+          { name: 'Self-motivated & Ownership', rating: 'Strong No' },
+          { name: 'Team Player & Empathy', rating: 'Strong No' },
+          { name: 'Clear Communication', rating: 'Strong No' },
+          { name: 'Disciplined & Adaptable', rating: 'Strong No' },
+        ]
+      },
+      {
+        name: 'Technical Competencies',
+        attributes: [
+          { name: 'Distributed Systems Architecture', rating: 'Strong No' },
+          { name: 'React & Node Ecosystems', rating: 'Strong No' },
+          { name: 'System Design & Concurrency', rating: 'Strong No' },
+          { name: 'API Design & Scalability', rating: 'Unassessed' },
+        ]
+      },
+      {
+        name: 'Research & Problem Solving',
+        attributes: [
+          { name: 'Algorithmic Rigor & Optimization', rating: 'Strong No' },
+          { name: 'Product Strategy & Tradeoffs', rating: 'Strong No' },
+          { name: 'Creative Problem Solving', rating: 'Strong No' },
+          { name: 'Analytical Thinking', rating: 'Strong No' },
+        ]
+      }
+    ]
+  }
+];
+
+MOCK_SCORECARDS.forEach(sc => {
+  sc.attributes = sc.categories.flatMap(c => c.attributes.map(a => ({ ...a, category: c.name })));
+});
+
+const getAggregatedAttributeRating = (categoryName, attrName) => {
+  const ratings = MOCK_SCORECARDS
+    .map(sc => sc.categories?.find(c => c.name === categoryName)?.attributes?.find(a => a.name === attrName)?.rating)
+    .filter(Boolean);
+  
+  if (ratings.length === 0) return 'Unassessed';
+  
+  const weights = { 'strong yes': 4, 'yes': 3, 'no': 2, 'strong no': 1, 'unassessed': 0 };
+  const validWeights = ratings.map(r => weights[r.toLowerCase()] ?? 0);
+  const avg = validWeights.reduce((a, b) => a + b, 0) / validWeights.length;
+  
+  if (avg >= 3.4) return 'Strong Yes';
+  if (avg >= 2.4) return 'Yes';
+  if (avg >= 1.4) return 'No';
+  if (avg >= 0.5) return 'Strong No';
+  return 'Unassessed';
+};
+
+const getScorecardsSummaryData = () => {
+  const attributeMap = {};
+
+  MOCK_SCORECARDS.forEach(sc => {
+    (sc.categories || []).forEach(cat => {
+      (cat.attributes || []).forEach(attr => {
+        const key = `${cat.name}___${attr.name}`;
+        if (!attributeMap[key]) {
+          attributeMap[key] = {
+            name: attr.name,
+            category: cat.name,
+            ratings: []
+          };
+        }
+        attributeMap[key].ratings.push({
+          interviewer: sc.interviewer,
+          stage: sc.stage,
+          rating: attr.rating
+        });
+      });
+    });
+  });
+
+  const consensus = [];
+  const discrepancies = [];
+
+  const ratingWeight = { 'strong yes': 4, 'yes': 3, 'no': 2, 'strong no': 1 };
+
+  Object.values(attributeMap).forEach(item => {
+    const assessedRatings = item.ratings.filter(r => r.rating && r.rating.toLowerCase() !== 'unassessed');
+    if (assessedRatings.length === 0) return;
+
+    const weights = assessedRatings.map(r => ratingWeight[r.rating.toLowerCase()] || 2);
+    const minW = Math.min(...weights);
+    const maxW = Math.max(...weights);
+    const diff = maxW - minW;
+
+    if (diff >= 2) {
+      discrepancies.push(item);
+    } else {
+      consensus.push(item);
+    }
+  });
+
+  const getTopDiverse = (list, limit = 3) => {
+    const categoriesSeen = new Set();
+    const result = [];
+    for (const item of list) {
+      if (!categoriesSeen.has(item.category) && result.length < limit) {
+        result.push(item);
+        categoriesSeen.add(item.category);
+      }
+    }
+    for (const item of list) {
+      if (result.length >= limit) break;
+      if (!result.includes(item)) {
+        result.push(item);
+      }
+    }
+    return result;
+  };
+
+  return { 
+    consensus: getTopDiverse(consensus, 3), 
+    discrepancies: getTopDiverse(discrepancies, 3) 
+  };
+};
+
+const SCORECARD_SUMMARY_ATTRIBUTES = [
+  { name: 'Self-motivated & Ownership', category: 'Personality Traits' },
+  { name: 'Clear Communication', category: 'Personality Traits' },
+  { name: 'React & Node Ecosystems', category: 'Technical Competencies' },
+  { name: 'System Design & Concurrency', category: 'Technical Competencies' },
+  { name: 'Product Strategy & Tradeoffs', category: 'Research & Problem Solving' },
+  { name: 'Creative Problem Solving', category: 'Research & Problem Solving' },
+];
+
+const getRatingAvatarStyle = (rating) => {
+  switch (rating?.toLowerCase()) {
+    case 'strong yes':
+    case 'advanced':
+      return {
+        bg: 'bg-[#00A76F]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Strong Yes',
+      };
+    case 'yes':
+    case 'competent':
+      return {
+        bg: 'bg-[#1890FF]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Yes',
+      };
+    case 'no':
+      return {
+        bg: 'bg-[#FFAB00]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'No',
+      };
+    case 'strong no':
+    case 'beginner':
+      return {
+        bg: 'bg-[#FF5630]',
+        text: 'text-white',
+        border: 'border-2 border-white dark:border-[#161c24]',
+        label: 'Strong No',
+      };
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return {
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        text: 'text-gray-400 dark:text-gray-500',
+        border: 'border-2 border-dashed border-gray-300 dark:border-gray-600',
+        label: 'Unassessed',
+      };
+  }
+};
+
+const renderRatingCircle = (rating, size = "w-3.5 h-3.5") => {
+  switch (rating?.toLowerCase()) {
+    case 'strong yes':
+    case 'advanced':
+      return <span title="Strong Yes" className={`inline-block shrink-0 ${size} rounded-full bg-[#00A76F] shadow-xs`} />;
+    case 'yes':
+    case 'competent':
+      return <span title="Yes" className={`inline-block shrink-0 ${size} rounded-full bg-[#1890FF] shadow-xs`} />;
+    case 'no':
+      return <span title="No" className={`inline-block shrink-0 ${size} rounded-full bg-[#FFAB00] shadow-xs`} />;
+    case 'strong no':
+    case 'beginner':
+      return <span title="Strong No" className={`inline-block shrink-0 ${size} rounded-full bg-[#FF5630] shadow-xs`} />;
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return <span title="Unassessed / Insufficient Data" className={`inline-block shrink-0 ${size} rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shadow-xs`} />;
+  }
+};
+
+const getRatingLabel = (rating) => {
+  switch (rating?.toLowerCase()) {
+    case 'strong yes':
+    case 'advanced':
+      return { label: 'Strong Yes', text: 'text-[#00A76F]' };
+    case 'yes':
+    case 'competent':
+      return { label: 'Yes', text: 'text-[#1890FF]' };
+    case 'no':
+      return { label: 'No', text: 'text-[#FFAB00]' };
+    case 'strong no':
+    case 'beginner':
+      return { label: 'Strong No', text: 'text-[#FF5630]' };
+    case 'unassessed':
+    case 'insufficient data':
+    case 'unassessed / insufficient data':
+    default:
+      return { label: 'Unassessed', text: 'text-gray-400' };
+  }
+};
+
+const getRecBadge = (recommendation) => {
+  switch (recommendation) {
+    case 'Strong Hire':
+    case 'Strong Yes':
+      return { 
+        label: 'Strong Hire', 
+        emoji: '🌟', 
+        bg: 'bg-[#00A76F]/10 dark:bg-[#00A76F]/20', 
+        border: 'border-[#00A76F]/30', 
+        text: 'text-[#00A76F]', 
+        dot: 'bg-[#00A76F]', 
+        borderNode: 'border-[#00A76F]' 
+      };
+    case 'Leaning Yes':
+    case 'Yes':
+    case 'Hire':
+      return { 
+        label: 'Leaning Yes', 
+        emoji: '👍', 
+        bg: 'bg-[#1890FF]/10 dark:bg-[#1890FF]/20', 
+        border: 'border-[#1890FF]/30', 
+        text: 'text-[#1890FF]', 
+        dot: 'bg-[#1890FF]', 
+        borderNode: 'border-[#1890FF]' 
+      };
+    case 'Leaning No':
+    case 'Mixed':
+      return { 
+        label: 'Leaning No', 
+        emoji: '👎', 
+        bg: 'bg-[#FFAB00]/10 dark:bg-[#FFAB00]/20', 
+        border: 'border-[#FFAB00]/30', 
+        text: 'text-[#FFAB00]', 
+        dot: 'bg-[#FFAB00]', 
+        borderNode: 'border-[#FFAB00]' 
+      };
+    case 'Strong Reject':
+    case 'Strong No':
+    case 'No':
+    case 'No Hire':
+    case 'Strong No Hire':
+      return { 
+        label: 'Strong Reject', 
+        emoji: '⛔', 
+        bg: 'bg-[#FF5630]/10 dark:bg-[#FF5630]/20', 
+        border: 'border-[#FF5630]/30', 
+        text: 'text-[#FF5630]', 
+        dot: 'bg-[#FF5630]', 
+        borderNode: 'border-[#FF5630]' 
+      };
+    default:
+      return { 
+        label: recommendation || 'Leaning Yes', 
+        emoji: '👍', 
+        bg: 'bg-[#1890FF]/10 dark:bg-[#1890FF]/20', 
+        border: 'border-[#1890FF]/30', 
+        text: 'text-[#1890FF]', 
+        dot: 'bg-[#1890FF]', 
+        borderNode: 'border-[#1890FF]' 
+      };
+  }
+};
 
 const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`;
 
@@ -124,28 +554,28 @@ const SCORECARD_RECOMMENDATIONS = [
 
 const RATING_OPTIONS = [
   {
-    id: 'Unassessed',
-    label: 'Unassessed',
-    colorClass: 'bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500',
-    activeRing: 'ring-2 ring-gray-400 dark:ring-gray-300 ring-offset-1 ring-offset-white dark:ring-offset-[#161c24]'
-  },
-  {
-    id: 'Beginner',
-    label: 'Beginner',
-    colorClass: 'bg-[#FF5630]',
-    activeRing: 'ring-2 ring-[#FF5630] ring-offset-1 ring-offset-white dark:ring-offset-[#161c24]'
-  },
-  {
-    id: 'Competent',
-    label: 'Competent',
-    colorClass: 'bg-[#FFAB00]',
-    activeRing: 'ring-2 ring-[#FFAB00] ring-offset-1 ring-offset-white dark:ring-offset-[#161c24]'
-  },
-  {
-    id: 'Advanced',
-    label: 'Advanced',
+    id: 'Strong Yes',
+    label: 'Strong Yes',
     colorClass: 'bg-[#00A76F]',
-    activeRing: 'ring-2 ring-[#00A76F] ring-offset-1 ring-offset-white dark:ring-offset-[#161c24]'
+    activeRing: 'ring-2 ring-[#00A76F] ring-offset-2 ring-offset-white dark:ring-offset-[#161c24]'
+  },
+  {
+    id: 'Yes',
+    label: 'Yes',
+    colorClass: 'bg-[#1890FF]',
+    activeRing: 'ring-2 ring-[#1890FF] ring-offset-2 ring-offset-white dark:ring-offset-[#161c24]'
+  },
+  {
+    id: 'No',
+    label: 'No',
+    colorClass: 'bg-[#FFAB00]',
+    activeRing: 'ring-2 ring-[#FFAB00] ring-offset-2 ring-offset-white dark:ring-offset-[#161c24]'
+  },
+  {
+    id: 'Strong No',
+    label: 'Strong No',
+    colorClass: 'bg-[#FF5630]',
+    activeRing: 'ring-2 ring-[#FF5630] ring-offset-2 ring-offset-white dark:ring-offset-[#161c24]'
   }
 ];
 
@@ -203,7 +633,7 @@ const PREVIOUS_ROUNDS_FEEDBACK = [
   },
   {
     id: 'round-hm',
-    roundName: 'Round 2 (Parallel): Hiring Manager Fit',
+    roundName: 'Round 2: Hiring Manager Fit',
     date: '26 Sep 2026',
     duration: '50 mins',
     interviewers: [
@@ -320,27 +750,67 @@ Key Strengths:
 • Pragmatic approach to handling database replica lag during write bursts.
 • Clear, confident communication with strong architectural articulation.`
   );
+  const [isFeedbackFocused, setIsFeedbackFocused] = useState(false);
   const [noteForOthers, setNoteForOthers] = useState(
     `Solid on high-level architecture and ledger design. In Round 3 (Executive / Bar Raiser), recommend probing her experience managing cross-geo stakeholder alignment and scaling engineering teams through rapid growth.`
   );
   const [isNoteExpanded, setIsNoteExpanded] = useState(false);
   const [isNoteSaved, setIsNoteSaved] = useState(true);
+
+  // Private Note State (Visible only to specific users/roles)
+  const [privateNote, setPrivateNote] = useState(
+    `Candidate indicated competing offer discussions with Atlassian concluding in 10 days. If extending an offer, comp expectations are ₹60L but she prioritizes technical ownership of the ledger architecture over absolute base salary.`
+  );
+  const [privateNoteVisibility, setPrivateNoteVisibility] = useState('Hiring Manager');
+  const [isPrivateNoteExpanded, setIsPrivateNoteExpanded] = useState(false);
+  const [isPrivateNoteSaved, setIsPrivateNoteSaved] = useState(true);
+  const [activeNoteTab, setActiveNoteTab] = useState('handover'); // 'handover' | 'private'
   const [selectedRecommendation, setSelectedRecommendation] = useState('Strong Hire');
   const [saveToast, setSaveToast] = useState(null);
+  const [isFeedModalOpen, setIsFeedModalOpen] = useState(false);
   const [attributeRatings, setAttributeRatings] = useState({
-    'Self-motivated & Ownership': 'Advanced',
-    'Team Player & Empathy': 'Competent',
-    'Clear Communication': 'Advanced',
-    'Disciplined & Adaptable': 'Competent',
-    'Distributed Systems Architecture': 'Advanced',
-    'System Design & Concurrency': 'Advanced',
-    'API Design & Scalability': 'Advanced',
-    'Java & Kafka Ecosystem': 'Advanced',
-    'Algorithmic Rigor & Optimization': 'Advanced',
-    'Product Strategy & Tradeoffs': 'Competent',
-    'Creative Problem Solving': 'Advanced',
-    'Analytical Thinking': 'Advanced',
+    'Self-motivated & Ownership': 'Strong Yes',
+    'Team Player & Empathy': 'Yes',
+    'Clear Communication': 'Strong Yes',
+    'Disciplined & Adaptable': 'Yes',
+    'Distributed Systems Architecture': 'Strong Yes',
+    'System Design & Concurrency': 'Strong Yes',
+    'API Design & Scalability': 'Strong Yes',
+    'Java & Kafka Ecosystem': 'Strong Yes',
+    'Algorithmic Rigor & Optimization': 'Strong Yes',
+    'Product Strategy & Tradeoffs': 'Yes',
+    'Creative Problem Solving': 'Strong Yes',
+    'Analytical Thinking': 'Strong Yes',
   });
+
+  // Scorecard (Candidate Profile replica) State
+  const [scorecardSubTab, setScorecardSubTab] = useState('Detailed Scorecards');
+  const [openScorecards, setOpenScorecards] = useState(['sc-1']);
+  const [expandedNotes, setExpandedNotes] = useState({});
+  const [inspectorData, setInspectorData] = useState(null);
+
+  const openInspectorDrawer = (interviewerName, attributeName) => {
+    const scorecard = MOCK_SCORECARDS.find(sc => sc.interviewer === interviewerName);
+    if (!scorecard) return;
+    setInspectorData({
+      scorecard,
+      focusedAttributeName: attributeName,
+    });
+  };
+
+  const closeInspectorDrawer = () => {
+    setInspectorData(null);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && inspectorData) {
+        closeInspectorDrawer();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [inspectorData]);
 
   const handleFormatText = (prefix, suffix = '') => {
     const textarea = document.getElementById('scorecard-rich-textarea');
@@ -393,7 +863,7 @@ Key Strengths:
     const userMsg = {
       id: Date.now(),
       sender: 'user',
-      text: 'Prepare interview brief for Neha Kulkarni — Technical Round 2: System Architecture & Concurrency'
+      text: 'Prepare interview brief for Neha Kulkarni — Technical Round 2: System Architecture'
     };
 
     const aiMsg = {
@@ -401,7 +871,7 @@ Key Strengths:
       sender: 'ai',
       type: 'interview-prep',
       candidateName: 'Neha Kulkarni',
-      roundName: 'Technical Round 2: System Architecture & Concurrency',
+      roundName: 'Technical Round 2: System Architecture',
       duration: '60 Mins',
       whyThisRoundExists: "Neha passed screening and coding with high marks. Our payments ledger processes 50M daily transactions (3x Quillpay's volume). This round evaluates her ability to build zero-downtime, strictly serialized financial ledgers under extreme concurrent load.",
       signalsToExtract: [
@@ -499,20 +969,31 @@ Key Strengths:
       {/* STANDALONE TABS ROW */}
       <div className="flex flex-wrap items-center gap-6 border-b border-gray-200 dark:border-gray-800 pb-0">
         {TABS.map((tab) => {
+          const isFeedTab = tab === 'Feed Scorecard';
           const isActive = activeTab === tab;
           return (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2.5 text-[13px] font-bold transition-colors whitespace-nowrap relative cursor-pointer flex items-center gap-2 ${
-                isActive
+              type="button"
+              onClick={() => {
+                if (isFeedTab) {
+                  setIsFeedModalOpen(true);
+                } else {
+                  setActiveTab(tab);
+                }
+              }}
+              className={`pb-2.5 text-[13px] font-bold transition-all duration-200 whitespace-nowrap relative cursor-pointer flex items-center gap-1.5 focus:outline-none focus:ring-0 select-none ${
+                isActive && !isFeedTab
                   ? 'text-[#1890FF] dark:text-[#1890FF]'
                   : 'text-gray-600 hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white'
               }`}
             >
               <span>{tab}</span>
-              {isActive && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#1890FF] rounded-t-full"></span>
+              {isFeedTab && (
+                <Lock size={12} className="shrink-0 text-gray-500 dark:text-gray-400" />
+              )}
+              {isActive && !isFeedTab && (
+                <span className="absolute bottom-0 left-0 w-full h-[2.5px] bg-[#1890FF] rounded-t-full shadow-xs transition-all duration-200"></span>
               )}
             </button>
           );
@@ -524,7 +1005,7 @@ Key Strengths:
         <div className="space-y-6 animate-fade-in">
           
           {/* ========================================================= */}
-          {/* CARD 1: INTERVIEW DETAILS & LIVE COUNTDOWN + ASK TRINITY */}
+          {/* CARD 1: INTERVIEW DETAILS & LIVE COUNTDOWN */}
           {/* ========================================================= */}
           <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm space-y-4">
             {/* Header with Round Title & Countdown */}
@@ -533,7 +1014,7 @@ Key Strengths:
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-bold text-[#212b36] dark:text-white flex items-center gap-2">
                     <Video size={16} className="text-gray-500 dark:text-gray-400" />
-                    Technical Round 2: System Architecture & Concurrency
+                    Technical Round 2: System Architecture
                   </h2>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] border border-blue-200/60 dark:border-blue-800/40">
                     60 Mins
@@ -610,6 +1091,197 @@ Key Strengths:
                   <div className="text-[11px] text-gray-500 dark:text-gray-400">Core Ledger & Payments</div>
                 </div>
               </div>
+            </div>
+          </div>
+
+
+          {/* ========================================================= */}
+          {/* CANDIDATE AT-A-GLANCE (PRE-INTERVIEW RESUME SUMMARY)      */}
+          {/* ========================================================= */}
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm space-y-4">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] shrink-0">
+                  <User size={16} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-[#212b36] dark:text-white">
+                      Candidate Snapshot · At a Glance
+                    </h2>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-[#00A76F] border border-emerald-200/60 dark:border-emerald-800/40">
+                      <span>⭐</span>
+                      <span>Top Company Alum</span>
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    Essential resume & profile intelligence synthesized for the interviewer without switching tabs.
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick shortcut to full resume */}
+              <button
+                type="button"
+                onClick={() => setActiveTab('Resume')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 text-xs font-semibold text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                title="Open PDF Resume Tab"
+              >
+                <FileText size={13} />
+                <span>View Full Resume</span>
+                <ChevronRight size={13} />
+              </button>
+            </div>
+
+            {/* 4 Compact Intelligence Tiles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              
+              {/* Tile 1: Experience & Tenure Stability */}
+              <div className="p-3.5 rounded-xl bg-gray-50/70 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/70 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                    <Briefcase size={14} className="text-[#1890FF]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Experience & Tenure</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] border border-emerald-200/50 dark:border-emerald-800/30">
+                    Job Stability
+                  </span>
+                </div>
+
+                <div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-base font-extrabold text-[#212b36] dark:text-white">8.0 Yrs</span>
+                    <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">Total · 5.5 Yrs Relevant</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    Current: <strong className="text-[#212b36] dark:text-gray-200 font-semibold">Backend Lead</strong> at Quillpay
+                  </p>
+                </div>
+
+                {/* Career Tenure Timeline */}
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800/60 space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-medium text-[#454f5b] dark:text-gray-300">Quillpay (2y) · Razorpay (3y) · Flipkart (3y)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                    <CheckCircle2 size={11} className="shrink-0 text-[#00A76F]" />
+                    <span>Avg tenure 2.7 yrs / company (Stable)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tile 2: Top Company & Scale Background */}
+              <div className="p-3.5 rounded-xl bg-gradient-to-br from-amber-50/50 via-gray-50/70 to-gray-50/50 dark:from-amber-950/15 dark:via-gray-800/30 dark:to-gray-800/20 border border-amber-200/50 dark:border-amber-800/30 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                    <Award size={14} className="text-[#FFAB00]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">Top Companies & Scale</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100/70 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 border border-amber-300/50 dark:border-amber-700/40">
+                    Big Tech / Unicorn
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 text-[#212b36] dark:text-white border border-gray-200 dark:border-gray-700 shadow-2xs">
+                      Flipkart (Walmart)
+                    </span>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 text-[#212b36] dark:text-white border border-gray-200 dark:border-gray-700 shadow-2xs">
+                      Razorpay
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-600 dark:text-gray-300 mt-1 leading-tight">
+                    Proven experience working at top companies (MAANG / Flipkart / Razorpay) with large-scale systems.
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-amber-200/40 dark:border-amber-900/30">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Education: <strong className="text-[#212b36] dark:text-gray-200 font-semibold">IIT Bombay</strong> (B.Tech CS · 2016)
+                  </p>
+                </div>
+              </div>
+
+              {/* Tile 3: Skill & Requirement Match */}
+              <div className="p-3.5 rounded-xl bg-gray-50/70 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/70 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                    <Target size={14} className="text-[#00A76F]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Skills Match</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/20 text-[#00A76F] border border-emerald-200/50 dark:border-emerald-800/30">
+                    8 of 9 Matched
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-base font-extrabold text-[#00A76F]">High Match</span>
+                    <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">for Target Role</span>
+                  </div>
+
+                  {/* Matched skill chips */}
+                  <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                    {['Java', 'Kafka', 'Postgres', 'Redis', 'Spring'].map((s) => (
+                      <span
+                        key={s}
+                        className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white dark:bg-gray-800 text-[#00A76F] border border-emerald-200/70 dark:border-emerald-800/50 shadow-2xs"
+                      >
+                        <Check size={9} className="stroke-[3]" />
+                        <span>{s}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bottom line: Gap to probe */}
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800/60 flex items-center justify-between text-[11px]">
+                  <span className="text-gray-500 dark:text-gray-400">Skill to Probe:</span>
+                  <span className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1 text-[10px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FFAB00] shrink-0" />
+                    AWS Cloud Infra
+                  </span>
+                </div>
+              </div>
+
+              {/* Tile 4: Location, Relocation & Availability */}
+              <div className="p-3.5 rounded-xl bg-gray-50/70 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/70 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                    <MapPin size={14} className="text-[#1890FF]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Location & Mobility</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] border border-blue-200/50 dark:border-blue-800/30">
+                    Local Match
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="text-xs font-bold text-[#212b36] dark:text-white flex items-center gap-1">
+                    <span>Bangalore, KA</span>
+                    <span className="text-[10px] font-normal text-emerald-600 dark:text-emerald-400 font-semibold">(Job Location Match)</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Prefers: <span className="font-semibold text-gray-700 dark:text-gray-300">Bangalore (Hybrid)</span>
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800/60 space-y-1 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">Willing to Relocate:</span>
+                    <span className="font-bold text-[#00A76F] flex items-center gap-0.5">
+                      <CheckCircle2 size={11} /> Yes (Open)
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-gray-500 dark:text-gray-400">Notice Period:</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">30 Days (Serving)</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Bottom Row with "Ask Trinity" CTA */}
@@ -972,19 +1644,7 @@ Key Strengths:
             </div>
 
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#212b36] dark:text-gray-100 uppercase tracking-wider">
-                  Skills Checklist
-                </span>
-                <div className="flex items-center gap-2 text-[10px] font-bold">
-                  <span className="px-2 py-0.5 rounded-md bg-[#00A76F]/10 text-[#00A76F]">
-                    {JOB_DESCRIPTION_DATA.skills.filter(s => s.required).length} Must Have
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-[#1890FF]/10 text-[#1890FF]">
-                    {JOB_DESCRIPTION_DATA.skills.filter(s => !s.required).length} Nice to Have
-                  </span>
-                </div>
-              </div>
+
 
               <div className="flex flex-wrap gap-2.5 pt-1">
                 {JOB_DESCRIPTION_DATA.skills.map((skill, index) => (
@@ -1206,636 +1866,486 @@ Key Strengths:
             </div>
           </div>
         </div>
+      ) : activeTab === 'Feed Scorecard' || activeTab === 'Feed Content' ? (
+        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 p-8 text-center space-y-4 shadow-sm animate-fade-in">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] flex items-center justify-center mx-auto">
+            <FileText size={24} />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+              Feed Scorecard
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-md mx-auto">
+              Evaluation feedback and scorecard submission is accessible in an interactive modal popup so you can complete evaluations from any section of the application.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsFeedModalOpen(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1890FF] hover:bg-[#0077e6] text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
+          >
+            <FileText size={14} />
+            <span>Open Feed Scorecard Modal</span>
+          </button>
+        </div>
       ) : activeTab === 'Scorecard' ? (
         /* ========================================================= */
-        /* TAB 4: SCORECARD TAB CONTENT (STATE 1: FILL SCORECARD)    */
+        /* TAB 5: SCORECARD (REPLICATED FROM CANDIDATE PROFILE)      */
         /* ========================================================= */
-        <div className="space-y-6 animate-fade-in pb-8">
-          
-          {/* Status Toast / Alert if triggered */}
-          {saveToast && (
-            <div className="p-3.5 rounded-xl bg-[#00A76F]/10 border border-[#00A76F]/30 text-[#00A76F] flex items-center justify-between animate-fade-in shadow-2xs">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 size={16} className="text-[#00A76F]" />
-                <span className="text-xs font-bold">{saveToast}</span>
+        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 sm:p-6 shadow-sm space-y-6 animate-fade-in">
+          {/* Card Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[#1890FF] shrink-0">
+                <FileText size={16} />
               </div>
-              <button 
-                onClick={() => setSaveToast(null)}
-                className="text-xs font-bold text-[#00A76F] hover:underline cursor-pointer"
-              >
-                Dismiss
-              </button>
-            </div>
-          )}
-
-          {!scorecardSubmitted ? (
-            /* ========================================================= */
-            /* STATE 1: ACTIVE SCORING / FILL SCORECARD                  */
-            /* ========================================================= */
-            <div className="space-y-6 animate-fade-in">
-              {/* CARD 1: INTERVIEWER FEEDBACK / COMMENTS & NOTES */}
-              <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm space-y-4">
-                {/* Card Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 shrink-0">
-                      <MessageSquare size={16} />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Interviewer Feedback & Observations</h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Share qualitative evaluation, candidate strengths, code structure insights, and potential risks.</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rich Text Editor Wrapper */}
-                <div className="border border-gray-200 dark:border-gray-700/80 rounded-xl overflow-hidden focus-within:border-[#1890FF] focus-within:ring-1 focus-within:ring-[#1890FF] transition-all bg-white dark:bg-[#161c24]">
-                  {/* Toolbar */}
-                  <div className="flex flex-wrap items-center gap-1 p-2 bg-gray-50/80 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700/70 text-gray-600 dark:text-gray-300">
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('**', '**')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors text-xs font-bold"
-                      title="Bold (**text**)"
-                    >
-                      <Bold size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('*', '*')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors text-xs font-bold"
-                      title="Italic (*text*)"
-                    >
-                      <Italic size={14} />
-                    </button>
-                    <div className="w-px h-4 bg-gray-300 dark:bg-gray-700 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('\n• ', '')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                      title="Bulleted List"
-                    >
-                      <List size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('\n1. ', '')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                      title="Numbered List"
-                    >
-                      <ListOrdered size={14} />
-                    </button>
-                    <div className="w-px h-4 bg-gray-300 dark:bg-gray-700 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('\n> ', '')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                      title="Quote"
-                    >
-                      <Quote size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('`', '`')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                      title="Inline Code (`code`)"
-                    >
-                      <Code size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFormatText('[', '](https://)')}
-                      className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                      title="Link"
-                    >
-                      <Link2 size={14} />
-                    </button>
-                  </div>
-
-                  {/* Text Area */}
-                  <textarea
-                    id="scorecard-rich-textarea"
-                    value={scorecardFeedback}
-                    onChange={(e) => setScorecardFeedback(e.target.value)}
-                    rows={6}
-                    placeholder="Enter your detailed interview feedback, observations, performance in coding/system design exercises, and areas of excellence..."
-                    className="w-full p-3.5 text-xs text-[#212b36] dark:text-gray-100 bg-transparent border-0 focus:outline-none focus:ring-0 resize-y leading-relaxed font-sans placeholder-gray-400 dark:placeholder-gray-500"
-                  />
-
-                  {/* Formatting Hint & Word Counter */}
-                  <div className="px-3.5 py-2 bg-gray-50/50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-[11px] text-gray-400">
-                    <span>Markdown supported</span>
-                    <span>{scorecardFeedback.trim().split(/\s+/).filter(Boolean).length} words · {scorecardFeedback.length} characters</span>
-                  </div>
-                </div>
-
-                {/* Note for other interviewers (Expandable accordion) */}
-                <div className="pt-1">
-                  <div className="rounded-xl border border-gray-200/80 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20 overflow-hidden transition-all">
-                    <button
-                      type="button"
-                      onClick={() => setIsNoteExpanded(!isNoteExpanded)}
-                      className="w-full p-3.5 flex items-center justify-between text-left hover:bg-gray-100/60 dark:hover:bg-gray-800/40 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] shrink-0">
-                          <Users size={14} />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#212b36] dark:text-white">Note for other interviewers</span>
-                            {noteForOthers.trim().length > 0 && isNoteSaved && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 flex items-center gap-1">
-                                <Check size={10} />
-                                Note Saved
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-gray-500 dark:text-gray-400">Private handover guidance and specific focus areas for subsequent interview rounds.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-[#1890FF] shrink-0 ml-3">
-                        <span>{isNoteExpanded ? 'Collapse' : noteForOthers.trim() ? 'Edit Note' : '+ Add Note'}</span>
-                        <ChevronDown size={15} className={`transition-transform duration-200 ${isNoteExpanded ? 'rotate-180' : ''}`} />
-                      </div>
-                    </button>
-
-                    {/* Expanded Plain Text Area */}
-                    {isNoteExpanded && (
-                      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-3 bg-white dark:bg-[#161c24] animate-fade-in">
-                        <textarea
-                          value={noteForOthers}
-                          onChange={(e) => setNoteForOthers(e.target.value)}
-                          rows={3}
-                          placeholder="Write private notes for subsequent interviewers (e.g. 'Strong in distributed locks. In Round 3, please probe deeper into Kafka consumer group rebalance storm handling and database failover strategies...')"
-                          className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 text-xs text-[#212b36] dark:text-gray-200 focus:outline-none focus:border-[#1890FF] leading-relaxed resize-y"
-                        />
-                        <div className="flex items-center justify-end gap-2.5">
-                          <button
-                            type="button"
-                            onClick={() => setIsNoteExpanded(false)}
-                            className="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsNoteSaved(true);
-                              setIsNoteExpanded(false);
-                              setSaveToast('Note for subsequent interviewers saved');
-                              setTimeout(() => setSaveToast(null), 2500);
-                            }}
-                            className="px-4 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-                          >
-                            <Save size={13} />
-                            <span>Save Note</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Collapsed Note Preview if Saved & Note exists */}
-                    {!isNoteExpanded && noteForOthers.trim().length > 0 && isNoteSaved && (
-                      <div className="px-4 pb-3.5 pt-1 border-t border-gray-100/60 dark:border-gray-800/40">
-                        <p className="text-xs text-[#454f5b] dark:text-gray-300 italic line-clamp-2 bg-white dark:bg-[#161c24] p-2.5 rounded-lg border border-gray-100 dark:border-gray-800">
-                          "{noteForOthers}"
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 2: COMPETENCY ATTRIBUTES & RATINGS */}
-              <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm space-y-4">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 shrink-0">
-                      <Target size={16} />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Skills & Qualities Checklist</h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Rate the candidate on personality, technical skills, and problem solving. Click a circle to set the rating.</p>
-                    </div>
-                  </div>
-                  <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400">
-                    <span className="text-[#00A76F]">
-                      {Object.values(attributeRatings).filter(r => r !== 'Unassessed').length} of {SCORECARD_CATEGORIES.reduce((acc, c) => acc + c.attributes.length, 0)} Assessed
-                    </span>
-                  </div>
-                </div>
-
-                {/* Categorized Attributes Grid matching CandidateProfilePage */}
-                <div className="space-y-4">
-                  {SCORECARD_CATEGORIES.map((cat) => (
-                    <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
-                      <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
-                        <span>{cat.name}</span>
-                        <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
-                      </h6>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                        {cat.attributes.map((attr) => {
-                          const currentRating = attributeRatings[attr.name] || 'Unassessed';
-                          return (
-                            <div
-                              key={attr.name}
-                              className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-200"
-                            >
-                              <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>
-                                {attr.name}
-                              </span>
-
-                              {/* Interactive Circle Color Selector */}
-                              <div className="shrink-0 flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/60 px-2 py-1 rounded-full border border-gray-100 dark:border-gray-700/50">
-                                {RATING_OPTIONS.map((opt) => {
-                                  const isSelected = currentRating === opt.id;
-                                  return (
-                                    <button
-                                      key={opt.id}
-                                      type="button"
-                                      onClick={() => setAttributeRatings(prev => ({ ...prev, [attr.name]: opt.id }))}
-                                      title={`${opt.label}: Click to set`}
-                                      className={`p-0.5 rounded-full transition-all cursor-pointer ${
-                                        isSelected ? `${opt.activeRing} opacity-100 z-10` : 'opacity-30 hover:opacity-75'
-                                      }`}
-                                    >
-                                      <span className={`w-3.5 h-3.5 rounded-full ${opt.colorClass} block shadow-2xs`} />
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Rating Scale Legend matching Candidate Profile Scorecards */}
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
-                  <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
-                      <span>Beginner</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
-                      <span>Competent</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                      <span>Advanced</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 3: OVERALL RECOMMENDATION */}
-              <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm space-y-4">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 shrink-0">
-                      <Award size={16} />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-[#212b36] dark:text-white">Overall Recommendation</h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Select your hiring recommendation verdict for this round.</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Recommendation 4-Option Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                  {SCORECARD_RECOMMENDATIONS.map((rec) => {
-                    const isSelected = selectedRecommendation === rec.id;
-                    return (
-                      <button
-                        key={rec.id}
-                        type="button"
-                        onClick={() => setSelectedRecommendation(rec.id)}
-                        className={`p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between relative ${
-                          isSelected
-                            ? `${rec.activeRing}`
-                            : `bg-white dark:bg-gray-800/30 border-gray-200 dark:border-gray-800 ${rec.hoverBorder}`
-                        }`}
-                      >
-                        {isSelected && (
-                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#1890FF] text-white flex items-center justify-center shadow-xs">
-                            <Check size={12} strokeWidth={3} />
-                          </div>
-                        )}
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xl">{rec.emoji}</span>
-                            <span className={`text-[13px] font-bold ${rec.badgeText}`}>{rec.label}</span>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                            {rec.description}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* BOTTOM ACTION BAR */}
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/60 shadow-sm">
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <CheckCircle2 size={15} className="text-[#00A76F]" />
-                  <span>Ready for submission · All skills & qualities rated</span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSaveToast('Draft saved successfully');
-                      setTimeout(() => setSaveToast(null), 2500);
-                    }}
-                    className="px-4 py-2 text-xs font-bold rounded-xl border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                  >
-                    Save Draft
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setScorecardSubmitted(true);
-                      setSaveToast('Scorecard submitted successfully');
-                      setTimeout(() => setSaveToast(null), 3000);
-                    }}
-                    className="px-5 py-2 text-xs font-bold rounded-xl bg-[#1890FF] hover:bg-[#0077e6] text-white shadow-sm flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <CheckCircle2 size={14} />
-                    <span>Submit Scorecard</span>
-                  </button>
-                </div>
+              <div>
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">
+                  Scorecard & Evaluations
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Multi-stage candidate evaluations, interviewer recommendations, and competency ratings.
+                </p>
               </div>
             </div>
-          ) : (
-            /* ========================================================= */
-            /* STATE 2: POST-SUBMISSION VIEW                             */
-            /* ========================================================= */
-            <div className="space-y-6 animate-fade-in">
-              {/* 1. TOP SUCCESS PANEL */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#00A76F]/10 via-[#00A76F]/5 to-transparent border border-[#00A76F]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
-                <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#00A76F]/15 text-[#00A76F] flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                    <CheckCircle2 size={22} className="text-[#00A76F]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#212b36] dark:text-white">
-                      Scorecard is submitted . You can amend it until the hiring manager closes the loop.
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      Submitted on 1 Oct 2026, 16:05 IST · Technical Round 2: System Architecture & Concurrency
-                    </p>
-                  </div>
-                </div>
+
+            <button
+              type="button"
+              onClick={() => setIsFeedModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1890FF] hover:bg-[#1890FF]/90 text-white text-xs font-bold shadow-2xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+            >
+              <FileText size={13} />
+              <span>Feed Scorecard</span>
+            </button>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gray-50/70 dark:bg-gray-800/40 p-4 sm:p-5 rounded-xl border border-gray-100 dark:border-gray-800 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
+              <div className="flex justify-between items-start">
+                <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase">
+                  <Bot size={14} className="text-[#00A76F]" /> AI Screening
+                </h3>
+                <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">9.8/10</span>
+              </div>
+              <p className="text-[13px] leading-relaxed text-gray-500 mt-1">
+                Excellent alignment on technical stack. Profile demonstrates high agency.
+              </p>
+            </div>
+            
+            <div className="bg-gray-50/70 dark:bg-gray-800/40 p-4 sm:p-5 rounded-xl border border-gray-100 dark:border-gray-800 flex flex-col gap-2 hover:border-[#1890FF]/40 transition-colors min-h-[120px] h-full">
+              <div className="flex justify-between items-start">
+                <h3 className="text-[11px] font-bold text-[#212b36] dark:text-white flex items-center gap-2 uppercase">
+                  <Cpu size={14} className="text-[#00A76F]" /> AI Interview
+                </h3>
+                <span className="bg-[#00A76F]/10 text-[#00A76F] px-2 py-0.5 rounded text-[11px] font-bold">8.5/10</span>
+              </div>
+              <p className="text-[13px] leading-relaxed text-gray-500 mt-1">
+                Clear communication. Handled ambiguity well but hesitated on some behavioral prompts.
+              </p>
+            </div>
+
+            <div className="bg-gray-50/70 dark:bg-gray-800/40 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700/80 flex flex-col items-center justify-center text-center gap-1.5 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 transition-colors group min-h-[120px] h-full">
+              <h3 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5 uppercase">
+                <User size={14} /> Human Interviews
+              </h3>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-gray-200/50 dark:bg-gray-700/50 px-2.5 py-0.5 rounded-full mb-1">
+                Yet to be done
+              </span>
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+                <button 
+                  onClick={() => setSaveToast('Opening scheduler...')} 
+                  className="text-[11px] font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                >
+                  <Calendar size={12} /> Schedule Now
+                </button>
+                <button 
+                  onClick={() => setIsFeedModalOpen(true)} 
+                  className="text-[11px] font-bold text-[#1890FF] bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 shadow-2xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                >
+                  <FileText size={12} /> Feed Scorecard
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {/* Sub-tabs header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-0 mt-6 mb-5">
+              <div className="flex items-center gap-6">
                 <button
                   type="button"
-                  onClick={() => setScorecardSubmitted(false)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 text-[#212b36] dark:text-white hover:border-[#1890FF] hover:text-[#1890FF] shadow-xs text-xs font-bold transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                  onClick={() => setScorecardSubTab('Detailed Scorecards')}
+                  className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors flex items-center gap-2 ${
+                    scorecardSubTab === 'Detailed Scorecards'
+                      ? 'text-[#1890FF]'
+                      : 'text-gray-500 hover:text-[#212b36] dark:hover:text-white'
+                  }`}
                 >
-                  <Edit3 size={14} />
-                  <span>Amend Scorecard</span>
+                  <FileText size={16} className={scorecardSubTab === 'Detailed Scorecards' ? 'text-[#1890FF]' : 'text-gray-400'} />
+                  <span>Detailed Scorecards</span>
+                  {scorecardSubTab === 'Detailed Scorecards' && (
+                    <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#1890FF] rounded-full" />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScorecardSubTab('Consolidated Scorecard Analysis')}
+                  className={`pb-3 text-[13px] font-bold relative cursor-pointer transition-colors flex items-center gap-2 ${
+                    scorecardSubTab === 'Consolidated Scorecard Analysis'
+                      ? 'text-[#1890FF]'
+                      : 'text-gray-500 hover:text-[#212b36] dark:hover:text-white'
+                  }`}
+                >
+                  <Sparkles size={16} className={scorecardSubTab === 'Consolidated Scorecard Analysis' ? 'text-[#1890FF]' : 'text-gray-400'} />
+                  <span>Consolidated Scorecard Analysis</span>
+                  {scorecardSubTab === 'Consolidated Scorecard Analysis' && (
+                    <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#1890FF] rounded-full" />
+                  )}
                 </button>
               </div>
 
-              {/* 2. SUMMARY OF THE SCORECARD (ROUND 2) */}
-              <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 sm:p-6 shadow-sm space-y-6 animate-fade-in">
-                {/* Header with Interviewer Info & Recommendation */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[#1890FF] font-bold text-sm flex items-center justify-center shrink-0">
-                      JA
+              {scorecardSubTab === 'Detailed Scorecards' && (
+                <button 
+                  onClick={() => setOpenScorecards(openScorecards.length > 0 ? [] : MOCK_SCORECARDS.map(s => s.id))}
+                  className="text-[12px] font-bold text-[#1890FF] hover:bg-[#1890FF]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#1890FF]/20 bg-[#1890FF]/5 shrink-0 self-start sm:self-auto mb-2"
+                >
+                  {openScorecards.length > 0 ? 'Collapse All' : 'Expand All'}
+                </button>
+              )}
+            </div>
+
+            {scorecardSubTab === 'Detailed Scorecards' ? (
+              <div className="space-y-4">
+                {MOCK_SCORECARDS.map(scorecard => {
+                  const isOpen = openScorecards.includes(scorecard.id);
+                  return (
+                    <div 
+                      id={`scorecard-card-${scorecard.id}`}
+                      key={scorecard.id} 
+                      className="bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl border border-gray-200/80 dark:border-gray-800/80 shadow-2xs overflow-hidden transition-colors hover:border-[#1890FF]/30"
+                    >
+                      <button 
+                        onClick={() => setOpenScorecards(prev => isOpen ? prev.filter(id => id !== scorecard.id) : [...prev, scorecard.id])}
+                        className={`w-full flex items-center justify-between p-5 cursor-pointer transition-colors ${isOpen ? 'bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50' : 'hover:bg-gray-50 dark:hover:bg-gray-800/20'}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-[12px] font-bold text-[#212b36] dark:text-white">
+                            {getInitials(scorecard.interviewer)}
+                          </div>
+                          <div className="text-left">
+                            <h4 className="text-[13px] font-bold text-[#212b36] dark:text-white">{scorecard.interviewer}</h4>
+                            <p className="text-[13px] leading-relaxed text-gray-500 mt-0.5">{scorecard.stage} • {scorecard.date}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-6">
+                           {(() => {
+                             const recStyle = getRecBadge(scorecard.recommendation);
+                             return (
+                               <div className="text-right hidden sm:block">
+                                 <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Recommendation</div>
+                                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
+                                   <span>{recStyle.emoji}</span>
+                                   <span>{recStyle.label}</span>
+                                 </div>
+                               </div>
+                             );
+                           })()}
+                           <ChevronDown size={18} className={`text-[#1890FF] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                        </div>
+                      </button>
+
+                      <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+                        <div className="overflow-hidden">
+                          <div className="p-6 space-y-8">
+                            
+                            {/* Top Row: Key Takeaways (80%) & Core Metrics (20%) */}
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
+                              <div className="lg:col-span-4 flex flex-col">
+                                <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Key Takeaways</h5>
+                                <div className="bg-gradient-to-br from-[#1890FF]/10 to-transparent border border-[#1890FF]/20 rounded-xl p-4 relative overflow-hidden flex-1 flex items-center">
+                                  <div className="absolute top-0 right-0 p-3 opacity-10"><FileText size={40} className="text-[#1890FF]" /></div>
+                                  <p className="text-[13px] text-[#212b36] dark:text-gray-200 font-semibold leading-relaxed relative z-10 italic">
+                                    "{scorecard.takeaways}"
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="lg:col-span-1 flex flex-col justify-between">
+                                <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">Core Metrics</h5>
+                                <div className="grid gap-2 flex-1">
+                                  {[
+                                    { label: 'Hard Skills', value: scorecard.hardSkills },
+                                    { label: 'Soft Skills', value: scorecard.softSkills },
+                                    { label: 'Culture Fit', value: scorecard.cultureFit || 8.0 }
+                                  ].map(metric => {
+                                    const isHigh = metric.value >= 8.0;
+                                    const isMed = metric.value >= 5.0 && metric.value < 8.0;
+                                    const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFC107]' : 'text-[#FF5630]';
+                                    return (
+                                      <div key={metric.label} className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
+                                        <span className="text-[12px] font-bold text-[#212b36] dark:text-gray-300">{metric.label}</span>
+                                        <span className={`text-[14px] font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Interviewer Notes (Full Width 100%) */}
+                            <div className="w-full bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText size={14} className="text-[#1890FF]" />
+                                <h5 className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Interviewer Notes</h5>
+                              </div>
+                              <p className="text-[13px] text-[#454f5b] dark:text-gray-300 leading-relaxed w-full">
+                                {expandedNotes[scorecard.id] || scorecard.notes.length <= 250 
+                                  ? scorecard.notes 
+                                  : `${scorecard.notes.slice(0, 250).trim()}...`}
+                                {scorecard.notes.length > 250 && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); setExpandedNotes(prev => ({...prev, [scorecard.id]: !prev[scorecard.id]})) }}
+                                    className="ml-2 font-bold text-[#1890FF] hover:underline cursor-pointer focus:outline-none inline-flex"
+                                  >
+                                    {expandedNotes[scorecard.id] ? 'Read Less' : 'Read More'}
+                                  </button>
+                                )}
+                              </p>
+                            </div>
+
+                            {/* Detailed Attributes (Categorized) */}
+                            <div className="pt-6 border-t border-gray-100 dark:border-gray-800/50 mt-8">
+                              <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">Detailed Attributes Evaluated</h5>
+                              <div className="space-y-4">
+                                {(scorecard.categories || []).map(cat => (
+                                  <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
+                                    <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
+                                      <span>{cat.name}</span>
+                                      <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
+                                    </h6>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                      {cat.attributes.map((attr, idx) => {
+                                        return (
+                                          <div 
+                                            key={idx} 
+                                            className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300"
+                                          >
+                                            <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>{attr.name}</span>
+                                            <div className="shrink-0 flex items-center justify-center">
+                                              {renderRatingCircle(attr.rating, "w-3.5 h-3.5")}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Rating Scale Legend */}
+                              <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
+                                <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 shrink-0" />
+                                    <span>Unassessed</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
+                                    <span>Strong No</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
+                                    <span>No</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#1890FF] shrink-0" />
+                                    <span>Yes</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
+                                    <span>Strong Yes</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* AI Summary */}
+                <div className="rounded-2xl border border-[#1890FF]/25 bg-gradient-to-br from-[#1890FF]/5 via-purple-500/5 to-transparent p-5 sm:p-6 shadow-sm relative overflow-hidden">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+                      <Sparkles size={16} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Jahangir Alam (You)</h3>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-[#1890FF]">
-                          Principal Architect
-                        </span>
+                        <h3 className="text-sm font-bold text-[#212b36] dark:text-white">AI Summary</h3>
+                        <span className="text-[10px] font-bold text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Synthesis</span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Technical Round 2: System Architecture & Concurrency · Submitted 1 Oct 2026 · 60 mins
+                    </div>
+                  </div>
+                  <p className="text-[13px] leading-relaxed text-[#454f5b] dark:text-gray-300">
+                    The evaluation panel demonstrates strong consensus on core technical capabilities, distributed systems fundamentals, and hands-on execution across all technical interview rounds. However, notable discrepancies emerged between engineering and executive reviewers regarding strategic product tradeoffs, high-stakes communication, and leadership presence under ambiguity.
+                  </p>
+                </div>
+
+                {/* Consensus & Discrepancies Sections */}
+                <div className="space-y-8">
+                  {/* Consensus Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#00A76F]/10 text-[#00A76F] flex items-center justify-center">
+                          <CheckCircle size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Consensus</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with aligned evaluations across interviewers</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-2.5 py-0.5 rounded-full">
+                        0 Attributes
+                      </span>
+                    </div>
+
+                    <div className="w-full py-8 px-4 flex flex-col items-center justify-center text-center rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-dashed border-gray-200 dark:border-gray-800">
+                      <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-200">No consensus attributes identified yet</p>
+                      <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+                        Consensus insights will appear once multiple interviewers evaluate and align on the same competency attributes.
                       </p>
                     </div>
                   </div>
 
-                  {/* Recommendation Badge */}
-                  <div className="flex items-center gap-3">
-                    {(() => {
-                      const rec = SCORECARD_RECOMMENDATIONS.find(r => r.id === selectedRecommendation) || SCORECARD_RECOMMENDATIONS[0];
+                  {/* Discrepancies Section */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#FF5630]/10 text-[#FF5630] flex items-center justify-center">
+                          <ArrowRightLeft size={15} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Discrepancies</h3>
+                          <p className="text-[11px] text-gray-500">Attributes with divergent ratings or conflicting viewpoints</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#FF5630] bg-[#FF5630]/10 px-2.5 py-0.5 rounded-full">
+                        0 Attributes
+                      </span>
+                    </div>
+
+                    <div className="w-full py-8 px-4 flex flex-col items-center justify-center text-center rounded-xl bg-gray-50/50 dark:bg-gray-800/20 border border-dashed border-gray-200 dark:border-gray-800">
+                      <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-200">No rating discrepancies found</p>
+                      <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+                        Attributes with divergent evaluations or conflicting viewpoints across interview stages will be highlighted here.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scorecard Ratings Section */}
+                <div className="bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl border border-gray-200/80 dark:border-gray-800/80 p-5 sm:p-6 shadow-2xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
+                        <Star size={16} />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Scorecard Ratings</h3>
+                        <p className="text-[11px] text-gray-500">Key competency attributes rated across interviewers</p>
+                      </div>
+                    </div>
+                    
+                    {/* Rating Color Code Legend */}
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F]" />
+                        <span className="font-medium text-[#212b36] dark:text-gray-300">Strong Yes</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#1890FF]" />
+                        <span className="font-medium text-[#212b36] dark:text-gray-300">Yes</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00]" />
+                        <span className="font-medium text-[#212b36] dark:text-gray-300">No</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630]" />
+                        <span className="font-medium text-[#212b36] dark:text-gray-300">Strong No</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-2.5">
+                    {SCORECARD_SUMMARY_ATTRIBUTES.map((attr, idx) => {
                       return (
-                        <div className="text-left sm:text-right">
-                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Your Recommendation</div>
-                          <div className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border ${rec.badgeBg} ${rec.badgeText} ${rec.border} shadow-2xs`}>
-                            <span>{rec.emoji}</span>
-                            <span>{rec.label}</span>
+                        <div 
+                          key={idx} 
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50/60 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                                {attr.category}
+                              </span>
+                            </div>
+                            <h4 className="text-[13px] font-semibold text-[#212b36] dark:text-white truncate">
+                              {attr.name}
+                            </h4>
+                          </div>
+
+                          <div className="flex items-center gap-2.5 shrink-0">
+                            {MOCK_SCORECARDS.map(sc => {
+                              const rating = sc.categories
+                                ?.flatMap(c => c.attributes)
+                                ?.find(a => a.name === attr.name)?.rating || 'Unassessed';
+                              const style = getRatingAvatarStyle(rating);
+                              const initials = getInitials(sc.interviewer);
+
+                              return (
+                                <button 
+                                  key={sc.id} 
+                                  type="button"
+                                  onClick={() => openInspectorDrawer(sc.interviewer, attr.name)}
+                                  className="group relative cursor-pointer"
+                                >
+                                  <div 
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shadow-xs transition-transform group-hover:scale-110 ${style.bg} ${style.text} ${style.border}`}
+                                  >
+                                    {initials}
+                                  </div>
+                                  
+                                  {/* Hover tooltip */}
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-30 pointer-events-none">
+                                    <div className="bg-[#212b36] dark:bg-gray-900 text-white text-[11px] py-1.5 px-3 rounded-lg shadow-xl whitespace-nowrap border border-gray-700/50">
+                                      <div className="font-bold">{sc.interviewer}</div>
+                                      <div className="text-[10px] text-gray-300 mt-0.5">
+                                        {sc.stage} • <span className={`font-semibold ${rating.toLowerCase() === 'strong yes' ? 'text-[#00A76F]' : rating.toLowerCase() === 'yes' ? 'text-[#1890FF]' : rating.toLowerCase() === 'no' ? 'text-[#FFAB00]' : rating.toLowerCase() === 'strong no' ? 'text-[#FF5630]' : 'text-gray-400'}`}>{rating}</span>
+                                      </div>
+                                      <div className="text-[9px] text-[#1890FF] font-medium mt-0.5">Click to inspect scorecard details →</div>
+                                    </div>
+                                    <div className="w-2 h-2 bg-[#212b36] dark:bg-gray-900 rotate-45 -mt-1" />
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       );
-                    })()}
-                  </div>
-                </div>
-
-                {/* Interviewer Notes / Qualitative Feedback */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare size={14} className="text-[#1890FF]" />
-                    <h4 className="text-xs font-bold text-[#212b36] dark:text-white uppercase tracking-wider">
-                      Interviewer Notes & Qualitative Evaluation
-                    </h4>
-                  </div>
-                  <div className="bg-gray-50/70 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-100 dark:border-gray-800/60">
-                    <p className="text-xs text-[#454f5b] dark:text-gray-200 leading-relaxed whitespace-pre-line font-sans">
-                      {scorecardFeedback}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Note for other interviewers (if provided) */}
-                {noteForOthers.trim().length > 0 && (
-                  <div className="rounded-xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <Users size={14} className="text-[#FFAB00]" />
-                      <h4 className="text-xs font-bold text-[#212b36] dark:text-white">
-                        Handover Note for Subsequent Interviewers (Executive / Round 3)
-                      </h4>
-                    </div>
-                    <p className="text-xs text-[#454f5b] dark:text-gray-300 italic leading-relaxed">
-                      "{noteForOthers}"
-                    </p>
-                  </div>
-                )}
-
-                {/* Evaluated Competency Dimensions Categorized */}
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Target size={14} className="text-[#1890FF]" />
-                      <h4 className="text-xs font-bold text-[#212b36] dark:text-white uppercase tracking-wider">
-                        Skills & Qualities Evaluated
-                      </h4>
-                    </div>
-                    <span className="text-[11px] font-bold text-[#00A76F]">
-                      {Object.values(attributeRatings).filter(r => r !== 'Unassessed').length} of {SCORECARD_CATEGORIES.reduce((acc, c) => acc + c.attributes.length, 0)} Assessed
-                    </span>
-                  </div>
-
-                  <div className="space-y-3.5">
-                    {SCORECARD_CATEGORIES.map((cat) => (
-                      <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3.5 border border-gray-100/80 dark:border-gray-800">
-                        <h6 className="text-[11px] font-bold uppercase tracking-wider text-[#1890FF] mb-2.5 flex items-center justify-between">
-                          <span>{cat.name}</span>
-                          <span className="text-[10px] text-gray-400 font-normal">({cat.attributes.length} attributes)</span>
-                        </h6>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                          {cat.attributes.map((attr) => {
-                            const currentRating = attributeRatings[attr.name] || 'Unassessed';
-                            const opt = RATING_OPTIONS.find(o => o.id === currentRating) || RATING_OPTIONS[0];
-                            return (
-                              <div
-                                key={attr.name}
-                                className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800"
-                              >
-                                <span className="text-[12px] font-medium text-[#454f5b] dark:text-gray-300 pr-2 truncate" title={attr.name}>
-                                  {attr.name}
-                                </span>
-                                <div className="shrink-0 flex items-center gap-2">
-                                  <span className={`w-3.5 h-3.5 rounded-full ${opt.colorClass} block shadow-2xs`} title={opt.label} />
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Legend */}
-                  <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-50/40 dark:bg-gray-800/20 p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/60">
-                    <span className="font-bold text-gray-400 uppercase tracking-wider">Legend:</span>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#FF5630] shrink-0" />
-                        <span>Beginner</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#FFAB00] shrink-0" />
-                        <span>Competent</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#00A76F] shrink-0" />
-                        <span>Advanced</span>
-                      </div>
-                    </div>
+                    })}
                   </div>
                 </div>
               </div>
-
-              {/* 3. THE REST OF THE PANEL: SUMMARY & COMMENTS FROM PREVIOUS ROUND INTERVIEWER */}
-              <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 sm:p-6 shadow-sm space-y-5 animate-fade-in">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 shrink-0">
-                      <FileText size={16} />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-[#212b36] dark:text-white">
-                        Previous Round Feedback
-                      </h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Notes and evaluations from previous interview rounds.
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 self-start sm:self-auto">
-                    1 Prior Round Evaluated
-                  </span>
-                </div>
-
-                {/* Prior Round 1 Card */}
-                <div className="rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-gray-50/50 dark:bg-[#1a222d] p-4 sm:p-5 space-y-4">
-                  {/* Round Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200/60 dark:border-gray-700/60">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-[#00A76F] font-bold text-xs flex items-center justify-center shrink-0">
-                        VN
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-[#212b36] dark:text-white">Vikram Nair</h3>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                            Staff Engineer
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          Round 1: Technical & Coding · 23 Sep 2026 · 45 mins
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/30">
-                        <span>🌟</span>
-                        <span>Strong Hire</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Key Takeaways Quote */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      <FileText size={13} className="text-[#1890FF]" />
-                      <span>Key Takeaways & Evaluation</span>
-                    </div>
-                    <div className="bg-white dark:bg-[#121820] p-3.5 rounded-xl border border-gray-200/70 dark:border-gray-700/60">
-                      <p className="text-xs text-[#212b36] dark:text-gray-200 leading-relaxed italic">
-                        "Demonstrated exceptional core Java memory management and clean API design. Solved the concurrent rate limiter with token bucket algorithm effortlessly under 25 minutes."
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Strengths Identified */}
-                  <div className="space-y-2">
-                    <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Strengths Identified:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        'Deep understanding of multi-threading and thread-safety mechanisms in high-concurrency JVM.',
-                        'Designed a graceful degradation pattern for batch transaction retries under 15 minutes.'
-                      ].map((strength, idx) => (
-                        <div key={idx} className="flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-[#121820] border border-gray-200/60 dark:border-gray-700/60 text-xs text-[#454f5b] dark:text-gray-300">
-                          <Check size={14} className="text-[#00A76F] shrink-0 mt-0.5" />
-                          <span>{strength}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Handover Note left for Round 2 */}
-                  <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/40 space-y-1">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#1890FF]">
-                      <Lightbulb size={14} />
-                      <span>Handover Note for Round 2 (System Architecture):</span>
-                    </div>
-                    <p className="text-xs text-[#454f5b] dark:text-gray-300 italic leading-relaxed">
-                      "Check how she handles data reconciliation lag when read-replicas desynchronize in distributed Postgres. Core algorithms and coding are rock solid."
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         /* OTHER TABS PLACEHOLDER */
@@ -1851,6 +2361,206 @@ Key Strengths:
           </p>
         </div>
       )}
+
+      {/* Slide-Over Detail Inspector Drawer (Right Panel) */}
+      {inspectorData && (
+        <div className="fixed inset-0 z-[150] overflow-hidden">
+          {/* Backdrop Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in cursor-pointer"
+            onClick={closeInspectorDrawer}
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-md md:max-w-lg bg-white dark:bg-[#161c24] shadow-2xl flex flex-col border-l border-gray-200 dark:border-gray-800 animate-slide-in-right overflow-hidden">
+              
+              {/* Drawer Header */}
+              <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/40 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-sm font-bold text-[#212b36] dark:text-white shadow-xs shrink-0">
+                    {getInitials(inspectorData.scorecard.interviewer)}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                        {inspectorData.scorecard.interviewer}
+                      </h3>
+                      {(() => {
+                        const recStyle = getRecBadge(inspectorData.scorecard.recommendation);
+                        return (
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${recStyle.bg} ${recStyle.text} ${recStyle.border}`}>
+                            <span>{recStyle.emoji}</span>
+                            <span>{recStyle.label}</span>
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <p className="text-[12px] text-gray-500 mt-0.5">
+                      {inspectorData.scorecard.stage} • {inspectorData.scorecard.date}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closeInspectorDrawer}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-200/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer shrink-0"
+                  aria-label="Close panel"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Drawer Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+                
+                {/* Pinned Focused Attribute Card */}
+                {(() => {
+                  const focusedAttr = inspectorData.scorecard.categories
+                    ?.flatMap(c => c.attributes.map(a => ({ ...a, category: c.name })))
+                    ?.find(a => a.name === inspectorData.focusedAttributeName);
+                  
+                  const ratingStyle = getRatingAvatarStyle(focusedAttr?.rating || 'Unassessed');
+
+                  return (
+                    <div className="rounded-2xl p-4 bg-gradient-to-br from-[#1890FF]/10 via-[#1890FF]/5 to-transparent border-2 border-[#1890FF]/30 shadow-xs relative overflow-hidden">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] bg-[#1890FF]/10 px-2 py-0.5 rounded">
+                          {focusedAttr?.category || 'Competency Attribute'}
+                        </span>
+                        <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <Sparkles size={12} className="text-[#1890FF]" /> Target Attribute
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 mt-1">
+                        <h4 className="text-sm sm:text-base font-bold text-[#212b36] dark:text-white">
+                          {inspectorData.focusedAttributeName}
+                        </h4>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`w-3.5 h-3.5 rounded-full ${ratingStyle.bg} shadow-xs`} />
+                          <span className={`text-[13px] font-bold ${focusedAttr?.rating?.toLowerCase() === 'strong yes' ? 'text-[#00A76F]' : focusedAttr?.rating?.toLowerCase() === 'yes' ? 'text-[#1890FF]' : focusedAttr?.rating?.toLowerCase() === 'no' ? 'text-[#FFAB00]' : focusedAttr?.rating?.toLowerCase() === 'strong no' ? 'text-[#FF5630]' : 'text-gray-400'}`}>
+                            {focusedAttr?.rating || 'Unassessed'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Quick Key Takeaway Quote */}
+                <div>
+                  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    Key Takeaways
+                  </h5>
+                  <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-3.5 border border-gray-100 dark:border-gray-800">
+                    <p className="text-[13px] text-[#212b36] dark:text-gray-200 italic font-medium leading-relaxed">
+                      "{inspectorData.scorecard.takeaways}"
+                    </p>
+                  </div>
+                </div>
+
+                {/* Core Metrics Grid */}
+                <div>
+                  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    Evaluation Metrics
+                  </h5>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: 'Hard Skills', value: inspectorData.scorecard.hardSkills },
+                      { label: 'Soft Skills', value: inspectorData.scorecard.softSkills },
+                      { label: 'Culture Fit', value: inspectorData.scorecard.cultureFit || 8.0 }
+                    ].map(metric => {
+                      const isHigh = metric.value >= 8.0;
+                      const isMed = metric.value >= 5.0 && metric.value < 8.0;
+                      const colorText = isHigh ? 'text-[#00A76F]' : isMed ? 'text-[#FFAB00]' : 'text-[#FF5630]';
+                      return (
+                        <div key={metric.label} className="p-3 text-center rounded-xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
+                          <div className={`text-base font-black ${colorText}`}>{Number(metric.value).toFixed(1)}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Interviewer Private Notes */}
+                <div>
+                  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <FileText size={13} className="text-[#1890FF]" /> Notes & Observations
+                  </h5>
+                  <div className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50/70 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                    {inspectorData.scorecard.notes}
+                  </div>
+                </div>
+
+                {/* Categorized Attributes Breakdown */}
+                <div>
+                  <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+                    Full Rubric for this Round
+                  </h5>
+                  <div className="space-y-3">
+                    {(inspectorData.scorecard.categories || []).map(cat => (
+                      <div key={cat.name} className="bg-gray-50/50 dark:bg-gray-800/20 rounded-xl p-3 border border-gray-100 dark:border-gray-800">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[#1890FF] mb-2">
+                          {cat.name}
+                        </div>
+                        <div className="space-y-1.5">
+                          {cat.attributes.map((attr, idx) => {
+                            const isFocused = attr.name === inspectorData.focusedAttributeName;
+                            return (
+                              <div 
+                                key={idx} 
+                                className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                                  isFocused 
+                                    ? 'bg-[#1890FF]/10 border border-[#1890FF]/40 font-semibold shadow-xs' 
+                                    : 'hover:bg-white dark:hover:bg-gray-800/60'
+                                }`}
+                              >
+                                <span className={`text-[12px] truncate pr-2 ${isFocused ? 'text-[#1890FF] font-bold' : 'text-[#454f5b] dark:text-gray-300'}`}>
+                                  {attr.name}
+                                </span>
+                                <div className="shrink-0 flex items-center gap-1.5">
+                                  {renderRatingCircle(attr.rating, "w-3 h-3")}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={closeInspectorDrawer}
+                  className="px-4 py-2 text-xs font-bold text-[#212b36] dark:text-white bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer shadow-xs"
+                >
+                  Close
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+      {/* REUSABLE FEED SCORECARD MODAL */}
+      <FeedScorecardModal
+        open={isFeedModalOpen}
+        onClose={() => setIsFeedModalOpen(false)}
+        onSubmit={(data) => {
+          setSaveToast('Scorecard submitted successfully');
+          setTimeout(() => setSaveToast(null), 3000);
+        }}
+        candidateName="Neha Kulkarni"
+        roundName="Technical Round 2: System Architecture"
+        roleName="Senior Backend Engineer"
+      />
     </div>
   );
 }

@@ -19,6 +19,71 @@ body {
   font-size: var(--text-sm, 14px);
 }
 
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST TYPOGRAPHY SYSTEM
+   Ensures text across the entire platform is dark grey or black for maximum
+   readability. Light grey is strictly preserved only for read-only / disabled states.
+   ========================================================================== */
+
+/* Light mode: elevate secondary/faint text utilities to rich dark grey (#374151 / #1f2937) */
+html:not(.dark) .text-gray-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-gray-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-slate-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-slate-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-neutral-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-neutral-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-zinc-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-zinc-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]) {
+  color: #374151; /* Dark charcoal grey (WCAG AAA contrast against light backgrounds) */
+}
+
+html:not(.dark) .text-gray-600:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+html:not(.dark) .text-slate-600:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]) {
+  color: #1f2937; /* Very dark grey / near black */
+}
+
+/* Ensure paragraph subtitles, descriptions, and labels are dark grey by default in light mode */
+html:not(.dark) p.text-gray-500,
+html:not(.dark) p.text-gray-400,
+html:not(.dark) span.text-gray-500,
+html:not(.dark) span.text-gray-400,
+html:not(.dark) div.text-gray-500,
+html:not(.dark) div.text-gray-400 {
+  color: #374151;
+}
+
+/* Read-only and disabled text preserved strictly as muted light grey */
+:disabled,
+[disabled],
+[aria-disabled="true"],
+.disabled,
+[readonly],
+input[readonly],
+textarea[readonly] {
+  color: #9ca3af !important;
+}
+
+/* Dark mode: crisp high-contrast text on dark backgrounds */
+.dark .text-gray-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+.dark .text-slate-400:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]) {
+  color: #cbd5e1; /* Clean readable light slate/grey */
+}
+
+.dark .text-gray-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]),
+.dark .text-slate-500:not(:hover):not(:disabled):not([disabled]):not([aria-disabled="true"]):not(.disabled):not([readonly]) {
+  color: #94a3b8;
+}
+
+.dark :disabled,
+.dark [disabled],
+.dark [aria-disabled="true"],
+.dark .disabled,
+.dark [readonly],
+.dark input[readonly],
+.dark textarea[readonly] {
+  color: #64748b !important;
+}
+
 th, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
 }
@@ -55,7 +120,7 @@ th, h2, h3, h4, h5, h6 {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-slide-up {
