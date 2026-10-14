@@ -23,7 +23,8 @@ import {
  Book,
  Star,
  FileSignature,
- Mail
+ Mail,
+  LayoutTemplate
 } from 'lucide-react';
 import UserMenu from './UserMenu';
 
@@ -50,6 +51,7 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },
  { name: 'Approvals', path: '/dashboard/approvals', icon: CheckSquare },
  { name: 'Interview Kits', path: '/dashboard/interview-kits', icon: ClipboardList },
+  { name: 'Org Templates', path: '/dashboard/org-templates', icon: LayoutTemplate },
  { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 }
  ];
 

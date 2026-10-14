@@ -1193,6 +1193,10 @@ export default function CandidateProfilePage() {
  <p className="text-[12px] text-gray-700 dark:text-gray-400 font-medium shrink-0 mt-0.5">Institution</p>
  <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">IIT Bombay (2013-2017)</p>
  </div>
+ <div className="flex justify-between items-start gap-4">
+ <p className="text-[12px] text-gray-700 dark:text-gray-400 font-medium shrink-0 mt-0.5">Certification</p>
+ <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">AWS Certified Solutions Architect (Professional)</p>
+ </div>
  </div>
  </div>
 

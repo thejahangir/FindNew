@@ -10,6 +10,7 @@ import JobsPage from './JobsPage';
 import ApprovalsPage from './ApprovalsPage';
 import CandidateProfilePage from './CandidateProfilePage';
 import InterviewKitsPage from './InterviewKitsPage';
+import OrgTemplatesPage from './OrgTemplatesPage';
 
 const PlaceholderPage = ({ title }) => (
  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center min-h-[400px]">
@@ -55,6 +56,7 @@ export default function DashboardPage() {
  <Route path="interview-kits" element={<InterviewKitsPage />} />
  <Route path="interview-kit" element={<InterviewKitsPage />} />
  <Route path="interview-prep" element={<InterviewKitsPage />} />
+            <Route path="org-templates" element={<OrgTemplatesPage />} />
  <Route path="reports" element={<PlaceholderPage title="Reports" />} />
  <Route path="reports/custom" element={<PlaceholderPage title="Custom Reports" />} />
  <Route path="reports/export" element={<PlaceholderPage title="Export Data" />} />

@@ -13,6 +13,7 @@ import {
   Users,
   Save,
   ChevronRight,
+  ChevronDown,
   Target,
   Award,
   FileText,
@@ -152,7 +153,8 @@ export default function FeedScorecardModal({
   );
   const [privateNoteVisibility, setPrivateNoteVisibility] = useState('Hiring Manager');
   const [isPrivateNoteSaved, setIsPrivateNoteSaved] = useState(true);
-  const [activeNoteTab, setActiveNoteTab] = useState('handover'); // 'handover' | 'private'
+  const [isHandoverOpen, setIsHandoverOpen] = useState(false);
+  const [isPrivateNoteOpen, setIsPrivateNoteOpen] = useState(false);
   const [selectedRecommendation, setSelectedRecommendation] = useState('Strong Hire');
   const [saveToast, setSaveToast] = useState(null);
 
@@ -374,194 +376,196 @@ export default function FeedScorecardModal({
                   />
                 </div>
 
-                {/* ADDITIONAL NOTES (TWO TABS: HANDOVER & PRIVATE) */}
-                <div className="pt-2">
-                  <div className="rounded-xl border border-gray-200 dark:border-gray-700/80 overflow-hidden bg-gray-50/30 dark:bg-gray-800/20 flex flex-col sm:flex-row min-h-[190px]">
-                    {/* Left Sidebar Nav Tabs */}
-                    <div className="w-full sm:w-56 p-2 bg-gray-50 dark:bg-gray-800/40 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700/80 flex flex-row sm:flex-col gap-1.5 shrink-0">
-                      <div className="px-2.5 py-1 hidden sm:block">
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Additional Notes</span>
+                {/* ADDITIONAL NOTES (SEPARATE COLLAPSIBLE SECTIONS: HANDOVER NOTE & PRIVATE NOTE) */}
+                <div className="pt-2 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Additional Notes
+                    </span>
+                  </div>
+
+                  {/* Section 1: Handover Note */}
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-700/80 bg-white dark:bg-[#161c24] overflow-hidden transition-all duration-200 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => setIsHandoverOpen(!isHandoverOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50/70 hover:bg-gray-100/70 dark:bg-gray-800/40 dark:hover:bg-gray-800/70 transition-colors cursor-pointer text-left"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] shrink-0 border border-blue-200/60 dark:border-blue-800/50">
+                          <Users size={14} />
+                        </div>
+                        <div className="min-w-0 flex items-baseline gap-2">
+                          <span className="text-xs font-bold text-[#212b36] dark:text-white">Handover Note</span>
+                          <span className="text-[11px] text-gray-400 hidden sm:inline">(For next interviewers)</span>
+                        </div>
                       </div>
 
-                      {/* Tab 1: Handover Note */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveNoteTab('handover')}
-                        className={`flex-1 sm:flex-none flex items-center justify-between p-2.5 rounded-lg border text-left transition-all duration-200 cursor-pointer ${
-                          activeNoteTab === 'handover'
-                            ? 'bg-blue-50/80 dark:bg-blue-950/50 border-[#1890FF] text-[#1890FF] shadow-2xs font-bold'
-                            : 'border-transparent bg-transparent hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-[#454f5b] dark:text-gray-300 font-medium'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`p-1.5 rounded-md shrink-0 transition-colors duration-200 ${
-                            activeNoteTab === 'handover'
-                              ? 'bg-[#1890FF] text-white shadow-xs'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                          }`}>
-                            <Users size={14} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <span className="text-xs truncate font-bold block">Handover Note</span>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">For next interviewers</p>
-                          </div>
-                        </div>
-                        {activeNoteTab === 'handover' && (
-                          <ChevronRight size={13} className="text-[#1890FF] shrink-0 transition-transform duration-200" />
-                        )}
-                      </button>
-
-                      {/* Tab 2: Private Note */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveNoteTab('private')}
-                        className={`flex-1 sm:flex-none flex items-center justify-between p-2.5 rounded-lg border text-left transition-all duration-200 cursor-pointer ${
-                          activeNoteTab === 'private'
-                            ? 'bg-blue-50/80 dark:bg-blue-950/50 border-[#1890FF] text-[#1890FF] shadow-2xs font-bold'
-                            : 'border-transparent bg-transparent hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-[#454f5b] dark:text-gray-300 font-medium'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`p-1.5 rounded-md shrink-0 transition-colors duration-200 ${
-                            activeNoteTab === 'private'
-                              ? 'bg-[#1890FF] text-white shadow-xs'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                          }`}>
-                            <Lock size={14} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <span className="text-xs truncate font-bold block">Private Note</span>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">Confidential note</p>
-                          </div>
-                        </div>
-                        {activeNoteTab === 'private' && (
-                          <ChevronRight size={13} className="text-[#1890FF] shrink-0 transition-transform duration-200" />
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Right Content Panel */}
-                    <div className="flex-1 p-3.5 bg-white dark:bg-[#161c24] flex flex-col justify-between overflow-hidden">
-                      {/* Tab 1 Content: Handover Note */}
-                      <div className={`space-y-2.5 flex-col h-full justify-between transition-opacity duration-200 ease-out ${
-                        activeNoteTab === 'handover' ? 'flex animate-fade-in' : 'hidden'
-                      }`}>
-                        <div>
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-[#212b36] dark:text-white">Note for other interviewers</span>
-                              <span className="text-[11px] text-gray-400 hidden sm:inline">(Handover guidance for subsequent rounds)</span>
-                            </div>
-                            {noteForOthers.trim().length > 0 && isNoteSaved && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 flex items-center gap-1">
-                                <Check size={10} /> Saved
-                              </span>
-                            )}
-                          </div>
-                          <textarea
-                            value={noteForOthers}
-                            onChange={(e) => setNoteForOthers(e.target.value)}
-                            rows={3}
-                            placeholder="Write private notes for subsequent interviewers (e.g. 'Strong in distributed locks. In Round 3, probe deeper into Kafka consumer group rebalances...')"
-                            className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/40 text-xs text-[#212b36] dark:text-gray-200 focus:outline-none focus:border-[#1890FF] leading-relaxed resize-none transition-colors"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
-                          <span className="text-[11px] text-gray-400">
-                            Shared across all interviewers in subsequent rounds
+                      <div className="flex items-center gap-2 shrink-0">
+                        {noteForOthers.trim().length > 0 && isNoteSaved && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 flex items-center gap-1">
+                            <Check size={10} /> Saved
                           </span>
-                          <div className="flex items-center gap-2">
-                            {noteForOthers.trim().length > 0 && (
-                              <button
-                                type="button"
-                                onClick={() => setNoteForOthers('')}
-                                className="px-2.5 py-1 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
-                              >
-                                Clear
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setIsNoteSaved(true);
-                                setSaveToast('Handover note saved for other interviewers');
-                                setTimeout(() => setSaveToast(null), 2500);
-                              }}
-                              className="px-3 py-1 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
-                            >
-                              <Save size={12} />
-                              <span>Save Note</span>
-                            </button>
-                          </div>
+                        )}
+                        <div className={`p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-transform duration-300 ease-in-out ${isHandoverOpen ? 'rotate-180' : ''}`}>
+                          <ChevronDown size={14} />
                         </div>
                       </div>
+                    </button>
 
-                      {/* Tab 2 Content: Private Note */}
-                      <div className={`space-y-2.5 flex-col h-full justify-between transition-opacity duration-200 ease-out ${
-                        activeNoteTab === 'private' ? 'flex animate-fade-in' : 'hidden'
-                      }`}>
-                        <div>
-                          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <div
+                      className={`grid transition-all duration-300 ease-in-out ${
+                        isHandoverOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="p-3.5 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                          <div className="space-y-1.5">
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                              Provide handover guidance and context for interviewers in subsequent evaluation rounds.
+                            </p>
+                            <textarea
+                              value={noteForOthers}
+                              onChange={(e) => setNoteForOthers(e.target.value)}
+                              rows={3}
+                              placeholder="Write private notes for subsequent interviewers (e.g. 'Strong in distributed locks. In Round 3, probe deeper into Kafka consumer group rebalances...')"
+                              className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/40 text-xs text-[#212b36] dark:text-gray-200 focus:outline-none focus:border-[#1890FF] leading-relaxed resize-none transition-colors"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800/60">
+                            <span className="text-[11px] text-gray-400">
+                              Shared across all interviewers in subsequent rounds
+                            </span>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-[#212b36] dark:text-white">Private Note</span>
-                              <span className="text-[11px] text-gray-400 hidden sm:inline">(Confidential)</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              {[
-                                { id: 'Only Me', label: 'Only Me' },
-                                { id: 'Hiring Manager', label: 'Hiring Manager' },
-                                { id: 'Admins', label: 'Admins' }
-                              ].map((vis) => (
+                              {noteForOthers.trim().length > 0 && (
                                 <button
-                                  key={vis.id}
                                   type="button"
-                                  onClick={() => setPrivateNoteVisibility(vis.id)}
-                                  className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                    privateNoteVisibility === vis.id
-                                      ? 'bg-[#1890FF] text-white shadow-2xs'
-                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                  }`}
+                                  onClick={() => setNoteForOthers('')}
+                                  className="px-2.5 py-1 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
                                 >
-                                  {vis.label}
+                                  Clear
                                 </button>
-                              ))}
-                            </div>
-                          </div>
-                          <textarea
-                            value={privateNote}
-                            onChange={(e) => setPrivateNote(e.target.value)}
-                            rows={3}
-                            placeholder="Write confidential observations (e.g. compensation expectations, offer timeline sensitivity, or private feedback)..."
-                            className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/40 text-xs text-[#212b36] dark:text-gray-200 focus:outline-none focus:border-[#1890FF] leading-relaxed resize-none transition-colors"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
-                          <span className="text-[11px] text-gray-400 flex items-center gap-1">
-                            <Lock size={11} className="text-[#1890FF]" />
-                            Visible to: <strong className="text-gray-600 dark:text-gray-300 font-semibold">{privateNoteVisibility}</strong>
-                          </span>
-                          <div className="flex items-center gap-2">
-                            {privateNote.trim().length > 0 && (
+                              )}
                               <button
                                 type="button"
-                                onClick={() => setPrivateNote('')}
-                                className="px-2.5 py-1 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
+                                onClick={() => {
+                                  setIsNoteSaved(true);
+                                  setSaveToast('Handover note saved for other interviewers');
+                                  setTimeout(() => setSaveToast(null), 2500);
+                                }}
+                                className="px-3 py-1 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
                               >
-                                Clear
+                                <Save size={12} />
+                                <span>Save Note</span>
                               </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setIsPrivateNoteSaved(true);
-                                setSaveToast(`Private note saved (Visible to ${privateNoteVisibility})`);
-                                setTimeout(() => setSaveToast(null), 2500);
-                              }}
-                              className="px-3 py-1 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
-                            >
-                              <Save size={12} />
-                              <span>Save Note</span>
-                            </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Private Note */}
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-700/80 bg-white dark:bg-[#161c24] overflow-hidden transition-all duration-200 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => setIsPrivateNoteOpen(!isPrivateNoteOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50/70 hover:bg-gray-100/70 dark:bg-gray-800/40 dark:hover:bg-gray-800/70 transition-colors cursor-pointer text-left"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 shrink-0 border border-amber-200/60 dark:border-amber-800/50">
+                          <Lock size={14} />
+                        </div>
+                        <div className="min-w-0 flex items-baseline gap-2">
+                          <span className="text-xs font-bold text-[#212b36] dark:text-white">Private Note</span>
+                          <span className="text-[11px] text-gray-400 hidden sm:inline">(Confidential · Visible to {privateNoteVisibility})</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {privateNote.trim().length > 0 && isPrivateNoteSaved && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/20 flex items-center gap-1">
+                            <Check size={10} /> Saved
+                          </span>
+                        )}
+                        <div className={`p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-transform duration-300 ease-in-out ${isPrivateNoteOpen ? 'rotate-180' : ''}`}>
+                          <ChevronDown size={14} />
+                        </div>
+                      </div>
+                    </button>
+
+                    <div
+                      className={`grid transition-all duration-300 ease-in-out ${
+                        isPrivateNoteOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="p-3.5 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between flex-wrap gap-2">
+                              <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                                Confidential observations visible only to selected roles:
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {[
+                                  { id: 'Only Me', label: 'Only Me' },
+                                  { id: 'Hiring Manager', label: 'Hiring Manager' },
+                                  { id: 'Admins', label: 'Admins' }
+                                ].map((vis) => (
+                                  <button
+                                    key={vis.id}
+                                    type="button"
+                                    onClick={() => setPrivateNoteVisibility(vis.id)}
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                      privateNoteVisibility === vis.id
+                                        ? 'bg-[#1890FF] text-white shadow-2xs'
+                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                    }`}
+                                  >
+                                    {vis.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <textarea
+                              value={privateNote}
+                              onChange={(e) => setPrivateNote(e.target.value)}
+                              rows={3}
+                              placeholder="Write confidential observations (e.g. compensation expectations, offer timeline sensitivity, or private feedback)..."
+                              className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/40 text-xs text-[#212b36] dark:text-gray-200 focus:outline-none focus:border-[#1890FF] leading-relaxed resize-none transition-colors"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800/60">
+                            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                              <Lock size={11} className="text-[#1890FF]" />
+                              Visible to: <strong className="text-gray-600 dark:text-gray-300 font-semibold">{privateNoteVisibility}</strong>
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {privateNote.trim().length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPrivateNote('')}
+                                  className="px-2.5 py-1 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
+                                >
+                                  Clear
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsPrivateNoteSaved(true);
+                                  setSaveToast(`Private note saved (Visible to ${privateNoteVisibility})`);
+                                  setTimeout(() => setSaveToast(null), 2500);
+                                }}
+                                className="px-3 py-1 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                              >
+                                <Save size={12} />
+                                <span>Save Note</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -602,7 +602,8 @@ const CANDIDATE_APPLICATION_DETAILS = {
   ],
   education: {
     degree: 'B.Tech in Computer Science',
-    institution: 'IIT Bombay (2012 - 2016)'
+    institution: 'IIT Bombay (2012 - 2016)',
+    certification: 'AWS Certified Solutions Architect (Professional)'
   },
   profiles: {
     linkedin: 'linkedin.com/in/nehasharma',
@@ -1026,10 +1027,14 @@ Key Strengths:
               </div>
 
               {/* Countdown ticker pill */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 shrink-0 self-start sm:self-auto">
-                <Clock size={15} className="text-[#1890FF]" />
-                <span className="text-[11px] font-bold text-[#1890FF] uppercase tracking-wider">Starts in:</span>
-                <span className="text-xs font-bold text-[#1890FF] font-mono">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 shrink-0 self-start sm:self-auto shadow-2xs">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5630] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5630]"></span>
+                </span>
+                <Clock size={15} className="text-[#FF5630]" />
+                <span className="text-[11px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Starts in:</span>
+                <span className="text-xs font-bold text-red-600 dark:text-red-400 font-mono">
                   {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
                 </span>
               </div>
@@ -1171,12 +1176,12 @@ Key Strengths:
                 </div>
               </div>
 
-              {/* Tile 2: Top Company & Scale Background */}
+              {/* Tile 2: Notable Companies & Education Background */}
               <div className="p-3.5 rounded-xl bg-gradient-to-br from-amber-50/50 via-gray-50/70 to-gray-50/50 dark:from-amber-950/15 dark:via-gray-800/30 dark:to-gray-800/20 border border-amber-200/50 dark:border-amber-800/30 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                     <Award size={14} className="text-[#FFAB00]" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">Top Companies & Scale</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">Notable Companies & Education</span>
                   </div>
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100/70 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 border border-amber-300/50 dark:border-amber-700/40">
                     Big Tech / Unicorn
@@ -1197,9 +1202,12 @@ Key Strengths:
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-amber-200/40 dark:border-amber-900/30">
+                <div className="pt-2 border-t border-amber-200/40 dark:border-amber-900/30 space-y-1">
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
                     Education: <strong className="text-[#212b36] dark:text-gray-200 font-semibold">IIT Bombay</strong> (B.Tech CS · 2016)
+                  </p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Certification: <strong className="text-[#212b36] dark:text-gray-200 font-semibold">AWS Certified Solutions Architect</strong> (Professional)
                   </p>
                 </div>
               </div>
@@ -1795,6 +1803,10 @@ Key Strengths:
                 <div className="flex justify-between items-start gap-4">
                   <p className="text-[12px] text-gray-700 dark:text-gray-400 font-medium shrink-0 mt-0.5">Institution</p>
                   <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">{CANDIDATE_APPLICATION_DETAILS.education.institution}</p>
+                </div>
+                <div className="flex justify-between items-start gap-4">
+                  <p className="text-[12px] text-gray-700 dark:text-gray-400 font-medium shrink-0 mt-0.5">Certification</p>
+                  <p className="text-[13px] font-semibold text-[#212b36] dark:text-gray-300 text-right">{CANDIDATE_APPLICATION_DETAILS.education.certification}</p>
                 </div>
               </div>
             </div>
