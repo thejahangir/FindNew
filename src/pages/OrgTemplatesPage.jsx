@@ -654,7 +654,7 @@ export default function OrgTemplatesPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search templates by title, prompt, or keyword..."
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 text-[#212b36] dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#1890FF] focus:ring-1 focus:ring-[#1890FF]"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 text-[#212b36] dark:text-white placeholder-gray-400 focus:outline-none focus:border-gray-300 dark:focus:border-gray-600 focus:ring-0"
               />
               {searchQuery && (
                 <button
@@ -775,7 +775,7 @@ export default function OrgTemplatesPage() {
                 return (
                   <div
                     key={template.id}
-                    className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-[0_4px_24px_rgb(0,0,0,0.03)] hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:border-[#1890FF]/40"
+                    className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-[0_4px_24px_rgb(0,0,0,0.03)] hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:border-gray-200 dark:hover:border-gray-700"
                   >
                     {/* Card Top & Body */}
                     <div className="p-5 flex-1 flex flex-col">
@@ -795,7 +795,7 @@ export default function OrgTemplatesPage() {
 
                       {/* Title of Template: Matches standard text-sm font-bold size */}
                       <h3
-                        className="text-sm font-bold text-[#212b36] dark:text-white line-clamp-1 mb-1 group-hover:text-[#1890FF] transition-colors"
+                        className="text-sm font-bold text-[#212b36] dark:text-white line-clamp-1 mb-1"
                         title={template.title}
                       >
                         {template.title}
@@ -840,9 +840,9 @@ export default function OrgTemplatesPage() {
                         type="button"
                         onClick={() => handleAskTrinity(template)}
                         title="Run this prompt in Trinity"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1890FF]/10 hover:bg-[#1890FF] text-[#1890FF] hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200/80 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-gray-200 border border-gray-200/80 dark:border-gray-700/80 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs"
                       >
-                        <Sparkles size={13} />
+                        <Sparkles size={13} className="text-[#1890FF]" />
                         <span>Ask Trinity</span>
                       </button>
 
@@ -912,7 +912,7 @@ export default function OrgTemplatesPage() {
                         {/* Title and Subtitle: Matches standard text-sm font-bold */}
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">
+                            <span className="text-sm font-bold text-[#212b36] dark:text-white">
                               {template.title}
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
@@ -973,10 +973,10 @@ export default function OrgTemplatesPage() {
                             <button
                               type="button"
                               onClick={() => handleAskTrinity(template)}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1890FF]/10 hover:bg-[#1890FF] text-[#1890FF] hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200/80 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#212b36] dark:text-gray-200 border border-gray-200/80 dark:border-gray-700/80 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs"
                               title="Ask Trinity"
                             >
-                              <Sparkles size={12} />
+                              <Sparkles size={12} className="text-[#1890FF]" />
                               <span>Ask Trinity</span>
                             </button>
 
