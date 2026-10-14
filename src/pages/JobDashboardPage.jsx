@@ -12,7 +12,7 @@ const getCurrencySymbol = (curr) => {
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2 } from 'lucide-react';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2, TrendingUp, TrendingDown, BarChart2, Sliders, Award, CheckCircle2 } from 'lucide-react';
 import { useChatbot } from '../contexts/ChatbotContext';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import DualRangeSlider from '../components/ui/DualRangeSlider';
@@ -26,6 +26,9 @@ import SettingsRankingRules from '../components/dashboard/settings/SettingsRanki
 import SettingsAgencies from '../components/dashboard/settings/SettingsAgencies';
 import SettingsNotifications from '../components/dashboard/settings/SettingsNotifications';
 import JobSetupHeader from '../components/dashboard/JobSetupHeader';
+import KPIStatsModal from '../components/dashboard/kpi/KPIStatsModal';
+import KPIEditMetricsModal from '../components/dashboard/kpi/KPIEditMetricsModal';
+import JobPipelineOverview from '../components/dashboard/JobPipelineOverview';
 
 // --- MOCK DATA ---
 const pipelineData = [
@@ -244,15 +247,240 @@ export default function JobDashboardPage() {
  location: jobData?.location || 'Bangalore, India',
  type: jobData?.type || 'Full-time',
  workMode: jobData?.workMode || 'Hybrid',
+ jobId: jobData?.jobId || (jobData?.id ? 'JOB-' + String(jobData.id).padStart(4, '0') : 'JOB-1024'),
+ requisitionRef: jobData?.requisitionRef || 'REQ-2024-001',
+ hiringManager: jobData?.hiringManager || 'Amit Sharma',
+ hiringManagerRole: jobData?.hiringManagerRole || 'Research Director',
+ postedDate: jobData?.postedDate || '2026-08-10',
  headcount: jobData?.headcount || '1',
  salaryMin: jobData?.salaryMin || '400000',
  salaryMax: jobData?.salaryMax || '600000',
  currency: jobData?.currency || 'INR',
  internalNotes: jobData?.internalNotes || '',
- requisitionRef: jobData?.requisitionRef || 'REQ-2024-001',
  status: jobData?.status || 'Published',
  isConfidential: jobData?.isConfidential || false
  });
+
+ const [copiedField, setCopiedField] = useState(null);
+ const [copyToastMsg, setCopyToastMsg] = useState(null);
+
+ // --- 5 KPI CARDS INITIAL DATA & STATE ---
+ const initialKpiMetrics = [
+   {
+     id: 'applications',
+     title: 'Applications',
+     total: 2450,
+     totalFormatted: '2,450',
+     changePercent: 12.8,
+     changePeriod: 'vs last month',
+     trend: 'up',
+     lastMonth: 2172,
+     lastMonthFormatted: '2,172',
+     color: '#1890FF',
+     bgColor: 'bg-[#1890FF]/10',
+     textColor: 'text-[#1890FF]',
+     borderColor: 'border-[#1890FF]/20',
+     icon: 'Users',
+     target: 2500,
+     description: 'Total inbound and sourced candidate submissions',
+     history: [
+       { week: 'Week 1', count: 520, lastMonthCount: 480 },
+       { week: 'Week 2', count: 610, lastMonthCount: 540 },
+       { week: 'Week 3', count: 640, lastMonthCount: 570 },
+       { week: 'Week 4', count: 680, lastMonthCount: 582 }
+     ],
+     sources: [
+       { source: 'LinkedIn Inbound', count: 1120, percentage: 46 },
+       { source: 'Direct Careers Site', count: 680, percentage: 28 },
+       { source: 'Referrals', count: 390, percentage: 16 },
+       { source: 'Agency Submissions', count: 260, percentage: 10 }
+     ],
+     funnelConversion: '100% of pipeline entry',
+     avgVelocity: '1.4 days initial triage',
+     showLastMonthFooter: true,
+     showChangeIndicator: true
+   },
+   {
+     id: 'rejections',
+     title: 'Rejections',
+     total: 2266,
+     totalFormatted: '2,266',
+     changePercent: 6.4,
+     changePeriod: 'vs last month',
+     trend: 'up',
+     lastMonth: 2130,
+     lastMonthFormatted: '2,130',
+     color: '#FF5630',
+     bgColor: 'bg-[#FF5630]/10',
+     textColor: 'text-[#FF5630]',
+     borderColor: 'border-[#FF5630]/20',
+     icon: 'UserX',
+     target: 2300,
+     description: 'Candidates rejected at resume screen or post-interview',
+     history: [
+       { week: 'Week 1', count: 480, lastMonthCount: 460 },
+       { week: 'Week 2', count: 570, lastMonthCount: 530 },
+       { week: 'Week 3', count: 600, lastMonthCount: 560 },
+       { week: 'Week 4', count: 616, lastMonthCount: 580 }
+     ],
+     sources: [
+       { source: 'Resume Fit (<75%)', count: 1540, percentage: 68 },
+       { source: 'Salary / Notice Misalignment', count: 410, percentage: 18 },
+       { source: 'Post-Interview Rejection', count: 216, percentage: 10 },
+       { source: 'Candidate Withdrew', count: 100, percentage: 4 }
+     ],
+     funnelConversion: '92.5% of total applications',
+     avgVelocity: '2.1 days avg notice sent',
+     showLastMonthFooter: true,
+     showChangeIndicator: true
+   },
+   {
+     id: 'interviews',
+     title: 'Interviews',
+     total: 142,
+     totalFormatted: '142',
+     changePercent: 18.3,
+     changePeriod: 'vs last month',
+     trend: 'up',
+     lastMonth: 120,
+     lastMonthFormatted: '120',
+     color: '#8E33FF',
+     bgColor: 'bg-[#8E33FF]/10',
+     textColor: 'text-[#8E33FF]',
+     borderColor: 'border-[#8E33FF]/20',
+     icon: 'Video',
+     target: 150,
+     description: 'Screening calls, technical assessments & rounds scheduled',
+     history: [
+       { week: 'Week 1', count: 30, lastMonthCount: 26 },
+       { week: 'Week 2', count: 36, lastMonthCount: 30 },
+       { week: 'Week 3', count: 38, lastMonthCount: 32 },
+       { week: 'Week 4', count: 38, lastMonthCount: 32 }
+     ],
+     sources: [
+       { source: 'Technical Round 1', count: 64, percentage: 45 },
+       { source: 'Hiring Manager Interview', count: 42, percentage: 30 },
+       { source: 'HR Culture Fit', count: 24, percentage: 17 },
+       { source: 'Leadership / Bar Raiser', count: 12, percentage: 8 }
+     ],
+     funnelConversion: '5.8% conversion from application',
+     avgVelocity: '4.8 days time to schedule',
+     showLastMonthFooter: true,
+     showChangeIndicator: true
+   },
+   {
+     id: 'offers',
+     title: 'Offers',
+     total: 24,
+     totalFormatted: '24',
+     changePercent: 20.0,
+     changePeriod: 'vs last month',
+     trend: 'up',
+     lastMonth: 20,
+     lastMonthFormatted: '20',
+     color: '#FFAB00',
+     bgColor: 'bg-[#FFAB00]/10',
+     textColor: 'text-[#b78103] dark:text-[#FFAB00]',
+     borderColor: 'border-[#FFAB00]/20',
+     icon: 'Award',
+     target: 25,
+     description: 'Formal employment offers extended to finalists',
+     history: [
+       { week: 'Week 1', count: 5, lastMonthCount: 4 },
+       { week: 'Week 2', count: 6, lastMonthCount: 5 },
+       { week: 'Week 3', count: 6, lastMonthCount: 5 },
+       { week: 'Week 4', count: 7, lastMonthCount: 6 }
+     ],
+     sources: [
+       { source: 'Accepted / Signed', count: 18, percentage: 75 },
+       { source: 'Pending Decision', count: 4, percentage: 17 },
+       { source: 'Declined (Competing Offer)', count: 2, percentage: 8 }
+     ],
+     funnelConversion: '16.9% of interviewees received offer',
+     avgVelocity: '3.5 days offer turnaround',
+     showLastMonthFooter: true,
+     showChangeIndicator: true
+   },
+   {
+     id: 'hires',
+     title: 'Hires',
+     total: 6,
+     totalFormatted: '6',
+     changePercent: 50.0,
+     changePeriod: 'vs last month',
+     trend: 'up',
+     lastMonth: 4,
+     lastMonthFormatted: '4',
+     color: '#00A76F',
+     bgColor: 'bg-[#00A76F]/10',
+     textColor: 'text-[#00A76F] dark:text-[#22c55e]',
+     borderColor: 'border-[#00A76F]/20',
+     icon: 'CheckCircle2',
+     target: 8,
+     description: 'Successfully onboarded candidates for this requisition',
+     history: [
+       { week: 'Week 1', count: 1, lastMonthCount: 1 },
+       { week: 'Week 2', count: 1, lastMonthCount: 1 },
+       { week: 'Week 3', count: 2, lastMonthCount: 1 },
+       { week: 'Week 4', count: 2, lastMonthCount: 1 }
+     ],
+     sources: [
+       { source: 'Senior AI Scientist', count: 3, percentage: 50 },
+       { source: 'ML Engineer', count: 2, percentage: 33 },
+       { source: 'Research Fellow', count: 1, percentage: 17 }
+     ],
+     funnelConversion: '75.0% offer acceptance rate',
+     avgVelocity: '28 days average time-to-hire',
+     showLastMonthFooter: true,
+     showChangeIndicator: true
+   }
+ ];
+
+ const [kpiMetrics, setKpiMetrics] = useState(initialKpiMetrics);
+ const [selectedStatsMetric, setSelectedStatsMetric] = useState(null);
+ const [selectedEditMetric, setSelectedEditMetric] = useState(null);
+
+ const handleSaveMetric = (updatedMetric) => {
+   setKpiMetrics(prev => prev.map(m => m.id === updatedMetric.id ? updatedMetric : m));
+   setCopyToastMsg(`${updatedMetric.title} metric updated`);
+   setTimeout(() => setCopyToastMsg(null), 3000);
+ };
+
+ const copyTextToClipboard = (text, label) => {
+ if (!text) return;
+ try {
+ navigator.clipboard.writeText(text);
+ setCopiedField(text);
+ setCopyToastMsg(label + ' copied to clipboard');
+ setTimeout(() => setCopiedField(null), 2000);
+ setTimeout(() => setCopyToastMsg(null), 3000);
+ } catch {}
+ };
+
+ const formatPostedDate = (dateStr) => {
+ if (!dateStr) return 'Aug 10, 2026';
+ try {
+ const d = new Date(dateStr);
+ if (isNaN(d.getTime())) return dateStr;
+ return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+ } catch {
+ return dateStr;
+ }
+ };
+
+ const calculateDaysActive = (dateStr) => {
+ if (!dateStr) return 'Active now';
+ try {
+ const d = new Date(dateStr);
+ if (isNaN(d.getTime())) return 'Active now';
+ const now = new Date('2026-10-14');
+ const diffTime = Math.abs(now - d);
+ const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+ return diffDays + ' days active';
+ } catch {
+ return 'Active now';
+ }
+ };
  const [pipelineBoard, setPipelineBoard] = useState(initialPipelineBoardData);
  const [selectedCandidate, setSelectedCandidate] = useState(null);
  const [moveDropdownId, setMoveDropdownId] = useState(null);
@@ -517,43 +745,164 @@ export default function JobDashboardPage() {
         <span className="text-[#212b36] dark:text-white truncate max-w-[300px]" title={setupJobData.title}>{setupJobData.title}</span>
       </nav>
 
-      {/* JOB HEADER CARD (MATCHING INTERVIEW & CANDIDATE PAGES) */}
-      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-5 shadow-sm">
+      {/* Toast Notification for quick actions / copy */}
+      {copyToastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl shadow-xl text-sm font-medium animate-fade-in border border-gray-700 dark:border-gray-200">
+          <CheckCircle size={16} className="text-[#00A76F]" />
+          <span>{copyToastMsg}</span>
+        </div>
+      )}
+
+      {/* JOB HEADER CARD (COMPACT WITH 2-LINE SUBTITLE) */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white truncate tracking-tight leading-none">
+            {/* Title & Badges */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
                 {setupJobData.title}
               </h1>
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]/10 text-[#b78103] dark:text-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]/10 text-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]/10 text-[#1890FF]' : 'bg-[#00A76F]/10 text-[#00A76F]'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${setupJobData.status === 'Draft' ? 'bg-[#FFC107]' : setupJobData.status === 'Closed' ? 'bg-[#FF5630]' : setupJobData.status === 'Internal' ? 'bg-[#1890FF]' : 'bg-[#00A76F]'}`}></span>
+
+              {/* Status Badge */}
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 ${
+                setupJobData.status === 'Draft'
+                  ? 'bg-[#FFC107]/10 text-[#b78103] dark:text-[#FFC107]'
+                  : setupJobData.status === 'Closed'
+                  ? 'bg-[#FF5630]/10 text-[#FF5630]'
+                  : setupJobData.status === 'Internal'
+                  ? 'bg-[#1890FF]/10 text-[#1890FF]'
+                  : 'bg-[#00A76F]/10 text-[#00A76F]'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  setupJobData.status === 'Draft'
+                    ? 'bg-[#FFC107]'
+                    : setupJobData.status === 'Closed'
+                    ? 'bg-[#FF5630]'
+                    : setupJobData.status === 'Internal'
+                    ? 'bg-[#1890FF]'
+                    : 'bg-[#00A76F]'
+                }`} />
                 {setupJobData.status}
               </span>
+
+              {/* Department Badge */}
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                {setupJobData.department}
+              </span>
+
+              {/* Confidential Badge if enabled */}
+              {setupJobData.isConfidential && (
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Confidential
+                </span>
+              )}
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-[13px] text-[#212b36] dark:text-gray-300 font-medium">
-              <div className="flex items-center gap-1.5">
-                <MapPin size={15} className="text-gray-500 dark:text-gray-400" />
-                <span className="font-bold">{setupJobData.location}</span>
-                <span className="text-gray-400 font-medium ml-1">• {setupJobData.workMode}</span>
+            {/* Subtitle Rows: 2 Lines */}
+            <div className="mt-3 space-y-1.5 text-[13px] text-gray-600 dark:text-gray-400 font-medium">
+              {/* Line 1: Location • Job Mode • Job ID • Req ID */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {/* 1. Location */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <MapPin size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span>{setupJobData.location}</span>
+                </div>
+
+                <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+
+                {/* 2. Job Mode */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <Globe size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span>{setupJobData.workMode}</span>
+                  <span className="text-gray-400 font-normal">({setupJobData.type})</span>
+                </div>
+
+                <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+
+                {/* 3. Job ID */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <Briefcase size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span className="font-mono text-xs font-semibold">{setupJobData.jobId}</span>
+                  <button
+                    type="button"
+                    onClick={() => copyTextToClipboard(setupJobData.jobId, 'Job ID')}
+                    className="p-0.5 hover:text-[#1890FF] text-gray-400 transition-colors cursor-pointer"
+                    title="Copy Job ID"
+                  >
+                    {copiedField === setupJobData.jobId ? <Check size={11} className="text-[#00A76F]" /> : <Copy size={11} />}
+                  </button>
+                </div>
+
+                <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+
+                {/* 4. Req ID */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <FileText size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span className="font-mono text-xs font-semibold">{setupJobData.requisitionRef}</span>
+                  <button
+                    type="button"
+                    onClick={() => copyTextToClipboard(setupJobData.requisitionRef, 'Req ID')}
+                    className="p-0.5 hover:text-[#1890FF] text-gray-400 transition-colors cursor-pointer"
+                    title="Copy Req ID"
+                  >
+                    {copiedField === setupJobData.requisitionRef ? <Check size={11} className="text-[#00A76F]" /> : <Copy size={11} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Line 2: Hiring Manager • Posted Date */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {/* 5. Hiring Manager */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <Users size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span>{setupJobData.hiringManager}</span>
+                </div>
+
+                <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+
+                {/* 6. Posted Date */}
+                <div className="flex items-center gap-1.5 text-[#212b36] dark:text-gray-300">
+                  <Calendar size={14} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                  <span>{formatPostedDate(setupJobData.postedDate)}</span>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Right Action: Hiring Team Stack & Invite CTA */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="flex -space-x-2">
-              {hiringTeam.map(member => (
-                <div key={member.id} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer ${member.color}`} title={member.name}>
-                  {member.initials}
-                </div>
-              ))}
+            <div className="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-800">
+              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 hidden sm:inline">
+                Team:
+              </span>
+              <div className="flex -space-x-2">
+                {hiringTeam.map(member => (
+                  <div 
+                    key={member.id} 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer shadow-xs transition-transform hover:scale-105 hover:z-10 ${member.color}`} 
+                    title={member.name}
+                  >
+                    {member.initials}
+                  </div>
+                ))}
+              </div>
+              <button 
+                onClick={() => setIsInviteModalOpen(true)}
+                className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
+                title="Invite Team Member"
+              >
+                <Plus size={14} />
+              </button>
             </div>
-            <button 
-              onClick={() => setIsInviteModalOpen(true)}
-              className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
-              title="Invite Team Member"
+
+            <button
+              onClick={() => copyTextToClipboard(window.location.href, 'Job link')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700/70 bg-white dark:bg-[#161c24] text-xs font-bold text-gray-700 dark:text-gray-200 hover:border-[#1890FF] hover:text-[#1890FF] transition-colors cursor-pointer shadow-2xs"
+              title="Copy Job Link"
             >
-              <Plus size={14} />
+              <Copy size={13} />
+              <span className="hidden sm:inline">Share</span>
             </button>
           </div>
         </div>
@@ -586,37 +935,109 @@ export default function JobDashboardPage() {
       {/* OVERVIEW TAB */}
  {activeTab === 'Overview' && (
  <div className="space-y-5 animate-fade-in">
- {/* METRICS ROW */}
- <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 flex items-center gap-4">
- <div className="w-14 h-14 rounded-full bg-[#1890FF]/10 flex items-center justify-center shrink-0">
- <Users size={24} className="text-[#1890FF]" />
- </div>
+ {/* 5 KPI CARDS ROW (Applications, Rejections, Interviews, Offers, Hires) */}
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+ {kpiMetrics.map((metric) => {
+ const renderCardIcon = (iconName) => {
+ switch (iconName) {
+ case 'Users': return <Users size={17} className={metric.textColor} />;
+ case 'UserX': return <UserX size={17} className={metric.textColor} />;
+ case 'Video': return <Video size={17} className={metric.textColor} />;
+ case 'Award': return <Award size={17} className={metric.textColor} />;
+ case 'CheckCircle2': return <CheckCircle2 size={17} className={metric.textColor} />;
+ default: return <BarChart2 size={17} className={metric.textColor} />;
+ }
+ };
+
+ const isPositive = metric.changePercent >= 0;
+
+ return (
+ <div 
+ key={metric.id}
+ className="bg-white dark:bg-[#161c24] p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800/70 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative"
+ >
+ {/* Card Header: Icon + Title & Percentage Change */}
  <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Total Applications</p>
- <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,450</h3>
+ <div className="flex items-center justify-between gap-2">
+ <div className="flex items-center gap-2.5 min-w-0">
+ <div className={`w-8 h-8 rounded-xl ${metric.bgColor} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
+ {renderCardIcon(metric.icon)}
  </div>
+ <h4 className="text-xs font-bold text-gray-700 dark:text-gray-200 truncate" title={metric.title}>
+ {metric.title}
+ </h4>
  </div>
- 
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 flex items-center gap-4">
- <div className="w-14 h-14 rounded-full bg-[#00A76F]/10 flex items-center justify-center shrink-0">
- <UserCheck size={24} className="text-[#00A76F]" />
+
+ {/* Percentage Change Indicator */}
+ {metric.showChangeIndicator !== false && (
+ <span 
+ className={`inline-flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
+ isPositive 
+ ? 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]' 
+ : 'bg-[#FF5630]/10 text-[#FF5630]'
+ }`}
+ title={`${isPositive ? '+' : ''}${metric.changePercent}% ${metric.changePeriod || 'vs last month'}`}
+ >
+ {isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+ <span>{isPositive ? `+${metric.changePercent}%` : `${metric.changePercent}%`}</span>
+ </span>
+ )}
  </div>
- <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Active Candidates</p>
- <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">184</h3>
+
+ {/* Middle: Total Number (Center Aligned) */}
+ <div className="my-2 text-center">
+ <div className="text-2xl sm:text-[28px] font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
+ {metric.totalFormatted || metric.total.toLocaleString()}
+ </div>
+ <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium block mt-1">
+ {metric.changePeriod || 'vs last month'}
+ </span>
  </div>
  </div>
 
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50 flex items-center gap-4">
- <div className="w-14 h-14 rounded-full bg-[#FF5630]/10 flex items-center justify-center shrink-0">
- <UserX size={24} className="text-[#FF5630]" />
+ {/* Card Footer: Last Month count + Action Icons (More Stats & Edit) */}
+ <div className="pt-2 mt-1.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-xs">
+ {/* Left: Last month number */}
+ <div className="text-gray-500 dark:text-gray-400 text-[11px]">
+ {metric.showLastMonthFooter !== false ? (
+ <>
+ Last month: <span className="font-bold text-[#212b36] dark:text-gray-200 ml-0.5">{metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}</span>
+ </>
+ ) : (
+ <span className="text-gray-400">Target: {metric.target?.toLocaleString()}</span>
+ )}
  </div>
- <div>
- <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase ">Rejected</p>
- <h3 className="text-3xl font-bold text-[#212b36] dark:text-white ">2,266</h3>
+
+ {/* Right: More stats (icon) and Edit card metrics (icon) */}
+ <div className="flex items-center gap-1 shrink-0">
+ <button
+ type="button"
+ onClick={(e) => {
+ e.stopPropagation();
+ setSelectedStatsMetric(metric);
+ }}
+ className="p-1.5 rounded-lg text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+ title="More stats and detailed analytics"
+ >
+ <BarChart2 size={14} />
+ </button>
+
+ <button
+ type="button"
+ onClick={(e) => {
+ e.stopPropagation();
+ setSelectedEditMetric(metric);
+ }}
+ className="p-1.5 rounded-lg text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+ title="Edit card metrics"
+ >
+ <Sliders size={14} />
+ </button>
  </div>
  </div>
+ </div>
+ );
+ })}
  </div>
 
  {/* MAIN GRID */}
@@ -625,54 +1046,20 @@ export default function JobDashboardPage() {
  {/* LEFT COLUMN (Manager Activity) */}
  <div className="xl:col-span-2 space-y-5">
  
- {/* Upcoming Interviews */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
- <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
- <Video size={20} className="text-[#1890FF]" />
- Upcoming Interviews
- </h3>
- <button onClick={() => setActiveTab('Interviews')} className="text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
- View Calendar
- </button>
- </div>
- 
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- {interviewsList.map(interview => (
- <div key={interview.id} className="border border-gray-100 dark:border-gray-800/50 p-4 rounded-xl hover:border-[#1890FF]/30 hover: transition-all group cursor-pointer">
- <div className="flex items-start justify-between mb-2">
- <div>
- <div className="flex items-center gap-2">
- <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{interview.candidate}</div>
- <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${(interview.score || 90) >= 90 ? 'bg-[#00A76F]/20 text-[#00A76F] dark:text-[#22c55e]' : 'bg-[#FFC107]/20 text-[#b78103] dark:text-[#FFC107]'}`}>
- {interview.score || 90}% Match
- </span>
- </div>
- <p className="text-xs text-black dark:text-gray-400 mt-0.5">{interview.role}</p>
- </div>
- <span className="bg-[#1890FF]/10 text-[#1890FF] text-[11px] font-bold px-2 py-1 rounded-md text-right">
- {interview.time}<br/><span className="text-[11px] opacity-90">{interview.platform || 'Zoom'}</span>
- </span>
- </div>
- <div className="flex items-center gap-2 mt-4 text-xs font-medium text-black dark:text-gray-400">
- <span className="flex items-center gap-1.5"><UserCheck size={14} className="text-[#1890FF]/70 shrink-0" /> {interview.type}</span>
- <span className="mx-1">•</span>
- <span>{interview.duration || '45 mins'}</span>
- </div>
- <div className="mt-4 flex gap-2">
- <button className="flex-1 py-1.5 text-xs font-bold text-[#1890FF] bg-[#1890FF]/10 hover:bg-[#1890FF]/20 rounded-lg transition-colors cursor-pointer">
- Join Call
- </button>
- <button onClick={(e) => { e.stopPropagation(); setActiveTab('Candidates'); }} className="flex-1 py-1.5 text-xs font-bold text-black bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer">
- View Profile
- </button>
- </div>
- </div>
- ))}
- </div>
- </div>
+ {/* Job Hiring Pipeline Overview (Replaces Upcoming Interviews) */}
+          <JobPipelineOverview
+            jobTitle={setupJobData?.title || 'Senior AI Research Scientist'}
+            onNavigateToBoard={() => setActiveTab('Pipeline')}
+            onNavigateToCandidates={(stageName) => {
+              setActiveTab('Candidates');
+            }}
+            onSelectCandidate={(candidate) => {
+              setSelectedCandidate(candidate);
+              setActiveTab('Candidates');
+            }}
+          />
 
- {/* Pending Reviews / Action Items */}
+          {/* Pending Reviews / Action Items */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-4 flex items-center gap-2">
  <ClipboardEdit size={20} className="text-[#FFC107]" />
@@ -2569,6 +2956,22 @@ export default function JobDashboardPage() {
  <p className="text-xs opacity-80">Ready to paste in your email.</p>
  </div>
  </div>
+
+ {/* KPI MORE STATS MODAL */}
+ <KPIStatsModal
+   isOpen={Boolean(selectedStatsMetric)}
+   onClose={() => setSelectedStatsMetric(null)}
+   metric={selectedStatsMetric}
+   onEditMetric={(metric) => setSelectedEditMetric(metric)}
+ />
+
+ {/* KPI EDIT METRICS MODAL */}
+ <KPIEditMetricsModal
+   isOpen={Boolean(selectedEditMetric)}
+   onClose={() => setSelectedEditMetric(null)}
+   metric={selectedEditMetric}
+   onSave={handleSaveMetric}
+ />
 
  </div>
  );
