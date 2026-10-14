@@ -541,10 +541,7 @@ export default function OrgTemplatesPage() {
         </div>
 
         {/* Global status indicator */}
-        <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 pb-2">
-          <span className="w-2 h-2 rounded-full bg-[#00A76F] inline-block animate-pulse" />
-          <span>Organization Library Active</span>
-        </div>
+    
       </div>
 
       {/* ========================================================= */}
