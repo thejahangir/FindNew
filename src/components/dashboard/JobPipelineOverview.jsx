@@ -120,6 +120,7 @@ export default function JobPipelineOverview({
     {
       id: 'pending_decision',
       name: 'Pending Decision',
+      shortName: 'Pending',
       count: 3,
       icon: Clock,
       color: '#FFAB00',
@@ -166,6 +167,7 @@ export default function JobPipelineOverview({
     {
       id: 'new_applications',
       name: 'New Applications',
+      shortName: 'Applications',
       count: 45,
       icon: FileText,
       color: '#1890FF',
@@ -224,6 +226,7 @@ export default function JobPipelineOverview({
     {
       id: 'scorecard_due',
       name: 'Scorecard Due',
+      shortName: 'Scorecards',
       count: 8,
       icon: ClipboardEdit,
       color: '#FF5630',
@@ -258,6 +261,7 @@ export default function JobPipelineOverview({
     {
       id: 'reference_checks',
       name: 'Reference Checks',
+      shortName: 'References',
       count: 6,
       icon: UserCheck,
       color: '#00A76F',
@@ -280,6 +284,7 @@ export default function JobPipelineOverview({
     {
       id: 'upcoming_interviews',
       name: 'Upcoming Interviews',
+      shortName: 'Interviews',
       count: 12,
       icon: Video,
       color: '#8E33FF',
@@ -332,28 +337,30 @@ export default function JobPipelineOverview({
         </p>
       </div>
 
-      {/* PIPELINE TABS NAVIGATION */}
-      <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-800 overflow-x-auto pb-0 scrollbar-hide">
+      {/* PIPELINE TABS NAVIGATION (COMPACT PILLS) */}
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
         {initialStages.map((stage) => {
           const isActive = activeTab === stage.id;
-          const Icon = stage.icon;
 
           return (
             <button
               key={stage.id}
               onClick={() => setActiveTab(stage.id)}
-              className={`flex items-center gap-2 pb-3 px-3 text-xs font-bold transition-all whitespace-nowrap border-b-2 cursor-pointer ${
+              title={`${stage.name} (${stage.count})`}
+              className={`flex items-center gap-1.5 px-3 py-1 sm:py-1.2 rounded-full text-xs transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 isActive
-                  ? 'border-[#1890FF] text-[#1890FF] dark:text-[#1890FF]'
-                  : 'border-transparent text-gray-500 hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white'
+                  ? 'bg-gradient-to-r from-blue-100/90 to-blue-50 dark:from-blue-900/50 dark:to-blue-950/40 text-[#1890FF] border border-blue-200/90 dark:border-blue-800/60 font-bold shadow-2xs'
+                  : 'bg-gray-100/90 dark:bg-[#1f2630] text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 hover:text-[#212b36] dark:hover:text-white border border-transparent font-medium'
               }`}
             >
-              <Icon size={15} className={isActive ? 'text-[#1890FF]' : 'text-gray-400'} />
-              <span>{stage.name}</span>
-              <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-bold transition-colors ${
-                isActive 
-                  ? 'bg-[#1890FF]/10 text-[#1890FF]' 
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+              <span>
+                <span className="hidden 2xl:inline">{stage.name}</span>
+                <span className="2xl:hidden inline">{stage.shortName}</span>
+              </span>
+              <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full min-w-[18px] text-center transition-colors ${
+                isActive
+                  ? 'bg-[#1890FF] text-white'
+                  : 'bg-white/80 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200/60 dark:border-gray-700/60'
               }`}>
                 {stage.count}
               </span>

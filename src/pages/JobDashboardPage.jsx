@@ -1151,7 +1151,6 @@ export default function JobDashboardPage() {
               });
             }}
             onManageSourcing={() => setActiveTab('Sourcing')}
-            onReviewAll={() => setActiveTab('Candidates')}
           />
 
           {/* Recent Activity Feed */}
@@ -1184,7 +1183,7 @@ export default function JobDashboardPage() {
  <HiringFunnelCard onStageClick={() => setActiveTab('Pipeline')} />
 
 					{/* Source Stats Card */}
-					<SourceStatsCard onChannelClick={() => setActiveTab('Overview')} />
+					<SourceStatsCard />
 
  </div>
  </div>
