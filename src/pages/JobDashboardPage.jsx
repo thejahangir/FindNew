@@ -32,6 +32,7 @@ import JobPipelineOverview from '../components/dashboard/JobPipelineOverview';
 import SourceStatsCard from '../components/dashboard/SourceStatsCard';
 import HiringFunnelCard from '../components/dashboard/HiringFunnelCard';
 import CandidateRecommendationsCard from '../components/dashboard/CandidateRecommendationsCard';
+import RecentActivityCard from '../components/dashboard/RecentActivityCard';
 
 // --- MOCK DATA ---
 const pipelineData = [
@@ -146,19 +147,6 @@ const roleOptions = [
  { value: 'observer', label: 'Observer', description: 'Read-only access' }
 ];
 
-const recentActivity = [
-	{ id: 1, action: 'Sneha Patil applied for the role via LinkedIn', time: '2 hours ago', icon: UserPlus, color: 'text-[#1890FF] bg-[#1890FF]/10' },
-	{ id: 2, action: 'Priya left a 4-star scorecard for Rahul Verma', time: '4 hours ago', icon: Star, color: 'text-[#FFC107] bg-[#FFC107]/10' },
-	{ id: 3, action: 'Amit moved Ananya Sharma to Tech Interview', time: 'Yesterday, 3:30 PM', icon: Activity, color: 'text-[#00A76F] bg-[#00A76F]/10' },
-	{ id: 4, action: 'Automated screening rejected 12 candidates', time: 'Yesterday, 9:00 AM', icon: UserX, color: 'text-[#FF5630] bg-[#FF5630]/10' },
-	{ id: 5, action: 'System Design Interview scheduled with Vikram Malhotra for Ravi Desai', time: 'Yesterday, 5:15 PM', icon: Calendar, color: 'text-[#8E33FF] bg-[#8E33FF]/10' },
-	{ id: 6, action: 'Offer letter signed & compensation approved for Pooja Desai', time: '2 days ago, 11:20 AM', icon: FileSignature, color: 'text-[#00A76F] bg-[#00A76F]/10' },
-	{ id: 7, action: 'Agency TechTalent Partners submitted 3 new candidate profiles', time: '2 days ago, 3:45 PM', icon: Briefcase, color: 'text-[#1890FF] bg-[#1890FF]/10' },
-	{ id: 8, action: 'Reference check completed: 2 peer evaluations verified for Arjun Kumar', time: '3 days ago, 10:00 AM', icon: CheckCircle2, color: 'text-[#00A76F] bg-[#00A76F]/10' },
-	{ id: 9, action: 'Candidate debrief notes published by Lead Architect for Nitin Gupta', time: '3 days ago, 4:10 PM', icon: ClipboardList, color: 'text-[#FFAB00] bg-[#FFAB00]/10' },
-	{ id: 10, action: 'Phone screen completed: 8.5/10 score submitted by Devina Roy', time: '4 days ago, 2:30 PM', icon: CheckSquare, color: 'text-[#00B8D9] bg-[#00B8D9]/10' },
-	{ id: 11, action: 'Hiring committee marked Tanmay Joshi application as Put on Hold', time: '5 days ago, 1:15 PM', icon: Clock, color: 'text-[#FFAB00] bg-[#FFAB00]/10' },
-];
 
 const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`;
 
@@ -1153,30 +1141,11 @@ export default function JobDashboardPage() {
             onManageSourcing={() => setActiveTab('Sourcing')}
           />
 
-          {/* Recent Activity Feed */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-6 flex items-center gap-2">
- <Activity size={20} className="text-[#1890FF]" />
- Recent Activity
- </h3>
- <div className="space-y-5 relative">
- <div className="absolute top-2 bottom-2 left-[15px] w-px bg-gray-100 dark:bg-gray-800/50 z-0"></div>
- {recentActivity.map(activity => (
- <div key={activity.id} className="relative z-10 flex gap-4">
- <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ring-4 ring-white dark:ring-[#161c24] ${activity.color}`}>
- <activity.icon size={14} />
- </div>
- <div className="pt-1.5">
- <p className="text-[13px] font-medium text-[#212b36] dark:text-white leading-snug">{activity.action}</p>
- <p className="text-xs text-[#919eab] mt-0.5">{activity.time}</p>
- </div>
- </div>
- ))}
- </div>
- </div>
- </div>
+          {/* Recent Activity Feed with Search and Pagination */}
+          <RecentActivityCard />
+        </div>
 
- {/* RIGHT COLUMN */}
+        {/* RIGHT COLUMN */}
  <div className="space-y-5">
  
  {/* Hiring Funnel Snapshot */}
