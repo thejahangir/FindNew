@@ -12,7 +12,7 @@ const getCurrencySymbol = (curr) => {
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2, TrendingUp, TrendingDown, BarChart2, Sliders, Award, CheckCircle2 } from 'lucide-react';
+import { Users, UserX, UserCheck, ChevronRight, ChevronDown, Search, Star, FileText, CheckSquare, Clock, MapPin, Plus, ClipboardEdit, FileCheck, AlertCircle, UserPlus, Activity, X, Video, Filter, MoreHorizontal, Settings, Settings2, Copy, Users as UsersIcon, CheckCircle, Calendar, Briefcase, CalendarDays, ArrowLeft, Check, ArrowUpRight, Download, ExternalLink, Columns, FileSignature, ClipboardList, Bell, Mail, Phone, Globe, BookOpen, Bookmark, Edit, Sparkles, Edit2, TrendingUp, TrendingDown, BarChart2, Sliders, Award, CheckCircle2, Pencil, Eye } from 'lucide-react';
 import { useChatbot } from '../contexts/ChatbotContext';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import DualRangeSlider from '../components/ui/DualRangeSlider';
@@ -29,6 +29,9 @@ import JobSetupHeader from '../components/dashboard/JobSetupHeader';
 import KPIStatsModal from '../components/dashboard/kpi/KPIStatsModal';
 import KPIEditMetricsModal from '../components/dashboard/kpi/KPIEditMetricsModal';
 import JobPipelineOverview from '../components/dashboard/JobPipelineOverview';
+import SourceStatsCard from '../components/dashboard/SourceStatsCard';
+import HiringFunnelCard from '../components/dashboard/HiringFunnelCard';
+import CandidateRecommendationsCard from '../components/dashboard/CandidateRecommendationsCard';
 
 // --- MOCK DATA ---
 const pipelineData = [
@@ -144,10 +147,17 @@ const roleOptions = [
 ];
 
 const recentActivity = [
- { id: 1, action: 'Sneha Patil applied for the role via LinkedIn', time: '2 hours ago', icon: UserPlus, color: 'text-[#1890FF] bg-[#1890FF]/10' },
- { id: 2, action: 'Priya left a 4-star scorecard for Rahul Verma', time: '4 hours ago', icon: Star, color: 'text-[#FFC107] bg-[#FFC107]/10' },
- { id: 3, action: 'Amit moved Ananya Sharma to Tech Interview', time: 'Yesterday, 3:30 PM', icon: Activity, color: 'text-[#00A76F] bg-[#00A76F]/10' },
- { id: 4, action: 'Automated screening rejected 12 candidates', time: 'Yesterday, 9:00 AM', icon: UserX, color: 'text-[#FF5630] bg-[#FF5630]/10' },
+	{ id: 1, action: 'Sneha Patil applied for the role via LinkedIn', time: '2 hours ago', icon: UserPlus, color: 'text-[#1890FF] bg-[#1890FF]/10' },
+	{ id: 2, action: 'Priya left a 4-star scorecard for Rahul Verma', time: '4 hours ago', icon: Star, color: 'text-[#FFC107] bg-[#FFC107]/10' },
+	{ id: 3, action: 'Amit moved Ananya Sharma to Tech Interview', time: 'Yesterday, 3:30 PM', icon: Activity, color: 'text-[#00A76F] bg-[#00A76F]/10' },
+	{ id: 4, action: 'Automated screening rejected 12 candidates', time: 'Yesterday, 9:00 AM', icon: UserX, color: 'text-[#FF5630] bg-[#FF5630]/10' },
+	{ id: 5, action: 'System Design Interview scheduled with Vikram Malhotra for Ravi Desai', time: 'Yesterday, 5:15 PM', icon: Calendar, color: 'text-[#8E33FF] bg-[#8E33FF]/10' },
+	{ id: 6, action: 'Offer letter signed & compensation approved for Pooja Desai', time: '2 days ago, 11:20 AM', icon: FileSignature, color: 'text-[#00A76F] bg-[#00A76F]/10' },
+	{ id: 7, action: 'Agency TechTalent Partners submitted 3 new candidate profiles', time: '2 days ago, 3:45 PM', icon: Briefcase, color: 'text-[#1890FF] bg-[#1890FF]/10' },
+	{ id: 8, action: 'Reference check completed: 2 peer evaluations verified for Arjun Kumar', time: '3 days ago, 10:00 AM', icon: CheckCircle2, color: 'text-[#00A76F] bg-[#00A76F]/10' },
+	{ id: 9, action: 'Candidate debrief notes published by Lead Architect for Nitin Gupta', time: '3 days ago, 4:10 PM', icon: ClipboardList, color: 'text-[#FFAB00] bg-[#FFAB00]/10' },
+	{ id: 10, action: 'Phone screen completed: 8.5/10 score submitted by Devina Roy', time: '4 days ago, 2:30 PM', icon: CheckSquare, color: 'text-[#00B8D9] bg-[#00B8D9]/10' },
+	{ id: 11, action: 'Hiring committee marked Tanmay Joshi application as Put on Hold', time: '5 days ago, 1:15 PM', icon: Clock, color: 'text-[#FFAB00] bg-[#FFAB00]/10' },
 ];
 
 const SAMPLE_RESUME_URL = `${import.meta.env.BASE_URL}resumes/sample-resume.pdf`;
@@ -269,10 +279,22 @@ export default function JobDashboardPage() {
    {
      id: 'applications',
      title: 'Applications',
-     total: 2450,
-     totalFormatted: '2,450',
-     changePercent: 12.8,
+     heroLabel: 'New Application',
+     total: 248,
+     totalFormatted: '248',
+     centerMetricId: 'total_applications',
+     topMetricId: 'percent_change',
+     topLabel: 'Percentage of new application',
+     topValue: '18.6%',
+     bottomMetricId: 'active_applications',
+     footerLabel: 'Total active applications',
+     footerValue: '186',
+     badgeValue: '18.6%',
+     badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+     badgeIcon: 'up',
+     changePercent: 18.6,
      changePeriod: 'vs last month',
+     changeText: 'Percentage of new application',
      trend: 'up',
      lastMonth: 2172,
      lastMonthFormatted: '2,172',
@@ -303,33 +325,45 @@ export default function JobDashboardPage() {
    {
      id: 'rejections',
      title: 'Rejections',
-     total: 2266,
-     totalFormatted: '2,266',
-     changePercent: 6.4,
-     changePeriod: 'vs last month',
-     trend: 'up',
-     lastMonth: 2130,
-     lastMonthFormatted: '2,130',
+     heroLabel: 'Total Rejections',
+     total: 850,
+     totalFormatted: '850',
+     centerMetricId: 'total_rejections',
+     topMetricId: 'rejection_percentage',
+     topLabel: 'Total rejection percentage',
+     topValue: '34.7%',
+     bottomMetricId: 'resume_rejections',
+     footerLabel: 'Resume rejection count',
+     footerValue: '23',
+     badgeValue: '34.7%',
+     badgeColor: 'bg-[#FF5630]/10 text-[#FF5630] dark:text-[#ff5630]',
+     badgeIcon: 'down',
+     changePercent: 34.7,
+     changePeriod: 'Total rejection percentage',
+     changeText: 'Total rejection percentage',
+     trend: 'down',
+     lastMonth: 790,
+     lastMonthFormatted: '790',
      color: '#FF5630',
      bgColor: 'bg-[#FF5630]/10',
      textColor: 'text-[#FF5630]',
      borderColor: 'border-[#FF5630]/20',
      icon: 'UserX',
-     target: 2300,
+     target: 900,
      description: 'Candidates rejected at resume screen or post-interview',
      history: [
-       { week: 'Week 1', count: 480, lastMonthCount: 460 },
-       { week: 'Week 2', count: 570, lastMonthCount: 530 },
-       { week: 'Week 3', count: 600, lastMonthCount: 560 },
-       { week: 'Week 4', count: 616, lastMonthCount: 580 }
+       { week: 'Week 1', count: 180, lastMonthCount: 160 },
+       { week: 'Week 2', count: 210, lastMonthCount: 190 },
+       { week: 'Week 3', count: 220, lastMonthCount: 210 },
+       { week: 'Week 4', count: 240, lastMonthCount: 230 }
      ],
      sources: [
-       { source: 'Resume Fit (<75%)', count: 1540, percentage: 68 },
-       { source: 'Salary / Notice Misalignment', count: 410, percentage: 18 },
-       { source: 'Post-Interview Rejection', count: 216, percentage: 10 },
-       { source: 'Candidate Withdrew', count: 100, percentage: 4 }
+       { source: 'Resume Fit (<75%)', count: 580, percentage: 68 },
+       { source: 'Salary / Notice Misalignment', count: 150, percentage: 18 },
+       { source: 'Post-Interview Rejection', count: 86, percentage: 10 },
+       { source: 'Candidate Withdrew', count: 34, percentage: 4 }
      ],
-     funnelConversion: '92.5% of total applications',
+     funnelConversion: '34.7% total rejection percentage',
      avgVelocity: '2.1 days avg notice sent',
      showLastMonthFooter: true,
      showChangeIndicator: true
@@ -337,10 +371,22 @@ export default function JobDashboardPage() {
    {
      id: 'interviews',
      title: 'Interviews',
+     heroLabel: 'Interviews Scheduled',
      total: 142,
      totalFormatted: '142',
-     changePercent: 18.3,
-     changePeriod: 'vs last month',
+     centerMetricId: 'total_interviews',
+     topMetricId: 'interview_pass_rate',
+     topLabel: 'Interview pass rate',
+     topValue: '72%',
+     bottomMetricId: 'interview_resume_rejections',
+     footerLabel: 'Resume rejection count',
+     footerValue: '12',
+     badgeValue: '72%',
+     badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+     badgeIcon: 'up',
+     changePercent: 72,
+     changePeriod: 'Interview pass rate',
+     changeText: 'Interview pass rate',
      trend: 'up',
      lastMonth: 120,
      lastMonthFormatted: '120',
@@ -363,7 +409,7 @@ export default function JobDashboardPage() {
        { source: 'HR Culture Fit', count: 24, percentage: 17 },
        { source: 'Leadership / Bar Raiser', count: 12, percentage: 8 }
      ],
-     funnelConversion: '5.8% conversion from application',
+     funnelConversion: '72% interview pass rate',
      avgVelocity: '4.8 days time to schedule',
      showLastMonthFooter: true,
      showChangeIndicator: true
@@ -371,32 +417,44 @@ export default function JobDashboardPage() {
    {
      id: 'offers',
      title: 'Offers',
-     total: 24,
-     totalFormatted: '24',
-     changePercent: 20.0,
-     changePeriod: 'vs last month',
+     heroLabel: 'Offers Extended',
+     total: 29,
+     totalFormatted: '29',
+     centerMetricId: 'total_offers',
+     topMetricId: 'offer_conversion_rate',
+     topLabel: 'Offer conversion rate',
+     topValue: '41%',
+     bottomMetricId: 'successful_offers',
+     footerLabel: 'Total successful offers',
+     footerValue: '12',
+     badgeValue: '41%',
+     badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+     badgeIcon: 'up',
+     changePercent: 41,
+     changePeriod: 'Offer conversion rate',
+     changeText: 'Offer conversion rate',
      trend: 'up',
-     lastMonth: 20,
-     lastMonthFormatted: '20',
+     lastMonth: 22,
+     lastMonthFormatted: '22',
      color: '#FFAB00',
      bgColor: 'bg-[#FFAB00]/10',
      textColor: 'text-[#b78103] dark:text-[#FFAB00]',
      borderColor: 'border-[#FFAB00]/20',
      icon: 'Award',
-     target: 25,
+     target: 30,
      description: 'Formal employment offers extended to finalists',
      history: [
-       { week: 'Week 1', count: 5, lastMonthCount: 4 },
-       { week: 'Week 2', count: 6, lastMonthCount: 5 },
-       { week: 'Week 3', count: 6, lastMonthCount: 5 },
-       { week: 'Week 4', count: 7, lastMonthCount: 6 }
+       { week: 'Week 1', count: 6, lastMonthCount: 5 },
+       { week: 'Week 2', count: 7, lastMonthCount: 5 },
+       { week: 'Week 3', count: 8, lastMonthCount: 6 },
+       { week: 'Week 4', count: 8, lastMonthCount: 6 }
      ],
      sources: [
-       { source: 'Accepted / Signed', count: 18, percentage: 75 },
-       { source: 'Pending Decision', count: 4, percentage: 17 },
-       { source: 'Declined (Competing Offer)', count: 2, percentage: 8 }
+       { source: 'Accepted / Signed', count: 12, percentage: 41 },
+       { source: 'Pending Decision', count: 11, percentage: 38 },
+       { source: 'Declined (Competing Offer)', count: 6, percentage: 21 }
      ],
-     funnelConversion: '16.9% of interviewees received offer',
+     funnelConversion: '41% offer conversion rate',
      avgVelocity: '3.5 days offer turnaround',
      showLastMonthFooter: true,
      showChangeIndicator: true
@@ -404,33 +462,45 @@ export default function JobDashboardPage() {
    {
      id: 'hires',
      title: 'Hires',
-     total: 6,
-     totalFormatted: '6',
-     changePercent: 50.0,
+     heroLabel: 'Total Hires',
+     total: 12,
+     totalFormatted: '12',
+     centerMetricId: 'total_hires',
+     topMetricId: 'offer_to_start_ratio',
+     topLabel: 'Offer to start conversion',
+     topValue: '100%',
+     bottomMetricId: 'hiring_timeline',
+     footerLabel: 'Hiring timeline',
+     footerValue: '27 / 52',
+     badgeValue: '100%',
+     badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+     badgeIcon: 'up',
+     changePercent: 100.0,
      changePeriod: 'vs last month',
+     changeText: 'Offer to start conversion',
      trend: 'up',
-     lastMonth: 4,
-     lastMonthFormatted: '4',
+     lastMonth: 8,
+     lastMonthFormatted: '8',
      color: '#00A76F',
      bgColor: 'bg-[#00A76F]/10',
      textColor: 'text-[#00A76F] dark:text-[#22c55e]',
      borderColor: 'border-[#00A76F]/20',
      icon: 'CheckCircle2',
-     target: 8,
+     target: 15,
      description: 'Successfully onboarded candidates for this requisition',
      history: [
-       { week: 'Week 1', count: 1, lastMonthCount: 1 },
-       { week: 'Week 2', count: 1, lastMonthCount: 1 },
-       { week: 'Week 3', count: 2, lastMonthCount: 1 },
-       { week: 'Week 4', count: 2, lastMonthCount: 1 }
+       { week: 'Week 1', count: 2, lastMonthCount: 1 },
+       { week: 'Week 2', count: 3, lastMonthCount: 2 },
+       { week: 'Week 3', count: 3, lastMonthCount: 2 },
+       { week: 'Week 4', count: 4, lastMonthCount: 3 }
      ],
      sources: [
-       { source: 'Senior AI Scientist', count: 3, percentage: 50 },
-       { source: 'ML Engineer', count: 2, percentage: 33 },
-       { source: 'Research Fellow', count: 1, percentage: 17 }
+       { source: 'Senior AI Scientist', count: 6, percentage: 50 },
+       { source: 'ML Engineer', count: 4, percentage: 33 },
+       { source: 'Research Fellow', count: 2, percentage: 17 }
      ],
-     funnelConversion: '75.0% offer acceptance rate',
-     avgVelocity: '28 days average time-to-hire',
+     funnelConversion: '100% hired from accepted offers',
+     avgVelocity: '27 / 52 days time-to-hire',
      showLastMonthFooter: true,
      showChangeIndicator: true
    }
@@ -439,6 +509,7 @@ export default function JobDashboardPage() {
  const [kpiMetrics, setKpiMetrics] = useState(initialKpiMetrics);
  const [selectedStatsMetric, setSelectedStatsMetric] = useState(null);
  const [selectedEditMetric, setSelectedEditMetric] = useState(null);
+ const [hoveredKpiCardId, setHoveredKpiCardId] = useState(null);
 
  const handleSaveMetric = (updatedMetric) => {
    setKpiMetrics(prev => prev.map(m => m.id === updatedMetric.id ? updatedMetric : m));
@@ -483,7 +554,16 @@ export default function JobDashboardPage() {
  };
  const [pipelineBoard, setPipelineBoard] = useState(initialPipelineBoardData);
  const [selectedCandidate, setSelectedCandidate] = useState(null);
+ const [isClosingCandidateModal, setIsClosingCandidateModal] = useState(false);
  const [moveDropdownId, setMoveDropdownId] = useState(null);
+
+ const handleCloseCandidateModal = () => {
+   setIsClosingCandidateModal(true);
+   setTimeout(() => {
+     setSelectedCandidate(null);
+     setIsClosingCandidateModal(false);
+   }, 240);
+ };
 
  const [candidateList, setCandidateList] = useState(MOCK_CANDIDATES);
  const [selectedAppCandidate, setSelectedAppCandidate] = useState(
@@ -785,10 +865,6 @@ export default function JobDashboardPage() {
                 {setupJobData.status}
               </span>
 
-              {/* Department Badge */}
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                {setupJobData.department}
-              </span>
 
               {/* Confidential Badge if enabled */}
               {setupJobData.isConfidential && (
@@ -871,38 +947,27 @@ export default function JobDashboardPage() {
           </div>
 
           {/* Right Action: Hiring Team Stack & Invite CTA */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-800">
-              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 hidden sm:inline">
-                Team:
-              </span>
-              <div className="flex -space-x-2">
-                {hiringTeam.map(member => (
-                  <div 
-                    key={member.id} 
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer shadow-xs transition-transform hover:scale-105 hover:z-10 ${member.color}`} 
-                    title={member.name}
-                  >
-                    {member.initials}
-                  </div>
-                ))}
-              </div>
-              <button 
-                onClick={() => setIsInviteModalOpen(true)}
-                className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
-                title="Invite Team Member"
-              >
-                <Plus size={14} />
-              </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 hidden sm:inline">
+              Team:
+            </span>
+            <div className="flex -space-x-2">
+              {hiringTeam.map(member => (
+                <div 
+                  key={member.id} 
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white dark:ring-[#161c24] cursor-pointer shadow-xs transition-transform hover:scale-105 hover:z-10 ${member.color}`} 
+                  title={member.name}
+                >
+                  {member.initials}
+                </div>
+              ))}
             </div>
-
-            <button
-              onClick={() => copyTextToClipboard(window.location.href, 'Job link')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700/70 bg-white dark:bg-[#161c24] text-xs font-bold text-gray-700 dark:text-gray-200 hover:border-[#1890FF] hover:text-[#1890FF] transition-colors cursor-pointer shadow-2xs"
-              title="Copy Job Link"
+            <button 
+              onClick={() => setIsInviteModalOpen(true)}
+              className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700/50 flex items-center justify-center text-gray-400 dark:text-white hover:text-[#1890FF] hover:border-[#1890FF] transition-colors cursor-pointer" 
+              title="Invite Team Member"
             >
-              <Copy size={13} />
-              <span className="hidden sm:inline">Share</span>
+              <Plus size={14} />
             </button>
           </div>
         </div>
@@ -936,111 +1001,120 @@ export default function JobDashboardPage() {
  {activeTab === 'Overview' && (
  <div className="space-y-5 animate-fade-in">
  {/* 5 KPI CARDS ROW (Applications, Rejections, Interviews, Offers, Hires) */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
- {kpiMetrics.map((metric) => {
- const renderCardIcon = (iconName) => {
- switch (iconName) {
- case 'Users': return <Users size={17} className={metric.textColor} />;
- case 'UserX': return <UserX size={17} className={metric.textColor} />;
- case 'Video': return <Video size={17} className={metric.textColor} />;
- case 'Award': return <Award size={17} className={metric.textColor} />;
- case 'CheckCircle2': return <CheckCircle2 size={17} className={metric.textColor} />;
- default: return <BarChart2 size={17} className={metric.textColor} />;
- }
- };
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {kpiMetrics.map((metric) => {
+            const renderCardIcon = (iconName) => {
+              switch (iconName) {
+                case 'Users': return <Users size={17} className={metric.textColor} />;
+                case 'UserX': return <UserX size={17} className={metric.textColor} />;
+                case 'Video': return <Video size={17} className={metric.textColor} />;
+                case 'Award': return <Award size={17} className={metric.textColor} />;
+                case 'CheckCircle2': return <CheckCircle2 size={17} className={metric.textColor} />;
+                default: return <BarChart2 size={17} className={metric.textColor} />;
+              }
+            };
 
- const isPositive = metric.changePercent >= 0;
+            const isPositive = metric.changePercent >= 0;
 
- return (
- <div 
- key={metric.id}
- className="bg-white dark:bg-[#161c24] p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-800/70 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative"
- >
- {/* Card Header: Icon + Title & Percentage Change */}
- <div>
- <div className="flex items-center justify-between gap-2">
- <div className="flex items-center gap-2.5 min-w-0">
- <div className={`w-8 h-8 rounded-xl ${metric.bgColor} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
- {renderCardIcon(metric.icon)}
- </div>
- <h4 className="text-xs font-bold text-gray-700 dark:text-gray-200 truncate" title={metric.title}>
- {metric.title}
- </h4>
- </div>
+            return (
+              <div 
+                key={metric.id}
+                data-kpi={metric.id}
+                onMouseEnter={() => setHoveredKpiCardId(metric.id)}
+                onMouseLeave={() => setHoveredKpiCardId(null)}
+                className="bg-white dark:bg-[#161c24] p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
+              >
+                {/* 1. Title Row: Icon + Title & Quick Action Icons */}
+                <div>
+                  <div className="flex items-center justify-between gap-2 min-h-[32px]">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-8 h-8 rounded-xl ${metric.bgColor || 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
+                        {renderCardIcon(metric.icon)}
+                      </div>
+                      <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate uppercase tracking-wider" title={metric.title}>
+                        {metric.title}
+                      </h4>
+                    </div>
 
- {/* Percentage Change Indicator */}
- {metric.showChangeIndicator !== false && (
- <span 
- className={`inline-flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
- isPositive 
- ? 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]' 
- : 'bg-[#FF5630]/10 text-[#FF5630]'
- }`}
- title={`${isPositive ? '+' : ''}${metric.changePercent}% ${metric.changePeriod || 'vs last month'}`}
- >
- {isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
- <span>{isPositive ? `+${metric.changePercent}%` : `${metric.changePercent}%`}</span>
- </span>
- )}
- </div>
+                    {/* Top Right Actions: Edit pencil & View stats (visible on card hover only) */}
+                    <div className={`flex items-center gap-1.5 shrink-0 transition-opacity duration-200 ${
+                      hoveredKpiCardId === metric.id ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
+                    }`}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedEditMetric(metric);
+                        }}
+                        className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[#1890FF] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        title="Edit Card Metrics"
+                      >
+                        <Pencil size={13.5} />
+                      </button>
 
- {/* Middle: Total Number (Center Aligned) */}
- <div className="my-2 text-center">
- <div className="text-2xl sm:text-[28px] font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
- {metric.totalFormatted || metric.total.toLocaleString()}
- </div>
- <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium block mt-1">
- {metric.changePeriod || 'vs last month'}
- </span>
- </div>
- </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStatsMetric(metric);
+                        }}
+                        className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[#1890FF] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        title="View More Metrics"
+                      >
+                        <Eye size={14} />
+                      </button>
+                    </div>
+                  </div>
 
- {/* Card Footer: Last Month count + Action Icons (More Stats & Edit) */}
- <div className="pt-2 mt-1.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-xs">
- {/* Left: Last month number */}
- <div className="text-gray-500 dark:text-gray-400 text-[11px]">
- {metric.showLastMonthFooter !== false ? (
- <>
- Last month: <span className="font-bold text-[#212b36] dark:text-gray-200 ml-0.5">{metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}</span>
- </>
- ) : (
- <span className="text-gray-400">Target: {metric.target?.toLocaleString()}</span>
- )}
- </div>
+                  {/* 2. Top Metric: Percentage of new application : number */}
+                  <div className="mt-3 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium truncate flex items-center justify-between gap-1.5">
+                    <span className="truncate">{metric.topLabel || metric.changeText || 'Percentage of new application'}</span>
+                    <div className="flex items-center shrink-0">
+                      <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
+                      <span className={`font-bold inline-flex items-center gap-0.5 ${
+                        metric.badgeColor ? metric.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
+                      }`}>
+                        {metric.badgeIcon === 'clock' ? (
+                          <Clock size={11} />
+                        ) : metric.badgeIcon === 'down' ? (
+                          <TrendingDown size={11} />
+                        ) : (
+                          <TrendingUp size={11} />
+                        )}
+                        <span>{String(metric.topValue || metric.badgeValue || (metric.changePercent ? `${metric.changePercent}%` : '')).replace(/^\+/, '')}</span>
+                      </span>
+                    </div>
+                  </div>
 
- {/* Right: More stats (icon) and Edit card metrics (icon) */}
- <div className="flex items-center gap-1 shrink-0">
- <button
- type="button"
- onClick={(e) => {
- e.stopPropagation();
- setSelectedStatsMetric(metric);
- }}
- className="p-1.5 rounded-lg text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
- title="More stats and detailed analytics"
- >
- <BarChart2 size={14} />
- </button>
+                  {/* 3. Hero Metric with label like "New Application" */}
+                  <div className="mt-2.5 mb-2">
+                    <div className="text-2xl sm:text-[28px] font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
+                      {metric.totalFormatted || metric.total.toLocaleString()}
+                    </div>
+                    <div className="text-[11.5px] font-semibold text-gray-600 dark:text-gray-300 mt-1 truncate">
+                      {metric.heroLabel || (metric.id === 'applications' ? 'New Application' : metric.title)}
+                    </div>
+                  </div>
+                </div>
 
- <button
- type="button"
- onClick={(e) => {
- e.stopPropagation();
- setSelectedEditMetric(metric);
- }}
- className="p-1.5 rounded-lg text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
- title="Edit card metrics"
- >
- <Sliders size={14} />
- </button>
- </div>
- </div>
- </div>
- );
- })}
- </div>
+                {/* 4. Footer Metric: in the footer, Total active applications : number */}
+                <div className="pt-2 mt-1 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] sm:text-xs">
+                  <span className="text-gray-500 dark:text-gray-400 truncate">
+                    {(metric.footerLabel || 'Total active applications').replace(/:\s*$/, '').trim()}
+                  </span>
+                  <div className="flex items-center shrink-0">
+                    <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
+                    <span className="font-bold text-[#212b36] dark:text-gray-100">
+                      {metric.footerValue || metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
- {/* MAIN GRID */}
+        {/* MAIN GRID */}
  <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
  
  {/* LEFT COLUMN (Manager Activity) */}
@@ -1059,35 +1133,28 @@ export default function JobDashboardPage() {
             }}
           />
 
-          {/* Pending Reviews / Action Items */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-4 flex items-center gap-2">
- <ClipboardEdit size={20} className="text-[#FFC107]" />
- Pending Reviews & Approvals
- </h3>
- <div className="space-y-3">
- {actionItems.map(item => (
- <div key={item.id} className="flex items-start justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800/50 hover:border-[#FFC107]/30 hover: transition-all cursor-pointer group">
- <div className="flex gap-4">
- <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
- item.type === 'offer' ? 'bg-[#00A76F]/10 text-[#00A76F]' : 'bg-[#FFC107]/10 text-[#FFC107]'
- }`}>
- {item.type === 'offer' ? <FileCheck size={18} /> : <FileText size={18} />}
- </div>
- <div>
- <h4 className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#FFC107] transition-colors mb-1">{item.title}</h4>
- <p className="text-xs font-medium text-black dark:text-gray-400">{item.subtitle}</p>
- </div>
- </div>
- <button className="px-3 py-1.5 text-xs font-bold text-white bg-[#212b36] dark:bg-gray-700 hover:bg-[#161c24] dark:hover:bg-gray-600 rounded-lg transition-colors cursor-pointer">
- Review
- </button>
- </div>
- ))}
- </div>
- </div>
+          {/* Candidate recommendations */}
+          <CandidateRecommendationsCard
+            onViewProfile={(cand) => {
+              setIsClosingCandidateModal(false);
+              setSelectedCandidate({
+                id: cand.id,
+                name: cand.name,
+                role: cand.designation || cand.role,
+                company: cand.company || 'Juniper Labs',
+                experience: cand.experience || "5 years' experience",
+                location: cand.location || 'Bangalore, India',
+                score: cand.score || Math.round(parseFloat(cand.matchScore || '9.0') * 10),
+                skills: cand.skills || cand.tags || ['Product design', 'Design systems'],
+                noticePeriod: cand.noticePeriod || '15-30 days',
+                time: 'Applied 1d ago'
+              });
+            }}
+            onManageSourcing={() => setActiveTab('Sourcing')}
+            onReviewAll={() => setActiveTab('Candidates')}
+          />
 
- {/* Recent Activity Feed */}
+          {/* Recent Activity Feed */}
  <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
  <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-6 flex items-center gap-2">
  <Activity size={20} className="text-[#1890FF]" />
@@ -1113,94 +1180,11 @@ export default function JobDashboardPage() {
  {/* RIGHT COLUMN */}
  <div className="space-y-5">
  
- {/* Pipeline summary */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
- <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white">Pipeline</h3>
- <button onClick={() => setActiveTab('Pipeline')} className="text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
- Board
- </button>
- </div>
- <div className="space-y-1 relative">
- {/* Vertical line connecting the steps */}
- <div className="absolute top-4 bottom-4 left-[11px] w-0.5 bg-gray-100 dark:bg-gray-800/50 z-0"></div>
- 
- {pipelineData.map((item, index) => {
- const isFinal = index >= pipelineData.length - 2; // Offer, Hired
- const isRejected = item.stage.toLowerCase().includes('reject');
- const isReview = item.stage === 'Application Review';
- const isRefCheck = item.stage === 'Reference Check';
- const isHold = item.stage === 'Put on hold';
- 
- let dotColor = "border-gray-300 dark:border-gray-700/50 bg-white dark:bg-[#161c24]";
- if (isFinal) dotColor = "border-[#00A76F] bg-[#00A76F]";
- else if (isRejected) dotColor = "border-[#FF5630] bg-[#FF5630]";
- else if (isHold) dotColor = "border-[#FFC107] bg-[#FFC107]";
- else dotColor = "border-[#1890FF] bg-[#1890FF]";
+ {/* Hiring Funnel Snapshot */}
+ <HiringFunnelCard onStageClick={() => setActiveTab('Pipeline')} />
 
- return (
- <div key={item.stage} className="relative z-10 flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 dark:bg-gray-800/50 rounded-lg transition-colors cursor-pointer group">
- <div className="flex items-center gap-4">
- <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${dotColor}`}>
- {isFinal && <UserCheck size={12} className="text-white" />}
- {isRejected && <UserX size={12} className="text-white" />}
- {isReview && <FileText size={12} className="text-white" />}
- {isRefCheck && <CheckSquare size={12} className="text-white" />}
- {isHold && <Clock size={12} className="text-white" />}
- </div>
- <span className="text-[13px] font-medium text-[#454f5b] dark:text-white group-hover:text-[#1890FF] transition-colors">{item.stage}</span>
- </div>
- <div className="flex items-center gap-2">
- {item.avgTime && (
- <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded ${item.warning ? 'bg-[#FF5630]/10 text-[#FF5630]' : 'bg-gray-100 dark:bg-gray-800/50 text-black dark:text-white '}`} title="Average time in stage">
- Avg {item.avgTime}
- </span>
- )}
- <span className="text-[13px] font-bold bg-gray-100 dark:bg-gray-800/50 px-2.5 py-0.5 rounded-full text-[#212b36] dark:text-white ">
- {item.count}
- </span>
- </div>
- </div>
- );
- })}
- </div>
- </div>
-
- {/* Top Recommendations / Talent Rediscovery */}
- <div className="bg-white dark:bg-[#161c24] p-6 rounded-2xl border border-gray-100 dark:border-gray-800/50">
- <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white flex items-center gap-2">
- <Search size={20} className="text-[#1890FF]" />
- Top Recommendations
- </h3>
- </div>
- <p className="text-[13px] text-black dark:text-white mb-3 leading-relaxed">
- AI found past candidates perfectly matching this role.
- </p>
- 
- <div className="space-y-3">
- {rediscoveryCandidates.slice(0, 3).map(candidate => (
- <div key={candidate.id} className="border border-gray-100 dark:border-gray-800/50 p-3 rounded-xl hover:border-[#1890FF]/30 hover: transition-all cursor-pointer group">
- <div className="flex justify-between items-center mb-1">
- <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors">{candidate.name}</div>
- <span className="text-[11px] font-bold text-[#00A76F] bg-[#00A76F]/10 px-1.5 py-0.5 rounded-full">
- {candidate.match} Match
- </span>
- </div>
- <p className="text-xs font-medium text-black dark:text-gray-400 mb-2">
- {candidate.role}
- </p>
- <button onClick={(e) => { e.stopPropagation(); setActiveTab('Candidates'); }} className="w-full py-1 text-xs font-bold text-[#1890FF] bg-[#1890FF]/5 hover:bg-[#1890FF]/10 rounded-lg transition-colors cursor-pointer">
- Review Profile
- </button>
- </div>
- ))}
- </div>
- 
- <button className="w-full mt-4 py-1.5 text-[13px] font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer">
- View All Matches <ChevronRight size={16} />
- </button>
- </div>
+					{/* Source Stats Card */}
+					<SourceStatsCard onChannelClick={() => setActiveTab('Overview')} />
 
  </div>
  </div>
@@ -2368,11 +2352,21 @@ export default function JobDashboardPage() {
 
  {/* Side Panel: Candidate Review */}
  {selectedCandidate && createPortal(
-        <div className="fixed inset-0 z-[9999] flex justify-end bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedCandidate(null)}>
-          <div className="w-full max-w-[450px] h-full bg-white dark:bg-[#161c24] shadow-2xl p-6 overflow-y-auto transform transition-transform duration-300 translate-x-0" onClick={e => e.stopPropagation()}>
+        <div 
+          className={`fixed inset-0 z-[9999] flex justify-end bg-black/60 backdrop-blur-sm ${
+            isClosingCandidateModal ? 'animate-fade-out' : 'animate-fade-in'
+          }`} 
+          onClick={handleCloseCandidateModal}
+        >
+          <div 
+            className={`w-full max-w-[450px] h-full bg-white dark:bg-[#161c24] shadow-2xl p-6 overflow-y-auto will-change-transform ${
+              isClosingCandidateModal ? 'animate-slide-out-right' : 'animate-slide-in-right'
+            }`} 
+            onClick={e => e.stopPropagation()}
+          >
  <div className="flex justify-between items-center mb-6">
  <h2 className="text-xl font-bold dark:text-white">Candidate Review</h2>
- <button onClick={() => setSelectedCandidate(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full cursor-pointer transition-colors"><X size={20}/></button>
+ <button onClick={handleCloseCandidateModal} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full cursor-pointer transition-colors"><X size={20}/></button>
  </div>
  
  {/* Profile Header */}
@@ -2395,8 +2389,8 @@ export default function JobDashboardPage() {
  <div>
  <h4 className="text-xs font-bold text-gray-400 mb-3">AI Insights</h4>
  <div className="bg-[#1890FF]/5 border border-[#1890FF]/20 rounded-xl p-4 text-[13px] text-[#212b36] dark:text-gray-300 leading-relaxed ">
- <p className="flex gap-2.5 mb-2.5"><CheckCircle size={16} className="text-[#00A76F] mt-0.5 shrink-0" /> <span><strong>Strong fit:</strong> Extensive experience in <span className="font-semibold">{selectedCandidate.skills[0]}</span> and <span className="font-semibold">{selectedCandidate.skills[1]}</span>.</span></p>
- <p className="flex gap-2.5"><AlertCircle size={16} className="text-[#FFC107] mt-0.5 shrink-0" /> <span><strong>Note:</strong> Notice period is <span className="font-semibold">{selectedCandidate.noticePeriod}</span>. Evaluate timeline constraints.</span></p>
+ <p className="flex gap-2.5 mb-2.5"><CheckCircle size={16} className="text-[#00A76F] mt-0.5 shrink-0" /> <span><strong>Strong fit:</strong> Extensive experience in <span className="font-semibold">{selectedCandidate.skills?.[0] || 'Technical Architecture'}</span> and <span className="font-semibold">{selectedCandidate.skills?.[1] || 'Product Engineering'}</span>.</span></p>
+ <p className="flex gap-2.5"><AlertCircle size={16} className="text-[#FFC107] mt-0.5 shrink-0" /> <span><strong>Note:</strong> Notice period is <span className="font-semibold">{selectedCandidate.noticePeriod || '15-30 days'}</span>. Evaluate timeline constraints.</span></p>
  </div>
  </div>
 
@@ -2405,7 +2399,7 @@ export default function JobDashboardPage() {
  <div className="grid grid-cols-2 gap-3">
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[11px] font-semibold text-gray-400 mb-1">Company</div>
- <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.company}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.company || selectedCandidate.currentCompany || 'Tech Corp'}</div>
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[11px] font-semibold text-gray-400 mb-1">Experience</div>
@@ -2417,7 +2411,7 @@ export default function JobDashboardPage() {
  </div>
  <div className="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-700/50">
  <div className="text-[11px] font-semibold text-gray-400 mb-1">Applied</div>
- <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.time}</div>
+ <div className="text-[13px] font-bold text-[#212b36] dark:text-white">{selectedCandidate.time || selectedCandidate.stageAge || '2d ago'}</div>
  </div>
  </div>
  </div>
@@ -2437,9 +2431,9 @@ export default function JobDashboardPage() {
  <div className="mt-8 flex gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
  <button onClick={() => {
  setPipelineBoard(prev => prev.map(c => ({...c, candidates: c.candidates.filter(cand => cand.id !== selectedCandidate.id)})));
- setSelectedCandidate(null);
- }} className="flex-1 py-2 bg-[#FF5630]/10 text-[#FF5630] text-[13px] font-bold rounded-lg hover:bg-[#FF5630]/20 transition-colors cursor-pointer">Reject</button>
- <button onClick={() => setSelectedCandidate(null)} className="flex-1 py-2 bg-[#1890FF] text-white text-[13px] font-bold rounded-lg hover:bg-[#1890FF]/90 shadow-md shadow-[#1890FF]/20 transition-all cursor-pointer">Advance Candidate</button>
+ handleCloseCandidateModal();
+ }} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-200 text-xs sm:text-[13px] font-bold rounded-xl transition-colors cursor-pointer">Pass</button>
+ <button onClick={handleCloseCandidateModal} className="flex-1 py-2.5 bg-[#1890FF] hover:bg-[#0077e6] active:scale-98 text-white text-xs sm:text-[13px] font-bold rounded-xl shadow-md shadow-[#1890FF]/20 transition-all cursor-pointer">Yes Interested</button>
   </div>
   </div>
   </div>,

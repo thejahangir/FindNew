@@ -1,0 +1,472 @@
+export const METRIC_CONFIGS = {
+  applications: {
+    title: 'Customize Applications Card',
+    statsTitle: 'Applications Metrics & Intelligence',
+    aiInsight: "Candidate qualification rate is 14% higher than department baseline. First review velocity is well within target SLA (median 1.4 days) ensuring fast candidate triage.",
+    note: "Qualification uses the job's documented criteria. First-review time runs from submission to the first meaningful recruiter review.",
+    defaultCenter: 'total_applications',
+    defaultTop: 'percent_change',
+    defaultBottom: 'active_applications',
+    heroStats: {
+      volume: '248',
+      volumeLabel: 'Total Applications',
+      volumeSubtext: '42 received in last month (+18.6% MoM)',
+      active: '186',
+      activeLabel: 'Total Active Applications',
+      activeSubtext: 'Currently progressing through open stages',
+      qualityRate: '62.5%',
+      qualityRatio: '155 / 248',
+      qualityLabel: 'Qualified Application Rate',
+      qualitySubtext: 'Candidates matching mandatory criteria',
+      velocity: '1.4 / 6.2 days',
+      velocityLabel: 'Time to First Review',
+      velocitySubtext: 'Median 1.4d • 90th percentile 6.2d',
+      slaStatus: 'Within 48h Target',
+      slaHealthy: true
+    },
+    options: [
+      {
+        id: 'total_applications',
+        label: 'Total applications',
+        heroLabel: 'New Application',
+        value: '248',
+        numericValue: 248,
+        description: 'Total inbound and sourced candidate submissions received',
+        badgeValue: '248',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'active_applications',
+        label: 'Total active applications',
+        heroLabel: 'Active Applications',
+        value: '186',
+        numericValue: 186,
+        description: 'Candidates currently progressing through active stages',
+        badgeValue: '186',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'last_month_applications',
+        label: 'Applications received in the last month',
+        heroLabel: 'Last Month Applications',
+        value: '42',
+        numericValue: 42,
+        description: 'New applicant submissions logged in the prior 30-day period',
+        badgeValue: '42',
+        badgeColor: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'percent_change',
+        label: 'Percent change in new applications',
+        heroLabel: 'New Application Trend',
+        value: '+18.6%',
+        numericValue: 18.6,
+        description: 'Month-over-month acceleration in new candidate volume',
+        badgeValue: '18.6%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'qualified_rate',
+        label: 'Qualified application rate',
+        heroLabel: 'Qualified Applications',
+        value: '62.5% (155 / 248)',
+        numericValue: 62.5,
+        description: 'Candidates meeting documented role minimum requirements (155 / 248)',
+        badgeValue: '62.5%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'time_to_first_review',
+        label: 'Time to first review (median / P90)',
+        heroLabel: 'First Review Time',
+        value: '1.4 / 6.2 days',
+        numericValue: 1.4,
+        description: 'Turnaround duration from application submission to recruiter action',
+        badgeValue: '1.4 / 6.2 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      }
+    ]
+  },
+  rejections: {
+    title: 'Customize Rejections Card',
+    statsTitle: 'Rejections Metrics & Dropout Analysis',
+    aiInsight: "68% of dropouts occur at initial resume screening due to salary or notice period mismatch. Post-interview rejection rate is low (1.6%).",
+    note: "Rejections at resume review require reason tagging. Post-interview rejections are dispatched after hiring manager review.",
+    defaultCenter: 'total_rejections',
+    defaultTop: 'rejection_percentage',
+    defaultBottom: 'resume_rejections',
+    heroStats: {
+      volume: '850',
+      volumeLabel: 'Total Rejections',
+      volumeSubtext: '34.7% total rejection rate against applications',
+      active: '23',
+      activeLabel: 'Resume Rejection Count',
+      activeSubtext: 'Disqualified at initial resume screening',
+      qualityRate: '34.7%',
+      qualityRatio: '850 / 2,450',
+      qualityLabel: 'Total Rejection Percentage',
+      qualitySubtext: 'Cumulative disqualification across all rounds',
+      velocity: '2.1 / 7.4 days',
+      velocityLabel: 'Time to Rejection Notice',
+      velocitySubtext: 'Median 2.1d • 90th percentile 7.4d',
+      slaStatus: 'Under 3-day SLA',
+      slaHealthy: true
+    },
+    options: [
+      {
+        id: 'total_rejections',
+        label: 'Total rejections',
+        heroLabel: 'Total Rejections',
+        value: '850',
+        numericValue: 850,
+        description: 'Cumulative candidate disqualifications across all hiring stages',
+        badgeValue: '850',
+        badgeColor: 'bg-[#FF5630]/10 text-[#FF5630]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'rejection_percentage',
+        label: 'Total rejection percentage',
+        heroLabel: 'Rejection Rate',
+        value: '34.7%',
+        numericValue: 34.7,
+        description: 'Ratio of rejected candidates relative to total applications',
+        badgeValue: '34.7%',
+        badgeColor: 'bg-[#FF5630]/10 text-[#FF5630] dark:text-[#ff5630]',
+        badgeIcon: 'down'
+      },
+      {
+        id: 'resume_rejections',
+        label: 'Resume rejection count',
+        heroLabel: 'Resume Rejections',
+        value: '23',
+        numericValue: 23,
+        description: 'Disqualified at initial resume analysis round this cycle',
+        badgeValue: '23',
+        badgeColor: 'bg-[#FF5630]/10 text-[#FF5630]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'post_interview_rejections',
+        label: 'Post-interview rejection count',
+        heroLabel: 'Interview Rejections',
+        value: '14',
+        numericValue: 14,
+        description: 'Candidates not advanced following live interview rounds',
+        badgeValue: '14',
+        badgeColor: 'bg-[#FF5630]/10 text-[#FF5630]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'rejections_last_month',
+        label: 'Rejections in last month',
+        heroLabel: 'Last Month Rejections',
+        value: '790',
+        numericValue: 790,
+        description: 'Total applicants disqualified during previous 30-day window',
+        badgeValue: '790',
+        badgeColor: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'time_to_rejection',
+        label: 'Time to rejection notice (median / P90)',
+        heroLabel: 'Rejection Turnaround',
+        value: '2.1 / 7.4 days',
+        numericValue: 2.1,
+        description: 'Turnaround duration to deliver decision feedback to candidate',
+        badgeValue: '2.1 / 7.4 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      }
+    ]
+  },
+  interviews: {
+    title: 'Customize Interviews Card',
+    statsTitle: 'Interviews Velocity & Pass Rates',
+    aiInsight: "Interview pass rate is performing strong at 72%. Candidate scheduling friction is minimal with median 3.2 days to calendar booking.",
+    note: "Pass rate reflects rounds with positive scorecard recommendations. Scheduling time measures invitation to calendar booking.",
+    defaultCenter: 'total_interviews',
+    defaultTop: 'interview_pass_rate',
+    defaultBottom: 'interview_resume_rejections',
+    heroStats: {
+      volume: '142',
+      volumeLabel: 'Interviews Scheduled',
+      volumeSubtext: 'Screenings, technical assessments & panels',
+      active: '88',
+      activeLabel: 'Technical Round Completions',
+      activeSubtext: 'Completed challenges and architecture reviews',
+      qualityRate: '72%',
+      qualityRatio: '102 / 142',
+      qualityLabel: 'Interview Pass Rate',
+      qualitySubtext: 'Advancement rate from technical & HM rounds',
+      velocity: '3.2 / 8.5 days',
+      velocityLabel: 'Time to Schedule Interview',
+      velocitySubtext: 'Median 3.2d • 90th percentile 8.5d',
+      slaStatus: 'Optimal Velocity',
+      slaHealthy: true
+    },
+    options: [
+      {
+        id: 'total_interviews',
+        label: 'Total interviews scheduled',
+        heroLabel: 'Interviews Scheduled',
+        value: '142',
+        numericValue: 142,
+        description: 'Screening calls, technical assessments, and panel interviews booked',
+        badgeValue: '142',
+        badgeColor: 'bg-[#8E33FF]/10 text-[#8E33FF]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'interview_pass_rate',
+        label: 'Interview pass rate',
+        heroLabel: 'Interview Pass Rate',
+        value: '72%',
+        numericValue: 72,
+        description: 'Ratio of interviewed candidates advancing to next stage',
+        badgeValue: '72%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'interview_resume_rejections',
+        label: 'Resume rejection count',
+        heroLabel: 'Pre-Screen Drops',
+        value: '12',
+        numericValue: 12,
+        description: 'Candidates filtered prior to advancing to interview stage',
+        badgeValue: '12',
+        badgeColor: 'bg-[#8E33FF]/10 text-[#8E33FF]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'interviews_last_month',
+        label: 'Interviews held last month',
+        heroLabel: 'Last Month Interviews',
+        value: '120',
+        numericValue: 120,
+        description: 'Completed candidate conversations in prior 30-day period',
+        badgeValue: '120',
+        badgeColor: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'technical_completions',
+        label: 'Technical completions',
+        heroLabel: 'Technical Passes',
+        value: '88 (62%)',
+        numericValue: 88,
+        description: 'Applicants successfully finishing programming & system designs',
+        badgeValue: '62%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'time_to_schedule',
+        label: 'Time to schedule interview (median / P90)',
+        heroLabel: 'Scheduling Velocity',
+        value: '3.2 / 8.5 days',
+        numericValue: 3.2,
+        description: 'Turnaround duration from candidate outreach to calendar lock',
+        badgeValue: '3.2 / 8.5 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      }
+    ]
+  },
+  offers: {
+    title: 'Customize Offers Card',
+    statsTitle: 'Offers & Conversion Pipeline',
+    aiInsight: "Offer conversion rate is solid at 41%. 12 formal acceptances secured with competitive packages and quick 3.5-day turnaround.",
+    note: "Conversion rate measures formally signed acceptances. Turnaround time tracks final interview to written offer dispatch.",
+    defaultCenter: 'total_offers',
+    defaultTop: 'offer_conversion_rate',
+    defaultBottom: 'successful_offers',
+    heroStats: {
+      volume: '29',
+      volumeLabel: 'Offers Extended',
+      volumeSubtext: 'Formal written packages delivered to finalists',
+      active: '12',
+      activeLabel: 'Total Successful Offers',
+      activeSubtext: 'Signed and confirmed acceptances',
+      qualityRate: '41%',
+      qualityRatio: '12 / 29',
+      qualityLabel: 'Offer Conversion Rate',
+      qualitySubtext: 'Acceptance efficiency across finalists',
+      velocity: '3.5 / 6.0 days',
+      velocityLabel: 'Offer Turnaround Time',
+      velocitySubtext: 'Median 3.5d • 90th percentile 6.0d',
+      slaStatus: 'Under 5-day Target',
+      slaHealthy: true
+    },
+    options: [
+      {
+        id: 'total_offers',
+        label: 'Total offers extended',
+        heroLabel: 'Offers Extended',
+        value: '29',
+        numericValue: 29,
+        description: 'Formal written compensation packages extended to finalists',
+        badgeValue: '29',
+        badgeColor: 'bg-[#FFAB00]/10 text-[#b78103]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'offer_conversion_rate',
+        label: 'Offer conversion rate',
+        heroLabel: 'Offer Conversion Rate',
+        value: '41%',
+        numericValue: 41,
+        description: 'Percentage of finalists accepting and signing formal offer',
+        badgeValue: '41%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'successful_offers',
+        label: 'Total successful offers',
+        heroLabel: 'Accepted Offers',
+        value: '12',
+        numericValue: 12,
+        description: 'Total confirmed offers counter-signed by candidate',
+        badgeValue: '12',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'pending_offers',
+        label: 'Pending offer decisions',
+        heroLabel: 'Pending Decisions',
+        value: '4',
+        numericValue: 4,
+        description: 'Finalists currently deliberating within active decision window',
+        badgeValue: '4',
+        badgeColor: 'bg-[#FFAB00]/10 text-[#b78103]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'offers_last_month',
+        label: 'Offers extended in last month',
+        heroLabel: 'Last Month Offers',
+        value: '20',
+        numericValue: 20,
+        description: 'Total employment packages delivered in prior 30-day period',
+        badgeValue: '20',
+        badgeColor: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'offer_turnaround_time',
+        label: 'Offer turnaround time (median / P90)',
+        heroLabel: 'Turnaround Duration',
+        value: '3.5 / 6.0 days',
+        numericValue: 3.5,
+        description: 'Speed from hiring manager approval to signed offer dispatch',
+        badgeValue: '3.5 / 6.0 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      }
+    ]
+  },
+  hires: {
+    title: 'Customize Hires Card',
+    statsTitle: 'Hires Velocity & Timeline Analytics',
+    aiInsight: "12 hires completed with 100% offer-to-start compliance. Median time-to-hire is 27 days, outperforming tech industry benchmarks.",
+    note: "Time-to-hire measures first application to offer acceptance. Time-to-fill runs until candidate's official start date.",
+    defaultCenter: 'total_hires',
+    defaultTop: 'offer_to_start_ratio',
+    defaultBottom: 'hiring_timeline',
+    heroStats: {
+      volume: '12',
+      volumeLabel: 'Total Hires Completed',
+      volumeSubtext: '100% offer-to-start ratio (zero pre-start attrition)',
+      active: '8',
+      activeLabel: 'Hires Onboarded Last Month',
+      activeSubtext: 'Successfully integrated onto payroll',
+      qualityRate: '100%',
+      qualityRatio: '12 / 12',
+      qualityLabel: 'Offer-to-Start Ratio',
+      qualitySubtext: 'Accepted offers leading to active day-one joiners',
+      velocity: '27 / 52 days',
+      velocityLabel: 'Total Time to Hire (Median / P90)',
+      velocitySubtext: 'Median 27d • 90th percentile 52d',
+      slaStatus: 'Under 30-day Target',
+      slaHealthy: true
+    },
+    options: [
+      {
+        id: 'total_hires',
+        label: 'Total hires completed',
+        heroLabel: 'Total Hires',
+        value: '12',
+        numericValue: 12,
+        description: 'Candidates confirmed and active on company payroll',
+        badgeValue: '12',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'offer_to_start_ratio',
+        label: 'Offer to start conversion',
+        heroLabel: 'Offer-to-Start Rate',
+        value: '100%',
+        numericValue: 100,
+        description: 'Percentage of offer acceptances successfully starting on day 1 (12 / 12)',
+        badgeValue: '100%',
+        badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
+        badgeIcon: 'up'
+      },
+      {
+        id: 'hiring_timeline',
+        label: 'Hiring timeline',
+        heroLabel: 'Hiring Timeline',
+        value: '27 / 52',
+        numericValue: 27,
+        description: 'Median days to hire benchmarked against P90 timeline',
+        badgeValue: '27 / 52',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      },
+      {
+        id: 'time_to_hire',
+        label: 'Total time to hire (median / P90)',
+        heroLabel: 'Time to Hire',
+        value: '27 / 52 days',
+        numericValue: 27,
+        description: 'Duration from candidate application to formal offer acceptance',
+        badgeValue: '27 / 52 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      },
+      {
+        id: 'hires_last_month',
+        label: 'Hires onboarded last month',
+        heroLabel: 'Last Month Hires',
+        value: '8',
+        numericValue: 8,
+        description: 'New employees inducted during the previous 30-day cycle',
+        badgeValue: '8',
+        badgeColor: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        badgeIcon: 'none'
+      },
+      {
+        id: 'time_to_fill',
+        label: 'Time to fill vacancy (median / P90)',
+        heroLabel: 'Time to Fill',
+        value: '24 / 48 days',
+        numericValue: 24,
+        description: 'Total duration requisition was active until employee start date',
+        badgeValue: '24 / 48 days',
+        badgeColor: 'bg-[#1890FF]/10 text-[#1890FF] dark:text-[#60a5fa]',
+        badgeIcon: 'clock'
+      }
+    ]
+  }
+};

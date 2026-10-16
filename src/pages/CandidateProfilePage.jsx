@@ -790,7 +790,13 @@ export default function CandidateProfilePage() {
  agency: 'TechTalent Partners'
  };
 
- const [activeTab, setActiveTab] = useState('Overview');
+ const [activeTab, setActiveTab] = useState(location.state?.tab || 'Overview');
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state?.tab]);
  const [openStages, setOpenStages] = useState(['interview-hm']);
  const { isChatbotCollapsed, setIsChatbotCollapsed, chatbotWidth } = useChatbot();
  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
