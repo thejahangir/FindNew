@@ -45,32 +45,30 @@ export default function HiringFunnelCard({ onStageClick }) {
       
 
 
-      {/* 2. Card Header: Icon + Title + Total Applications */}
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] flex items-center justify-center border border-blue-100/60 dark:border-blue-800/40 shrink-0 shadow-2xs">
-              <Filter size={17} />
-            </div>
+      {/* 2. Card Header: Icon + Title + Subtitle + Total Applications */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] flex items-center justify-center border border-blue-100/60 dark:border-blue-800/40 shrink-0 shadow-2xs">
+            <Filter size={17} />
+          </div>
+          <div>
             <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
               HIRING FUNNEL
             </h3>
-          </div>
-
-          <div className="text-right shrink-0">
-            <div className="text-2xl font-extrabold text-black dark:text-white leading-none">
-              {totalApplications}
-            </div>
-            <div className="text-[10.5px] text-gray-400 dark:text-gray-500 font-medium mt-0.5">
-              applications
-            </div>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-none mt-1">
+              Candidates by current stage
+            </p>
           </div>
         </div>
 
-        {/* Subtitle below the title */}
-        <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium pl-12 mt-1">
-          Candidates by current stage
-        </p>
+        <div className="text-right shrink-0">
+          <div className="text-2xl font-extrabold text-black dark:text-white leading-none">
+            {totalApplications}
+          </div>
+          <div className="text-[10.5px] text-gray-400 dark:text-gray-500 font-medium mt-0.5">
+            applications
+          </div>
+        </div>
       </div>
 
       {/* 3. Table Header Columns */}

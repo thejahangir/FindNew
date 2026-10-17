@@ -1012,89 +1012,77 @@ export default function JobDashboardPage() {
                 onMouseLeave={() => setHoveredKpiCardId(null)}
                 className="bg-white dark:bg-[#161c24] p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
               >
-                {/* 1. Title Row: Icon + Title & Quick Action Icons */}
-                <div>
-                  <div className="flex items-center justify-between gap-2 min-h-[32px]">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-8 h-8 rounded-xl ${metric.bgColor || 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
-                        {renderCardIcon(metric.icon)}
-                      </div>
-                      <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate uppercase tracking-wider" title={metric.title}>
-                        {metric.title}
-                      </h4>
+                {/* 1. Title Row: Icon + Title on left, Fixed Number on Top Right */}
+                <div className="flex items-center justify-between gap-2 min-h-[32px]">
+                  <div 
+                    onClick={() => setSelectedStatsMetric(metric)}
+                    className="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-85 transition-opacity"
+                    title="Click to view all metrics"
+                  >
+                    <div className={`w-8 h-8 rounded-xl ${metric.bgColor || 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
+                      {renderCardIcon(metric.icon)}
                     </div>
-
-                    {/* Top Right Actions: Edit pencil & View stats (visible on card hover only) */}
-                    <div className={`flex items-center gap-1.5 shrink-0 transition-opacity duration-200 ${
-                      hoveredKpiCardId === metric.id ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
-                    }`}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedEditMetric(metric);
-                        }}
-                        className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[#1890FF] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                        title="Edit Card Metrics"
-                      >
-                        <Pencil size={13.5} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedStatsMetric(metric);
-                        }}
-                        className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[#1890FF] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                        title="View More Metrics"
-                      >
-                        <Eye size={14} />
-                      </button>
-                    </div>
+                    <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate uppercase tracking-wider" title={metric.title}>
+                      {metric.title}
+                    </h4>
                   </div>
 
-                  {/* 2. Top Metric: Percentage of new application : number */}
-                  <div className="mt-3 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium truncate flex items-center justify-between gap-1.5">
-                    <span className="truncate">{metric.topLabel || metric.changeText || 'Percentage of new application'}</span>
-                    <div className="flex items-center shrink-0">
-                      <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
-                      <span className={`font-bold inline-flex items-center gap-0.5 ${
-                        metric.badgeColor ? metric.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
-                      }`}>
-                        {metric.badgeIcon === 'clock' ? (
-                          <Clock size={11} />
-                        ) : metric.badgeIcon === 'down' ? (
-                          <TrendingDown size={11} />
-                        ) : (
-                          <TrendingUp size={11} />
-                        )}
-                        <span>{String(metric.topValue || metric.badgeValue || (metric.changePercent ? `${metric.changePercent}%` : '')).replace(/^\+/, '')}</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 3. Hero Metric with label like "New Application" */}
-                  <div className="mt-2.5 mb-2">
-                    <div className="text-2xl sm:text-[28px] font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
-                      {metric.totalFormatted || metric.total.toLocaleString()}
-                    </div>
-                    <div className="text-[11.5px] font-semibold text-gray-600 dark:text-gray-300 mt-1 truncate">
-                      {metric.heroLabel || (metric.id === 'applications' ? 'New Application' : metric.title)}
-                    </div>
+                  {/* Fixed Total Number on top right (cannot be configured) */}
+                  <div 
+                    onClick={() => setSelectedStatsMetric(metric)}
+                    className="text-xl sm:text-2xl font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity"
+                    title={`Total ${metric.title}: ${metric.totalFormatted || metric.total.toLocaleString()} (Fixed)`}
+                  >
+                    {metric.totalFormatted || metric.total.toLocaleString()}
                   </div>
                 </div>
 
-                {/* 4. Footer Metric: in the footer, Total active applications : number */}
-                <div className="pt-2 mt-1 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] sm:text-xs">
-                  <span className="text-gray-500 dark:text-gray-400 truncate">
-                    {(metric.footerLabel || 'Total active applications').replace(/:\s*$/, '').trim()}
-                  </span>
-                  <div className="flex items-center shrink-0">
-                    <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
-                    <span className="font-bold text-[#212b36] dark:text-gray-100">
-                      {metric.footerValue || metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}
+                {/* 2 & 3. Card Body: Middle Metric + Bottom Metric grouped together */}
+                <div className="mt-3.5 space-y-1">
+                  {/* Metric 1 (Middle metric on card body - Left Aligned) */}
+                  <div className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5 min-w-0">
+                    <span className="truncate max-w-[65%]" title={metric.topLabel || metric.changeText}>
+                      {(metric.topLabel || metric.changeText || 'Percentage of new application').replace(/:\s*$/, '').trim()}
                     </span>
+                    <span className={`font-extrabold text-sm sm:text-[15px] inline-flex items-center gap-0.5 shrink-0 ${
+                      metric.badgeColor ? metric.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
+                    }`}>
+                      {metric.badgeIcon === 'clock' ? (
+                        <Clock size={12} />
+                      ) : metric.badgeIcon === 'down' ? (
+                        <TrendingDown size={12} />
+                      ) : metric.badgeIcon === 'up' ? (
+                        <TrendingUp size={12} />
+                      ) : null}
+                      <span>{String(metric.topValue || metric.badgeValue || (metric.changePercent ? `${metric.changePercent}%` : '')).replace(/^\+/, '')}</span>
+                    </span>
+                  </div>
+
+                  {/* Metric 2 (Bottom metric on card body - Left Aligned, tightly spaced with middle metric) */}
+                  <div className="pt-1 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] sm:text-xs min-h-[24px]">
+                    <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                      <span className="text-gray-500 dark:text-gray-400 truncate" title={metric.footerLabel}>
+                        {(metric.footerLabel || 'Total active applications').replace(/:\s*$/, '').trim()}
+                      </span>
+                      <span className="font-extrabold text-sm sm:text-[15px] text-[#212b36] dark:text-gray-100 shrink-0">
+                        {metric.footerValue || metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* View icon shown on hover on the right bottom next to the second metric */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedStatsMetric(metric);
+                      }}
+                      className={`p-1 rounded-lg text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-opacity duration-200 cursor-pointer shrink-0 ${
+                        hoveredKpiCardId === metric.id ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
+                      }`}
+                      title="View Metrics"
+                    >
+                      <Eye size={14} />
+                    </button>
                   </div>
                 </div>
               </div>

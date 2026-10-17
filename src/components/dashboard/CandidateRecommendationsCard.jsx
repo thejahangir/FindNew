@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowUpRight, ArrowRight, Check } from 'lucide-react';
+import { Sparkles, ArrowUpRight, ArrowRight, Check, Eye, X } from 'lucide-react';
 import { INITIAL_RECOMMENDATIONS } from './candidateRecommendationsData';
 import CandidateRecommendationsModal from './CandidateRecommendationsModal';
 
@@ -10,6 +10,16 @@ export default function CandidateRecommendationsCard({
 }) {
   const [candidates, setCandidates] = useState(INITIAL_RECOMMENDATIONS);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    // Keep candidates in sync with INITIAL_RECOMMENDATIONS if Vite HMR preserved older state
+    setCandidates(prev => 
+      INITIAL_RECOMMENDATIONS.map(initial => {
+        const existing = prev.find(p => p.id === initial.id);
+        return existing ? { ...initial, status: existing.status } : initial;
+      })
+    );
+  }, []);
 
   const handleAction = (id, newStatus) => {
     setCandidates(prev => 
@@ -30,49 +40,38 @@ export default function CandidateRecommendationsCard({
     <>
       <div className="bg-white dark:bg-[#161c24] p-5 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xs hover:shadow-md transition-all duration-200">
 
-        {/* 1. Card Header: Icon + Title + Pill */}
-        <div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] flex items-center justify-center border border-blue-100/60 dark:border-blue-800/40 shrink-0 shadow-2xs">
-                <Sparkles size={17} />
-              </div>
+        {/* 1. Card Header: Icon + Title + Subtitle + Pill */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] flex items-center justify-center border border-blue-100/60 dark:border-blue-800/40 shrink-0 shadow-2xs">
+              <Sparkles size={17} />
+            </div>
+            <div>
               <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
                 CANDIDATE RECOMMENDATIONS
               </h3>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-none mt-1">
+                Potential matches found for this job.
+              </p>
             </div>
-
-            {/* 12 new Pill - clickable to open review modal */}
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="border border-blue-200/80 dark:border-blue-800/60 bg-blue-50/50 dark:bg-blue-900/20 text-[#1890FF] hover:bg-blue-100/60 dark:hover:bg-blue-900/40 text-xs font-bold px-3 py-1 rounded-full shrink-0 transition-colors cursor-pointer"
-              title="View all 12 recommendations"
-            >
-              12 new
-            </button>
           </div>
 
-          {/* Subtitle below the title */}
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium pl-12 mt-1">
-            Potential matches found for this job.
-          </p>
-        </div>
-
-        {/* 2. Scan Status Subheader */}
-        <div className="border-b border-gray-100 dark:border-gray-800 mt-4 pb-3 flex items-center justify-between text-xs">
-          <div className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Daily sourcing scan complete</span>
-          </div>
-          <span className="text-gray-400 dark:text-gray-500 font-normal">
-            Today, 6:15 AM
-          </span>
+          {/* 12 new Pill - clickable to open review modal */}
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="border border-blue-200/80 dark:border-blue-800/60 bg-blue-50/50 dark:bg-blue-900/20 text-[#1890FF] hover:bg-blue-100/60 dark:hover:bg-blue-900/40 text-xs font-bold px-3 py-1 rounded-full shrink-0 transition-colors cursor-pointer"
+            title="View all 12 recommendations"
+          >
+            12 new
+          </button>
         </div>
 
         {/* 3. Candidate Rows */}
-        <div className="divide-y divide-gray-100 dark:divide-gray-800">
-          {displayedCandidates.map((candidate) => (
+        <div className="divide-y divide-gray-100 dark:divide-gray-800 mt-2">
+          {displayedCandidates.map((candidate) => {
+            const sourceName = candidate.source || INITIAL_RECOMMENDATIONS.find(c => c.id === candidate.id)?.source || 'Direct';
+            return (
             <div 
               key={candidate.id}
               className={`py-3.5 sm:py-4 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-opacity ${
@@ -81,24 +80,34 @@ export default function CandidateRecommendationsCard({
             >
               {/* Left: Avatar + Details */}
               <div className="min-w-0 flex-1">
-                {/* Avatar + Candidate Name: center-aligned with each other */}
+                {/* Avatar + Candidate Name + Source + Status Badge */}
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] font-bold text-xs flex items-center justify-center shrink-0 border border-blue-100/60 dark:border-blue-800/40">
                     {candidate.initials}
                   </div>
-                  <span className="text-sm font-bold text-[#212b36] dark:text-white leading-none">
-                    {candidate.name}
-                  </span>
-                  {candidate.status === 'interested' && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded-full border border-emerald-200 dark:border-emerald-900/40 leading-none">
-                      <Check size={10} strokeWidth={3} /> Interested
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-[#212b36] dark:text-white leading-none">
+                      {candidate.name}
                     </span>
-                  )}
-                  {candidate.status === 'passed' && (
-                    <span className="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.2 rounded-full leading-none">
-                      Passed
-                    </span>
-                  )}
+                    {sourceName && (
+                      <>
+                        <span className="text-gray-400 dark:text-gray-500 text-xs font-normal select-none">•</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-none whitespace-nowrap">
+                          Source : <span className="text-gray-800 dark:text-gray-200 font-semibold">{sourceName}</span>
+                        </span>
+                      </>
+                    )}
+                    {candidate.status === 'interested' && (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded-full border border-emerald-200 dark:border-emerald-900/40 leading-none">
+                        <Check size={10} strokeWidth={3} /> Interested
+                      </span>
+                    )}
+                    {candidate.status === 'passed' && (
+                      <span className="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.2 rounded-full leading-none">
+                        Passed
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Role and Skills Pills underneath, aligned with name text */}
@@ -137,25 +146,29 @@ export default function CandidateRecommendationsCard({
                 </div>
 
                 {/* Action Buttons: content-fitting width */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => onViewProfile && onViewProfile(candidate)}
-                    className="h-7 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[11px] font-bold text-[#212b36] dark:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600 transition-colors shadow-2xs flex items-center justify-center cursor-pointer whitespace-nowrap"
+                    className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-gray-500 dark:text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-2xs flex items-center justify-center cursor-pointer shrink-0"
+                    title="Profile View"
+                    aria-label="Profile View"
                   >
-                    Profile View
+                    <Eye size={14} />
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleAction(candidate.id, 'passed')}
-                    className={`h-7 px-3 rounded-lg border text-[11px] font-bold transition-colors shadow-2xs flex items-center justify-center cursor-pointer whitespace-nowrap ${
+                    className={`w-7 h-7 rounded-lg border transition-colors shadow-2xs flex items-center justify-center cursor-pointer shrink-0 ${
                       candidate.status === 'passed'
-                        ? 'border-gray-300 bg-gray-100 dark:bg-gray-800 text-gray-500'
+                        ? 'border-gray-300 bg-gray-100 dark:bg-gray-800 text-gray-400'
                         : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-200'
                     }`}
+                    title={candidate.status === 'passed' ? 'Undo pass' : 'Pass'}
+                    aria-label="Pass"
                   >
-                    Pass
+                    <X size={14} />
                   </button>
 
                   <button
@@ -172,7 +185,8 @@ export default function CandidateRecommendationsCard({
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 4. Card Footer */}

@@ -198,7 +198,7 @@ export default function RecentActivityCard({
             <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none">
               Recent Activity
             </h3>
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium mt-1">
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-none mt-1">
               Latest recruitment updates & audit log
             </p>
           </div>

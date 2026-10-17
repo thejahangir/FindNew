@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  X, Check, RotateCcw, Users, UserX, Video, Award, CheckCircle2 
+  X, Check, RotateCcw, Users, UserX, Video, Award, CheckCircle2,
+  Pencil, Eye, Clock, TrendingDown, TrendingUp, BarChart2
 } from 'lucide-react';
 import { METRIC_CONFIGS } from './kpiConfig';
 
@@ -20,18 +21,16 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
     };
   }, [metric]);
 
-  // Draft assigned metrics state for the 3 customizable slots: Top, Center, Bottom
+  // Draft assigned metrics state for the 2 customizable slots: Center, Bottom
   const [assignedMetrics, setAssignedMetrics] = useState({
-    Top: config.defaultTop,
-    Center: config.defaultCenter,
+    Center: config.defaultTop || config.defaultCenter,
     Bottom: config.defaultBottom
   });
 
   useEffect(() => {
     if (metric) {
       setAssignedMetrics({
-        Top: metric.topMetricId || config.defaultTop,
-        Center: metric.centerMetricId || config.defaultCenter,
+        Center: metric.centerMetricId || metric.topMetricId || config.defaultTop,
         Bottom: metric.bottomMetricId || config.defaultBottom
       });
       setActivePosition('Center');
@@ -51,11 +50,11 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
   if (!isOpen || !metric) return null;
 
   // Selected option objects for live preview & saving
-  const topOption = config.options.find(o => o.id === assignedMetrics.Top) || config.options[1] || config.options[0];
-  const centerOption = config.options.find(o => o.id === assignedMetrics.Center) || config.options[0];
+  const centerOption = config.options.find(o => o.id === assignedMetrics.Center) || config.options[1] || config.options[0];
   const bottomOption = config.options.find(o => o.id === assignedMetrics.Bottom) || config.options[2] || config.options[0];
 
   const handleSelectMetric = (option) => {
+    if (option.id === config.defaultCenter) return;
     setAssignedMetrics(prev => ({
       ...prev,
       [activePosition]: option.id
@@ -64,8 +63,7 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
 
   const handleResetDefaults = () => {
     setAssignedMetrics({
-      Top: config.defaultTop,
-      Center: config.defaultCenter,
+      Center: config.defaultTop,
       Bottom: config.defaultBottom
     });
   };
@@ -74,21 +72,16 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
     if (onSave && metric) {
       const updated = {
         ...metric,
-        // Center / Hero Slot
+        // Center Slot
         centerMetricId: assignedMetrics.Center,
-        total: centerOption.numericValue ?? metric.total,
-        totalFormatted: centerOption.value,
-        heroLabel: centerOption.heroLabel || centerOption.label,
-
-        // Top Slot
-        topMetricId: assignedMetrics.Top,
-        topLabel: topOption.label,
-        topValue: topOption.value,
-        badgeValue: topOption.badgeValue || topOption.value,
-        badgeColor: topOption.badgeColor,
-        badgeIcon: topOption.badgeIcon,
-        changeText: topOption.label,
-        changePercent: topOption.numericValue,
+        topMetricId: assignedMetrics.Center,
+        topLabel: centerOption.label,
+        topValue: centerOption.value,
+        badgeValue: centerOption.badgeValue || centerOption.value,
+        badgeColor: centerOption.badgeColor,
+        badgeIcon: centerOption.badgeIcon,
+        changeText: centerOption.label,
+        changePercent: centerOption.numericValue,
 
         // Bottom Slot
         bottomMetricId: assignedMetrics.Bottom,
@@ -107,7 +100,7 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
       case 'Video': return <Video size={16} className={metric.textColor || 'text-[#8E33FF]'} />;
       case 'Award': return <Award size={16} className={metric.textColor || 'text-[#FFAB00]'} />;
       case 'CheckCircle2': return <CheckCircle2 size={16} className={metric.textColor || 'text-[#00A76F]'} />;
-      default: return <Users size={16} className={metric.textColor || 'text-[#1890FF]'} />;
+      default: return <BarChart2 size={16} className={metric.textColor || 'text-[#1890FF]'} />;
     }
   };
 
@@ -130,7 +123,7 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
               Customize {metric.title.toLowerCase()} card
             </div>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Choose a card position, then select the metric to show there. Editing: {activePosition}.
+              Choose a card position, then select the metric to show there. Editing: <span className="font-semibold text-[#1890FF]">{activePosition}</span>.
             </p>
           </div>
 
@@ -145,102 +138,104 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
         </div>
 
         {/* FIXED SECTION: LIVE PREVIEW DUMMY CARD & POSITION SELECTOR (DOES NOT SCROLL) */}
-        <div className="px-6 pt-4 pb-0 bg-gray-50/50 dark:bg-gray-800/20 shrink-0 space-y-3.5">
+        <div className="px-6 pt-4 pb-0 bg-gray-50/50 dark:bg-gray-800/20 shrink-0 space-y-3">
           {/* DUMMY CARD PREVIEW */}
           <div className="bg-white dark:bg-[#161c24] p-3.5 sm:p-4 rounded-xl shadow-xs border border-gray-200/80 dark:border-gray-800 max-w-sm mx-auto transition-all">
-            {/* 1. Title Row */}
-            <div className="flex items-center justify-between pb-1.5">
-              <div className="flex items-center gap-2">
+            {/* 1. Title Row: Icon + Title on left, FIXED TOTAL NUMBER on top right */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
                 <div className={`w-7 h-7 rounded-lg ${metric.bgColor || 'bg-[#1890FF]/10'} flex items-center justify-center shrink-0`}>
                   {renderCardIcon(metric.icon)}
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 truncate">
                   {metric.title}
                 </span>
               </div>
-              <span className="text-[10px] text-gray-400 font-mono tracking-wider font-semibold">PREVIEW</span>
+
+              {/* Fixed Total Number on top right next to Title */}
+              <div className="flex items-center gap-1.5 shrink-0" title="Fixed metric - cannot be configured">
+                <span className="text-lg sm:text-xl font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
+                  {metric.totalFormatted || metric.total?.toLocaleString() || '0'}
+                </span>
+                <span className="text-[9px] font-semibold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  Fixed
+                </span>
+              </div>
             </div>
 
-            {/* 2. Top Metric Slot */}
-            <div 
-              onClick={() => setActivePosition('Top')}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
-                activePosition === 'Top'
-                  ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
-                  : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
-              }`}
-              title="Click to select Top position"
-            >
-              {activePosition === 'Top' && (
-                <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
-                  Editing Top
-                </span>
-              )}
-              <div className="text-[11px] text-gray-500 dark:text-gray-400 font-medium flex items-center justify-between gap-1.5">
-                <span className="truncate">{topOption.label}</span>
-                <div className="flex items-center shrink-0">
-                  <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
-                  <span className="font-bold text-[#00A76F] dark:text-[#22c55e]">
-                    {String(topOption.value).replace(/^\+/, '')}
+            {/* Metrics Body: Center + Bottom slots grouped together with tighter space between them */}
+            <div className="mt-3 space-y-0.5">
+              {/* 2. Center Slot on card body (Left Aligned - Label : Number) */}
+              <div 
+                onClick={() => setActivePosition('Center')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
+                  activePosition === 'Center'
+                    ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
+                    : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
+                }`}
+                title="Click to configure Center position"
+              >
+                {activePosition === 'Center' && (
+                  <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+                    Editing Center
+                  </span>
+                )}
+                <div className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5 min-w-0">
+                  <span className="truncate max-w-[65%] leading-none">
+                    {(centerOption.label || '').replace(/:\s*$/, '').trim()}
+                  </span>
+                  <span className={`font-extrabold text-sm sm:text-[15px] inline-flex items-center gap-0.5 shrink-0 leading-none ${
+                    centerOption.badgeColor ? centerOption.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
+                  }`}>
+                    {centerOption.badgeIcon === 'clock' ? (
+                      <Clock size={11} />
+                    ) : centerOption.badgeIcon === 'down' ? (
+                      <TrendingDown size={11} />
+                    ) : centerOption.badgeIcon === 'up' ? (
+                      <TrendingUp size={11} />
+                    ) : null}
+                    <span>{String(centerOption.value).replace(/^\+/, '')}</span>
                   </span>
                 </div>
               </div>
-            </div>
 
-            {/* 3. Center / Hero Metric Slot */}
-            <div 
-              onClick={() => setActivePosition('Center')}
-              className={`my-1.5 p-2 rounded-lg transition-all cursor-pointer relative ${
-                activePosition === 'Center'
-                  ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
-                  : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
-              }`}
-              title="Click to select Center position"
-            >
-              {activePosition === 'Center' && (
-                <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
-                  Editing Center
-                </span>
-              )}
-              <div className="text-2xl sm:text-[26px] font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none">
-                {centerOption.value}
-              </div>
-              <div className="text-[11.5px] font-semibold text-gray-600 dark:text-gray-300 mt-1 truncate">
-                {centerOption.heroLabel || centerOption.label}
-              </div>
-            </div>
-
-            {/* 4. Bottom Metric Slot */}
-            <div className="border-t border-gray-100 dark:border-gray-800 my-1" />
-            <div 
-              onClick={() => setActivePosition('Bottom')}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
-                activePosition === 'Bottom'
-                  ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
-                  : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
-              }`}
-              title="Click to select Bottom position"
-            >
-              {activePosition === 'Bottom' && (
-                <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
-                  Editing Bottom
-                </span>
-              )}
-              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-                <span className="truncate">{bottomOption.label}</span>
-                <div className="flex items-center shrink-0">
-                  <span className="text-gray-400 dark:text-gray-500 font-bold mx-1">:</span>
-                  <span className="font-bold text-[#212b36] dark:text-gray-200">
-                    {bottomOption.value}
+              {/* 3. Bottom Slot on card body with View icon on right bottom (Left Aligned - Label Number) */}
+              <div className="border-t border-gray-100 dark:border-gray-800 my-0.5" />
+              <div 
+                onClick={() => setActivePosition('Bottom')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
+                  activePosition === 'Bottom'
+                    ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
+                    : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
+                }`}
+                title="Click to configure Bottom position"
+              >
+                {activePosition === 'Bottom' && (
+                  <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+                    Editing Bottom
                   </span>
+                )}
+                <div className="flex items-center justify-between text-[11px] sm:text-xs min-h-[24px]">
+                  <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                    <span className="text-gray-500 dark:text-gray-400 truncate leading-none">
+                      {(bottomOption.label || '').replace(/:\s*$/, '').trim()}
+                    </span>
+                    <span className="font-extrabold text-sm sm:text-[15px] text-[#212b36] dark:text-gray-200 shrink-0 leading-none">
+                      {bottomOption.value}
+                    </span>
+                  </div>
+                  {/* View icon shown next to second metric on right bottom */}
+                  <div className="p-1 rounded-md text-[#1890FF] bg-[#1890FF]/10 shrink-0" title="View icon position (on hover)">
+                    <Eye size={12} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+        </div>
 
-          {/* POSITION TABS: Top, Center, Bottom */}
+          {/* POSITION TABS: Center, Bottom */}
           <div className="flex items-center gap-7 border-b border-gray-200 dark:border-gray-800">
-            {['Top', 'Center', 'Bottom'].map((pos) => {
+            {['Center', 'Bottom'].map((pos) => {
               const isActive = activePosition === pos;
               return (
                 <button
@@ -267,6 +262,7 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
         <div className="p-6 overflow-y-auto flex-1 min-h-0">
           <div>
             {config.options.map((option) => {
+              const isFixedTotal = option.id === config.defaultCenter;
               const isSelectedForActiveSlot = assignedMetrics[activePosition] === option.id;
 
               return (
@@ -274,16 +270,27 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
                   key={option.id}
                   className="py-3.5 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between gap-4 text-xs sm:text-sm first:pt-0"
                 >
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    {option.label}
-                  </span>
+                  <div className="min-w-0">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 block truncate">
+                      {option.label}
+                    </span>
+                    {isFixedTotal && (
+                      <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                        Fixed on card header (top right)
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="font-bold text-gray-900 dark:text-white text-right">
                       {option.value}
                     </span>
 
-                    {isSelectedForActiveSlot ? (
+                    {isFixedTotal ? (
+                      <span className="bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-semibold px-2.5 py-0.5 rounded-md select-none">
+                        Fixed
+                      </span>
+                    ) : isSelectedForActiveSlot ? (
                       <span className="bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] dark:text-blue-400 text-xs font-semibold px-2.5 py-0.5 rounded-md select-none">
                         On card
                       </span>
@@ -310,10 +317,7 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
 
         {/* MODAL FOOTER (FIXED AT BOTTOM) */}
         <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#161c24] shrink-0 space-y-3">
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
-            Illustrative values; time pairs are median / P90. Actual values will come from the daily ATS statistics snapshot.
-          </p>
-
+  
           <div className="flex items-center justify-between">
             <button
               type="button"

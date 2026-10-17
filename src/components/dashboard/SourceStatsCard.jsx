@@ -122,7 +122,6 @@ const SOURCE_CHANNELS = [
     name: 'Other / Unattributed',
     codeType: 'dots',
     badgeClass: 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400',
-    nameColor: 'text-[#1890FF]',
     totalVolume: 6,
     totalQualified: 1,
     totalRate: 17,
@@ -145,8 +144,6 @@ const SOURCE_CHANNELS = [
 ];
 
 export default function SourceStatsCard({ onChannelClick }) {
-  const [selectedRange, setSelectedRange] = useState('Last 3 mo · Oct 10');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [expandedChannels, setExpandedChannels] = useState({});
   const [selectedSubSource, setSelectedSubSource] = useState(null);
 
@@ -160,65 +157,26 @@ export default function SourceStatsCard({ onChannelClick }) {
     }
   };
 
-  const ranges = ['Last 30 days', 'Last 3 mo · Oct 10', 'Year to Date', 'All Time'];
-
   return (
     <div className="bg-white dark:bg-[#161c24] p-5 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xs hover:shadow-md transition-all duration-200">
       
 
-      {/* 2. Card Header: Icon + Title + Filter */}
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900/40 shrink-0 shadow-2xs">
-              <Share2 size={17} />
-            </div>
+      {/* 2. Card Header: Icon + Title + Subtitle */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900/40 shrink-0 shadow-2xs">
+            <Share2 size={17} />
+          </div>
+          <div>
             <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
               SOURCE STATS
             </h3>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-none mt-1">
+              Candidate volume and qualification rates by source.
+            </p>
           </div>
-
-          {/* Time Filter Pill */}
-          <div className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="px-2.5 py-1 rounded-lg border border-gray-200/80 dark:border-gray-700/80 bg-gray-50/60 dark:bg-gray-800/40 text-[11px] font-medium text-gray-600 dark:text-gray-300 hover:border-[#1890FF] hover:text-[#1890FF] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-          >
-            <span>{selectedRange}</span>
-            <ChevronDown size={11} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 z-30 w-40 bg-white dark:bg-[#161c24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl py-1 text-xs animate-fade-in">
-              {ranges.map(range => (
-                <button
-                  key={range}
-                  type="button"
-                  onClick={() => {
-                    setSelectedRange(range);
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    selectedRange === range
-                      ? 'bg-[#1890FF]/10 text-[#1890FF] font-bold'
-                      : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <span>{range}</span>
-                  {selectedRange === range && <span className="w-1.5 h-1.5 rounded-full bg-[#1890FF]" />}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Subtitle below the title */}
-      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium pl-12 mt-1">
-        Candidate volume and qualification rates by source.
-      </p>
-    </div>
 
       {/* 3. Summary Metrics Bar: 3 Columns */}
       <div className="grid grid-cols-3 gap-2 mt-4 pt-1 pb-1">
@@ -411,12 +369,7 @@ export default function SourceStatsCard({ onChannelClick }) {
         })}
       </div>
 
-      {/* 6. Card Footnote */}
-      <div className="border-t border-gray-100 dark:border-gray-800 mt-3 pt-3">
-        <p className="text-[10px] sm:text-[10.5px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed">
-          Illustrative data • 30d = applications received in the 30 days ending Oct 10, 2026. Pending candidates are included in both qualified-rate denominators.
-        </p>
-      </div>
+
 
       {/* 7. Modal displaying candidates for clicked source item */}
       <SourceCandidatesModal

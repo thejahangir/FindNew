@@ -217,7 +217,7 @@ export default function SourceCandidatesModal({
               >
                 Applications from {childName}
               </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mt-1 truncate">
+              <p className="text-xs text-gray-400 dark:text-gray-500 font-medium leading-none mt-1 truncate">
                 {childSource.totalVolume} candidates · {childSource.totalQualified} considered · {childSource.totalRate}%
               </p>
             </div>
@@ -277,15 +277,7 @@ export default function SourceCandidatesModal({
           ))}
         </div>
 
-        {/* Modal Footer Note */}
-        <div className="px-5 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20 shrink-0">
-          <p className="text-xs text-gray-400 dark:text-gray-500 font-normal leading-relaxed">
-            Sample rows shown for this prototype; production opens the full filtered application list.
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 font-normal mt-2">
-            {candidates.length} example candidates
-          </p>
-        </div>
+
       </div>
     </div>,
     document.body

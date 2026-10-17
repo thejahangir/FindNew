@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkles, X, Check } from 'lucide-react';
+import { Sparkles, X, Check, Eye } from 'lucide-react';
+import { INITIAL_RECOMMENDATIONS } from './candidateRecommendationsData';
 
 export default function CandidateRecommendationsModal({
   open,
@@ -55,9 +56,14 @@ export default function CandidateRecommendationsModal({
               <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] flex items-center justify-center border border-blue-100/60 dark:border-blue-800/40 shrink-0 shadow-2xs">
                 <Sparkles size={17} />
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
-                CANDIDATE RECOMMENDATIONS
-              </h2>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
+                  CANDIDATE RECOMMENDATIONS
+                </h2>
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-none mt-1">
+                  Potential matches found for this job.
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -74,16 +80,13 @@ export default function CandidateRecommendationsModal({
               </button>
             </div>
           </div>
-
-          {/* Subtitle below the title */}
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium pl-12 mt-1">
-            Potential matches found for this job.
-          </p>
         </div>
 
         {/* Modal Scrollable Candidate List */}
         <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-1 divide-y divide-gray-100 dark:divide-gray-800 custom-scrollbar">
-          {candidates.map((candidate) => (
+          {candidates.map((candidate) => {
+            const sourceName = candidate.source || INITIAL_RECOMMENDATIONS.find(c => c.id === candidate.id)?.source || 'Direct';
+            return (
             <div
               key={candidate.id}
               className={`py-3.5 sm:py-4 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-opacity ${
@@ -92,24 +95,34 @@ export default function CandidateRecommendationsModal({
             >
               {/* Left: Avatar + Details */}
               <div className="min-w-0 flex-1">
-                {/* Avatar + Candidate Name: center-aligned with each other */}
+                {/* Avatar + Candidate Name + Source + Status Badge */}
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[#1890FF] font-bold text-xs flex items-center justify-center shrink-0 border border-blue-100/60 dark:border-blue-800/40">
                     {candidate.initials}
                   </div>
-                  <span className="text-sm font-bold text-[#212b36] dark:text-white leading-none">
-                    {candidate.name}
-                  </span>
-                  {candidate.status === 'interested' && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded-full border border-emerald-200 dark:border-emerald-900/40 leading-none">
-                      <Check size={10} strokeWidth={3} /> Interested
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-[#212b36] dark:text-white leading-none">
+                      {candidate.name}
                     </span>
-                  )}
-                  {candidate.status === 'passed' && (
-                    <span className="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.2 rounded-full leading-none">
-                      Passed
-                    </span>
-                  )}
+                    {sourceName && (
+                      <>
+                        <span className="text-gray-400 dark:text-gray-500 text-xs font-normal select-none">•</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-none whitespace-nowrap">
+                          Source : <span className="text-gray-800 dark:text-gray-200 font-semibold">{sourceName}</span>
+                        </span>
+                      </>
+                    )}
+                    {candidate.status === 'interested' && (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded-full border border-emerald-200 dark:border-emerald-900/40 leading-none">
+                        <Check size={10} strokeWidth={3} /> Interested
+                      </span>
+                    )}
+                    {candidate.status === 'passed' && (
+                      <span className="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.2 rounded-full leading-none">
+                        Passed
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Role and Skills Pills underneath, aligned with name text (just designation and experience) */}
@@ -148,25 +161,29 @@ export default function CandidateRecommendationsModal({
                 </div>
 
                 {/* Action Buttons: content-fitting width */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => onViewProfile && onViewProfile(candidate)}
-                    className="h-7 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-[11px] font-bold text-[#212b36] dark:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600 transition-colors shadow-2xs flex items-center justify-center cursor-pointer whitespace-nowrap"
+                    className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-gray-500 dark:text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-2xs flex items-center justify-center cursor-pointer shrink-0"
+                    title="Profile View"
+                    aria-label="Profile View"
                   >
-                    Profile View
+                    <Eye size={14} />
                   </button>
 
                   <button
                     type="button"
                     onClick={() => onAction && onAction(candidate.id, 'passed')}
-                    className={`h-7 px-3 rounded-lg border text-[11px] font-bold transition-colors shadow-2xs flex items-center justify-center cursor-pointer whitespace-nowrap ${
+                    className={`w-7 h-7 rounded-lg border transition-colors shadow-2xs flex items-center justify-center cursor-pointer shrink-0 ${
                       candidate.status === 'passed'
-                        ? 'border-gray-300 bg-gray-100 dark:bg-gray-800 text-gray-500'
+                        ? 'border-gray-300 bg-gray-100 dark:bg-gray-800 text-gray-400'
                         : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-200'
                     }`}
+                    title={candidate.status === 'passed' ? 'Undo pass' : 'Pass'}
+                    aria-label="Pass"
                   >
-                    Pass
+                    <X size={14} />
                   </button>
 
                   <button
@@ -183,7 +200,8 @@ export default function CandidateRecommendationsModal({
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Modal Footer */}

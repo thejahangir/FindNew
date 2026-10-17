@@ -113,9 +113,6 @@ export default function KPIStatsModal({ isOpen, onClose, metric, onEditMetric })
 
         {/* MODAL FOOTER (FIXED AT BOTTOM) */}
         <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#161c24] shrink-0 space-y-3">
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
-            Illustrative values; time pairs are median / P90. Actual values will come from the daily ATS statistics snapshot.
-          </p>
 
           <div className="flex items-center justify-end">
             {onEditMetric && (
@@ -126,10 +123,10 @@ export default function KPIStatsModal({ isOpen, onClose, metric, onEditMetric })
                   onEditMetric(metric);
                 }}
                 className="px-5 py-2.5 rounded-xl bg-[#1890FF] hover:bg-[#096dd9] text-white text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer flex items-center justify-center gap-1.5"
-                title="Customized the Card"
+                title="Customize the Card"
               >
                 <Sliders size={13.5} />
-                <span>Customized the Card</span>
+                <span>Customize the Card</span>
               </button>
             )}
           </div>

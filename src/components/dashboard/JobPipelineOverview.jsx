@@ -311,15 +311,20 @@ export default function JobPipelineOverview({
   return (
     <div className="bg-white dark:bg-[#161c24] p-5 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xs hover:shadow-md transition-all duration-200 space-y-4">
       {/* HEADER SECTION */}
-      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+      <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
               <GitBranch size={20} />
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
-              Need Your Attention
-            </h3>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-[#212b36] dark:text-white leading-none uppercase tracking-wide">
+                Need Your Attention
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-none">
+                Tasks and candidates that need your next step for <span className="font-semibold text-gray-700 dark:text-gray-300">{jobTitle}</span>
+              </p>
+            </div>
           </div>
 
           {/* FEEDBACK TOAST */}
@@ -330,15 +335,10 @@ export default function JobPipelineOverview({
             </div>
           )}
         </div>
-
-        {/* Subtitle below the title */}
-        <p className="text-xs text-gray-500 dark:text-gray-400 pl-[52px] mt-1">
-          Tasks and candidates that need your next step for <span className="font-semibold text-gray-700 dark:text-gray-300">{jobTitle}</span>
-        </p>
       </div>
 
       {/* PIPELINE TABS NAVIGATION (COMPACT PILLS) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
+      <div className="flex flex-wrap items-center gap-2 py-1">
         {initialStages.map((stage) => {
           const isActive = activeTab === stage.id;
 
@@ -347,16 +347,13 @@ export default function JobPipelineOverview({
               key={stage.id}
               onClick={() => setActiveTab(stage.id)}
               title={`${stage.name} (${stage.count})`}
-              className={`flex items-center gap-1.5 px-3 py-1 sm:py-1.2 rounded-full text-xs transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1 sm:py-1.2 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-blue-100/90 to-blue-50 dark:from-blue-900/50 dark:to-blue-950/40 text-[#1890FF] border border-blue-200/90 dark:border-blue-800/60 font-bold shadow-2xs'
                   : 'bg-gray-100/90 dark:bg-[#1f2630] text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 hover:text-[#212b36] dark:hover:text-white border border-transparent font-medium'
               }`}
             >
-              <span>
-                <span className="hidden 2xl:inline">{stage.name}</span>
-                <span className="2xl:hidden inline">{stage.shortName}</span>
-              </span>
+              <span>{stage.name}</span>
               <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full min-w-[18px] text-center transition-colors ${
                 isActive
                   ? 'bg-[#1890FF] text-white'
@@ -477,9 +474,7 @@ export default function JobPipelineOverview({
       {/* FOOTER SECTION AS IN ATTACHMENT */}
       <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-400 dark:text-gray-500">
         <span>Counts are per application and may overlap across categories.</span>
-        <span>
-          <strong className="text-gray-600 dark:text-gray-300 font-semibold">Illustrative data</strong> · Actions are preview-only.
-        </span>
+
       </div>
 
       {/* Floating Stage Change Dropdown (Portal overlay on top of everything) */}
