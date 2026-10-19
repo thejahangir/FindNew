@@ -5,6 +5,7 @@ import {
   Pencil, Eye, Clock, TrendingDown, TrendingUp, BarChart2
 } from 'lucide-react';
 import { METRIC_CONFIGS } from './kpiConfig';
+import { DonutRing } from './KpiCard';
 
 export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave }) {
   const [activePosition, setActivePosition] = useState('Center');
@@ -52,6 +53,16 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
   // Selected option objects for live preview & saving
   const centerOption = config.options.find(o => o.id === assignedMetrics.Center) || config.options[1] || config.options[0];
   const bottomOption = config.options.find(o => o.id === assignedMetrics.Bottom) || config.options[2] || config.options[0];
+
+  const rawCenterValue = String(centerOption.value || '');
+  const centerNumeric = parseFloat(rawCenterValue.replace(/%/g, ''));
+  const isCenterPercentage = rawCenterValue.includes('%') || 
+                             String(centerOption.label || '').toLowerCase().includes('percent') || 
+                             String(centerOption.label || '').toLowerCase().includes('rate') || 
+                             String(centerOption.label || '').toLowerCase().includes('ratio') ||
+                             String(centerOption.id || '').includes('percent') ||
+                             String(centerOption.id || '').includes('rate') ||
+                             String(centerOption.id || '').includes('ratio');
 
   const handleSelectMetric = (option) => {
     if (option.id === config.defaultCenter) return;
@@ -163,12 +174,12 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
               </div>
             </div>
 
-            {/* Metrics Body: Center + Bottom slots grouped together with tighter space between them */}
-            <div className="mt-3 space-y-0.5">
-              {/* 2. Center Slot on card body (Left Aligned - Label : Number) */}
+            {/* Metrics Body: Center + Bottom slots matching new KPI card design */}
+            <div className="mt-3.5 space-y-2">
+              {/* 2. Center Slot on card body */}
               <div 
                 onClick={() => setActivePosition('Center')}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
+                className={`p-2 rounded-xl transition-all cursor-pointer relative ${
                   activePosition === 'Center'
                     ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
                     : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
@@ -176,34 +187,49 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
                 title="Click to configure Center position"
               >
                 {activePosition === 'Center' && (
-                  <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+                  <span className="absolute -top-2.5 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
                     Editing Center
                   </span>
                 )}
-                <div className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5 min-w-0">
-                  <span className="truncate max-w-[65%] leading-none">
-                    {(centerOption.label || '').replace(/:\s*$/, '').trim()}
-                  </span>
-                  <span className={`font-extrabold text-sm sm:text-[15px] inline-flex items-center gap-0.5 shrink-0 leading-none ${
-                    centerOption.badgeColor ? centerOption.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
-                  }`}>
-                    {centerOption.badgeIcon === 'clock' ? (
-                      <Clock size={11} />
-                    ) : centerOption.badgeIcon === 'down' ? (
-                      <TrendingDown size={11} />
-                    ) : centerOption.badgeIcon === 'up' ? (
-                      <TrendingUp size={11} />
-                    ) : null}
-                    <span>{String(centerOption.value).replace(/^\+/, '')}</span>
-                  </span>
-                </div>
+                {isCenterPercentage ? (
+                  /* Center with Donut Chart */
+                  <div className="flex items-center gap-3 min-h-[44px]">
+                    <DonutRing
+                      percent={centerNumeric}
+                      size={44}
+                      strokeWidth={4.5}
+                      color={metric.color || '#1890FF'}
+                      trackColor="text-gray-100 dark:text-gray-800"
+                    >
+                      <span className="text-[10px] font-black text-[#212b36] dark:text-white leading-none">
+                        {centerNumeric}
+                      </span>
+                    </DonutRing>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-gray-700 dark:text-gray-200 leading-snug truncate" title={centerOption.label}>
+                        {(centerOption.label || '').replace(/:\s*$/, '').trim()}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Center without Donut Chart: Simple Bold and Bigger Number */
+                  <div className="flex items-center gap-3 min-h-[44px]">
+                    <span className="text-2xl font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none shrink-0">
+                      {isNaN(centerNumeric) ? rawCenterValue : centerNumeric}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-gray-700 dark:text-gray-200 leading-snug truncate" title={centerOption.label}>
+                        {(centerOption.label || '').replace(/:\s*$/, '').trim()}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* 3. Bottom Slot on card body with View icon on right bottom (Left Aligned - Label Number) */}
-              <div className="border-t border-gray-100 dark:border-gray-800 my-0.5" />
+              {/* 3. Bottom Slot on card body with View icon on right bottom */}
               <div 
                 onClick={() => setActivePosition('Bottom')}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer relative ${
+                className={`pt-2 border-t border-gray-100 dark:border-gray-800 p-2 rounded-xl transition-all cursor-pointer relative ${
                   activePosition === 'Bottom'
                     ? 'border-2 border-dashed border-[#1890FF] bg-[#1890FF]/5'
                     : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/60'
@@ -211,27 +237,26 @@ export default function KPIEditMetricsModal({ isOpen, onClose, metric, onSave })
                 title="Click to configure Bottom position"
               >
                 {activePosition === 'Bottom' && (
-                  <span className="absolute -top-2 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+                  <span className="absolute -top-2.5 right-2 bg-[#1890FF] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
                     Editing Bottom
                   </span>
                 )}
-                <div className="flex items-center justify-between text-[11px] sm:text-xs min-h-[24px]">
+                <div className="flex items-center justify-between text-[11px] min-h-[24px]">
                   <div className="flex items-center gap-1.5 min-w-0 pr-1">
                     <span className="text-gray-500 dark:text-gray-400 truncate leading-none">
                       {(bottomOption.label || '').replace(/:\s*$/, '').trim()}
                     </span>
-                    <span className="font-extrabold text-sm sm:text-[15px] text-[#212b36] dark:text-gray-200 shrink-0 leading-none">
-                      {bottomOption.value}
+                    <span className="font-extrabold text-sm text-[#212b36] dark:text-gray-100 shrink-0 leading-none">
+                      {String(bottomOption.value || '').replace(/%/g, '').trim()}
                     </span>
                   </div>
-                  {/* View icon shown next to second metric on right bottom */}
-                  <div className="p-1 rounded-md text-[#1890FF] bg-[#1890FF]/10 shrink-0" title="View icon position (on hover)">
-                    <Eye size={12} />
+                  <div className="p-1 rounded-lg text-[#1890FF] shrink-0" title="View icon">
+                    <Eye size={13} />
                   </div>
                 </div>
               </div>
             </div>
-        </div>
+          </div>
 
           {/* POSITION TABS: Center, Bottom */}
           <div className="flex items-center gap-7 border-b border-gray-200 dark:border-gray-800">

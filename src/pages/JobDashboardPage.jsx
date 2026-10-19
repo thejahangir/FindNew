@@ -28,6 +28,7 @@ import SettingsNotifications from '../components/dashboard/settings/SettingsNoti
 import JobSetupHeader from '../components/dashboard/JobSetupHeader';
 import KPIStatsModal from '../components/dashboard/kpi/KPIStatsModal';
 import KPIEditMetricsModal from '../components/dashboard/kpi/KPIEditMetricsModal';
+import KpiCard from '../components/dashboard/kpi/KpiCard';
 import JobPipelineOverview from '../components/dashboard/JobPipelineOverview';
 import SourceStatsCard from '../components/dashboard/SourceStatsCard';
 import HiringFunnelCard from '../components/dashboard/HiringFunnelCard';
@@ -317,12 +318,12 @@ export default function JobDashboardPage() {
      total: 850,
      totalFormatted: '850',
      centerMetricId: 'total_rejections',
-     topMetricId: 'rejection_percentage',
-     topLabel: 'Total rejection percentage',
-     topValue: '34.7%',
-     bottomMetricId: 'resume_rejections',
-     footerLabel: 'Resume rejection count',
-     footerValue: '23',
+     topMetricId: 'resume_rejections',
+     topLabel: 'Resume rejection count',
+     topValue: '23',
+     bottomMetricId: 'rejection_percentage',
+     footerLabel: 'Total rejection percentage',
+     footerValue: '34.7',
      badgeValue: '34.7%',
      badgeColor: 'bg-[#FF5630]/10 text-[#FF5630] dark:text-[#ff5630]',
      badgeIcon: 'down',
@@ -354,7 +355,8 @@ export default function JobDashboardPage() {
      funnelConversion: '34.7% total rejection percentage',
      avgVelocity: '2.1 days avg notice sent',
      showLastMonthFooter: true,
-     showChangeIndicator: true
+     showChangeIndicator: true,
+     showViewIconOnHover: true
    },
    {
      id: 'interviews',
@@ -409,12 +411,12 @@ export default function JobDashboardPage() {
      total: 29,
      totalFormatted: '29',
      centerMetricId: 'total_offers',
-     topMetricId: 'offer_conversion_rate',
-     topLabel: 'Offer conversion rate',
-     topValue: '41%',
-     bottomMetricId: 'successful_offers',
-     footerLabel: 'Total successful offers',
-     footerValue: '12',
+     topMetricId: 'successful_offers',
+     topLabel: 'Total successful offers',
+     topValue: '12',
+     bottomMetricId: 'offer_conversion_rate',
+     footerLabel: 'Offer conversion rate',
+     footerValue: '41',
      badgeValue: '41%',
      badgeColor: 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]',
      badgeIcon: 'up',
@@ -445,7 +447,8 @@ export default function JobDashboardPage() {
      funnelConversion: '41% offer conversion rate',
      avgVelocity: '3.5 days offer turnaround',
      showLastMonthFooter: true,
-     showChangeIndicator: true
+     showChangeIndicator: true,
+     showViewIconOnHover: true
    },
    {
      id: 'hires',
@@ -1002,90 +1005,17 @@ export default function JobDashboardPage() {
               }
             };
 
-            const isPositive = metric.changePercent >= 0;
-
             return (
-              <div 
+              <KpiCard
                 key={metric.id}
-                data-kpi={metric.id}
+                metric={metric}
+                renderCardIcon={renderCardIcon}
+                onOpenStats={() => setSelectedStatsMetric(metric)}
+                isHovered={hoveredKpiCardId === metric.id}
                 onMouseEnter={() => setHoveredKpiCardId(metric.id)}
                 onMouseLeave={() => setHoveredKpiCardId(null)}
-                className="bg-white dark:bg-[#161c24] p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
-              >
-                {/* 1. Title Row: Icon + Title on left, Fixed Number on Top Right */}
-                <div className="flex items-center justify-between gap-2 min-h-[32px]">
-                  <div 
-                    onClick={() => setSelectedStatsMetric(metric)}
-                    className="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-85 transition-opacity"
-                    title="Click to view all metrics"
-                  >
-                    <div className={`w-8 h-8 rounded-xl ${metric.bgColor || 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center shrink-0 border ${metric.borderColor || 'border-transparent'}`}>
-                      {renderCardIcon(metric.icon)}
-                    </div>
-                    <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate uppercase tracking-wider" title={metric.title}>
-                      {metric.title}
-                    </h4>
-                  </div>
-
-                  {/* Fixed Total Number on top right (cannot be configured) */}
-                  <div 
-                    onClick={() => setSelectedStatsMetric(metric)}
-                    className="text-xl sm:text-2xl font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity"
-                    title={`Total ${metric.title}: ${metric.totalFormatted || metric.total.toLocaleString()} (Fixed)`}
-                  >
-                    {metric.totalFormatted || metric.total.toLocaleString()}
-                  </div>
-                </div>
-
-                {/* 2 & 3. Card Body: Middle Metric + Bottom Metric grouped together */}
-                <div className="mt-3.5 space-y-1">
-                  {/* Metric 1 (Middle metric on card body - Left Aligned) */}
-                  <div className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5 min-w-0">
-                    <span className="truncate max-w-[65%]" title={metric.topLabel || metric.changeText}>
-                      {(metric.topLabel || metric.changeText || 'Percentage of new application').replace(/:\s*$/, '').trim()}
-                    </span>
-                    <span className={`font-extrabold text-sm sm:text-[15px] inline-flex items-center gap-0.5 shrink-0 ${
-                      metric.badgeColor ? metric.badgeColor.replace(/bg-\S+/, '').trim() : 'text-[#00A76F] dark:text-[#22c55e]'
-                    }`}>
-                      {metric.badgeIcon === 'clock' ? (
-                        <Clock size={12} />
-                      ) : metric.badgeIcon === 'down' ? (
-                        <TrendingDown size={12} />
-                      ) : metric.badgeIcon === 'up' ? (
-                        <TrendingUp size={12} />
-                      ) : null}
-                      <span>{String(metric.topValue || metric.badgeValue || (metric.changePercent ? `${metric.changePercent}%` : '')).replace(/^\+/, '')}</span>
-                    </span>
-                  </div>
-
-                  {/* Metric 2 (Bottom metric on card body - Left Aligned, tightly spaced with middle metric) */}
-                  <div className="pt-1 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] sm:text-xs min-h-[24px]">
-                    <div className="flex items-center gap-1.5 min-w-0 pr-1">
-                      <span className="text-gray-500 dark:text-gray-400 truncate" title={metric.footerLabel}>
-                        {(metric.footerLabel || 'Total active applications').replace(/:\s*$/, '').trim()}
-                      </span>
-                      <span className="font-extrabold text-sm sm:text-[15px] text-[#212b36] dark:text-gray-100 shrink-0">
-                        {metric.footerValue || metric.lastMonthFormatted || metric.lastMonth.toLocaleString()}
-                      </span>
-                    </div>
-
-                    {/* View icon shown on hover on the right bottom next to the second metric */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedStatsMetric(metric);
-                      }}
-                      className={`p-1 rounded-lg text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-opacity duration-200 cursor-pointer shrink-0 ${
-                        hoveredKpiCardId === metric.id ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
-                      }`}
-                      title="View Metrics"
-                    >
-                      <Eye size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
+                showViewIconOnHover={true}
+              />
             );
           })}
         </div>
