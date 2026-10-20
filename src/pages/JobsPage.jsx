@@ -1,30 +1,301 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, MoreVertical, Briefcase, MapPin, 
- Users, Clock, CheckCircle, AlertCircle, Calendar, 
- ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft, GripVertical } from 'lucide-react';
+ Users, Clock, CheckCircle, CheckCircle2, AlertCircle, Calendar, 
+ ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft, GripVertical, RotateCcw, SlidersHorizontal,
+  Building2, Bookmark, Award, Sparkles } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import findNewIco from '../assets/findnew-ico.png';
+import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
+import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
 
 const MOCK_JOBS = [
- { id: 1, title: 'Senior AI Research Scientist', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Published', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', hiringManager: 'Amit Sharma', score: 98 },
- { id: 2, title: 'Product Design Lead', department: 'Design', location: 'San Francisco, CA', type: 'Hybrid', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-20', hiringManager: 'Sarah Jenkins', score: 0 },
- { id: 3, title: 'VP of Marketing', department: 'Marketing', location: 'New York, NY', type: 'Full-time', status: 'Closed', applicants: 89, newApplicants: 0, postedDate: '2026-07-01', hiringManager: 'David Chen', score: 100 },
- { id: 4, title: 'Data Engineer', department: 'Data Science', location: 'London, UK', type: 'Full-time', status: 'Internal', applicants: 12, newApplicants: 2, postedDate: '2026-08-18', hiringManager: 'Amit Sharma', score: 85 },
- { id: 5, title: 'Frontend Developer', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Published', applicants: 210, newApplicants: 15, postedDate: '2026-08-21', hiringManager: 'Amit Sharma', score: 92 },
- { id: 6, title: 'DevOps Engineer', department: 'Engineering', location: 'Bangalore, India', type: 'Contract', status: 'Published', applicants: 85, newApplicants: 8, postedDate: '2026-08-22', hiringManager: 'Sarah Jenkins', score: 88 },
- { id: 7, title: 'HR Business Partner', department: 'HR', location: 'New York, NY', type: 'Hybrid', status: 'Internal', applicants: 5, newApplicants: 1, postedDate: '2026-08-15', hiringManager: 'David Chen', score: 75 },
- { id: 8, title: 'Sales Executive', department: 'Sales', location: 'London, UK', type: 'Full-time', status: 'Closed', applicants: 120, newApplicants: 0, postedDate: '2026-07-10', hiringManager: 'Amit Sharma', score: 90 }
+  { id: 1, title: 'Senior AI Research Scientist', company: 'Anthropic Labs', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Open', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', daysOpen: 70, experience: '5-8 yrs', avgMatch: 94, skills: ['PyTorch', 'Python', 'LLMs', 'Transformers', 'NLP', 'CUDA'], hiringManager: 'Amit Sharma', score: 98 },
+  { id: 2, title: 'Product Design Lead', company: 'Figma', department: 'Design', location: 'San Francisco, CA', type: 'Hybrid', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-08-20', daysOpen: 60, experience: '6-9 yrs', avgMatch: 82, skills: ['Figma', 'UI/UX Design', 'Design Systems', 'Wireframing', 'User Testing', 'Prototyping'], hiringManager: 'Sarah Jenkins', score: 0 },
+  { id: 3, title: 'VP of Marketing', company: 'Stripe', department: 'Marketing', location: 'New York, NY', type: 'Full-time', status: 'Closed', applicants: 89, newApplicants: 0, postedDate: '2026-07-01', daysOpen: 110, experience: '10+ yrs', avgMatch: 89, skills: ['Brand Strategy', 'Growth Marketing', 'Demand Gen', 'SEO/SEM', 'Content Strategy', 'Analytics'], hiringManager: 'David Chen', score: 100 },
+  { id: 4, title: 'Data Engineer', company: 'Snowflake', department: 'Data Science', location: 'London, UK', type: 'Full-time', status: 'On Hold', applicants: 12, newApplicants: 2, postedDate: '2026-08-18', daysOpen: 62, experience: '3-5 yrs', avgMatch: 85, skills: ['Python', 'Apache Spark', 'PostgreSQL', 'Airflow', 'Kafka', 'Data Modeling'], hiringManager: 'Amit Sharma', score: 85 },
+  { id: 5, title: 'Frontend Developer', company: 'Meta', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Open', applicants: 210, newApplicants: 15, postedDate: '2026-08-21', daysOpen: 59, experience: '3-6 yrs', avgMatch: 92, skills: ['React.js', 'TypeScript', 'Tailwind CSS', 'Next.js', 'Redux', 'GraphQL'], hiringManager: 'Amit Sharma', score: 92 },
+  { id: 6, title: 'DevOps Engineer', company: 'Amazon AWS', department: 'Engineering', location: 'Bangalore, India', type: 'Contract', status: 'Open', applicants: 85, newApplicants: 8, postedDate: '2026-08-22', daysOpen: 58, experience: '4-7 yrs', avgMatch: 88, skills: ['Kubernetes', 'Docker', 'AWS Cloud', 'CI/CD Pipelines', 'Terraform', 'Prometheus'], hiringManager: 'Sarah Jenkins', score: 88 },
+  { id: 7, title: 'HR Business Partner', company: 'Google', department: 'HR', location: 'New York, NY', type: 'Hybrid', status: 'Draft', applicants: 5, newApplicants: 1, postedDate: '2026-08-15', daysOpen: 65, experience: '5-8 yrs', avgMatch: 78, skills: ['Talent Strategy', 'Employee Relations', 'HRIS Systems', 'Performance Mgmt', 'Onboarding', 'Labor Laws'], hiringManager: 'David Chen', score: 75 },
+  { id: 8, title: 'Sales Executive', company: 'Salesforce', department: 'Sales', location: 'London, UK', type: 'Full-time', status: 'Closed', applicants: 120, newApplicants: 0, postedDate: '2026-07-10', daysOpen: 101, experience: '3-5 yrs', avgMatch: 90, skills: ['B2B SaaS Sales', 'Enterprise Accounts', 'Salesforce CRM', 'Lead Gen', 'Negotiation', 'Pipeline Mgmt'], hiringManager: 'Amit Sharma', score: 90 },
+  { id: 9, title: 'Product Manager', company: 'Uber Technologies', department: 'Product', location: 'San Francisco, CA', type: 'Full-time', status: 'On Hold', applicants: 48, newApplicants: 3, postedDate: '2026-08-05', daysOpen: 75, experience: '4-8 yrs', avgMatch: 91, skills: ['Product Strategy', 'Agile / Scrum', 'Roadmapping', 'User Research', 'Jira Software', 'Data Analytics'], hiringManager: 'Sarah Jenkins', score: 91 },
+  { id: 10, title: 'Cloud Infrastructure Architect', company: 'Databricks', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Open', applicants: 64, newApplicants: 9, postedDate: '2026-08-12', daysOpen: 68, experience: '8+ yrs', avgMatch: 95, skills: ['AWS Cloud', 'Terraform', 'Kubernetes', 'Cloud Security', 'Microservices', 'Linux Systems'], hiringManager: 'Amit Sharma', score: 95 },
+  { id: 11, title: 'Full Stack Engineer', company: 'OpenAI', department: 'Engineering', location: 'San Francisco, CA', type: 'Full-time', status: 'Open', applicants: 320, newApplicants: 42, postedDate: '2026-08-25', daysOpen: 55, experience: '4-7 yrs', avgMatch: 96, skills: ['TypeScript', 'Next.js', 'Python', 'Node.js', 'PostgreSQL', 'Tailwind CSS'], hiringManager: 'Amit Sharma', score: 97 },
+  { id: 12, title: 'Machine Learning Engineer', company: 'Apple', department: 'Engineering', location: 'Remote - US', type: 'Full-time', status: 'Open', applicants: 185, newApplicants: 28, postedDate: '2026-08-27', daysOpen: 53, experience: '3-6 yrs', avgMatch: 93, skills: ['PyTorch', 'TensorFlow', 'CoreML', 'Python', 'Computer Vision', 'C++'], hiringManager: 'Sarah Jenkins', score: 94 },
+  { id: 13, title: 'Senior UX Researcher', company: 'Airbnb', department: 'Design', location: 'New York, NY', type: 'Hybrid', status: 'Open', applicants: 74, newApplicants: 12, postedDate: '2026-09-01', daysOpen: 48, experience: '5-8 yrs', avgMatch: 87, skills: ['User Interviews', 'Usability Testing', 'Figma', 'Qualitative Analysis', 'Persona Building', 'Journey Mapping'], hiringManager: 'Sarah Jenkins', score: 89 },
+  { id: 14, title: 'Security Operations Lead', company: 'Microsoft', department: 'Engineering', location: 'Seattle, WA', type: 'Full-time', status: 'Open', applicants: 58, newApplicants: 6, postedDate: '2026-09-03', daysOpen: 46, experience: '7-10 yrs', avgMatch: 91, skills: ['Cybersecurity', 'SIEM / Splunk', 'Incident Response', 'Cloud Security', 'Azure Security', 'Zero Trust'], hiringManager: 'Amit Sharma', score: 93 },
+  { id: 15, title: 'Growth Marketing Manager', company: 'Netflix', department: 'Marketing', location: 'Los Angeles, CA', type: 'Full-time', status: 'Open', applicants: 142, newApplicants: 24, postedDate: '2026-09-05', daysOpen: 44, experience: '4-7 yrs', avgMatch: 88, skills: ['Paid Acquisition', 'A/B Testing', 'Retention Loops', 'SQL / Analytics', 'Meta Ads', 'Funnel Optimization'], hiringManager: 'David Chen', score: 86 },
+  { id: 16, title: 'Backend Software Architect', company: 'Spotify', department: 'Engineering', location: 'Berlin, Germany', type: 'Full-time', status: 'Open', applicants: 96, newApplicants: 14, postedDate: '2026-09-08', daysOpen: 41, experience: '8-12 yrs', avgMatch: 95, skills: ['Java / Spring', 'Go / Golang', 'Kafka', 'Distributed Systems', 'gRPC', 'PostgreSQL'], hiringManager: 'Amit Sharma', score: 96 },
+  { id: 17, title: 'Technical Program Manager', company: 'Google', department: 'Product', location: 'Bangalore, India', type: 'Hybrid', status: 'Draft', applicants: 0, newApplicants: 0, postedDate: '2026-09-10', daysOpen: 39, experience: '6-9 yrs', avgMatch: 84, skills: ['Agile / Scrum', 'Cross-functional Leadership', 'Jira', 'Risk Management', 'System Design', 'Stakeholder Comms'], hiringManager: 'Sarah Jenkins', score: 0 },
+  { id: 18, title: 'Customer Success Team Lead', company: 'Salesforce', department: 'Customer Success', location: 'Dublin, Ireland', type: 'Full-time', status: 'Open', applicants: 62, newApplicants: 7, postedDate: '2026-09-12', daysOpen: 37, experience: '5-8 yrs', avgMatch: 89, skills: ['Client Retention', 'QBR Leadership', 'SaaS Onboarding', 'Zendesk', 'Churn Reduction', 'Account Growth'], hiringManager: 'David Chen', score: 88 },
+  { id: 19, title: 'Senior Data Analyst', company: 'Snowflake', department: 'Data Science', location: 'Toronto, Canada', type: 'Hybrid', status: 'Open', applicants: 115, newApplicants: 19, postedDate: '2026-09-14', daysOpen: 35, experience: '3-5 yrs', avgMatch: 90, skills: ['SQL Advanced', 'Tableau', 'dbt', 'Python', 'Statistical Analysis', 'Snowflake DW'], hiringManager: 'Amit Sharma', score: 91 },
+  { id: 20, title: 'QA Automation Lead', company: 'Atlassian', department: 'Engineering', location: 'Sydney, Australia', type: 'Full-time', status: 'On Hold', applicants: 38, newApplicants: 2, postedDate: '2026-09-15', daysOpen: 34, experience: '5-8 yrs', avgMatch: 86, skills: ['Cypress', 'Playwright', 'Selenium', 'CI/CD Pipelines', 'JavaScript / TS', 'API Testing'], hiringManager: 'Sarah Jenkins', score: 84 },
+  { id: 21, title: 'Enterprise Account Executive', company: 'Databricks', department: 'Sales', location: 'New York, NY', type: 'Full-time', status: 'Open', applicants: 88, newApplicants: 11, postedDate: '2026-09-18', daysOpen: 31, experience: '6-10 yrs', avgMatch: 92, skills: ['Enterprise SaaS', 'MEDDPICC', 'C-Level Selling', 'Cloud Solutions', 'Salesforce CRM', 'Territory Planning'], hiringManager: 'David Chen', score: 93 },
+  { id: 22, title: 'Senior iOS Developer', company: 'Apple', department: 'Engineering', location: 'San Francisco, CA', type: 'Full-time', status: 'Open', applicants: 150, newApplicants: 22, postedDate: '2026-09-20', daysOpen: 29, experience: '5-8 yrs', avgMatch: 94, skills: ['Swift', 'SwiftUI', 'Combine', 'iOS SDK', 'Unit Testing', 'CI/CD Fastlane'], hiringManager: 'Amit Sharma', score: 95 },
+  { id: 23, title: 'Finance & Strategy Analyst', company: 'Stripe', department: 'Finance', location: 'London, UK', type: 'Full-time', status: 'Draft', applicants: 2, newApplicants: 0, postedDate: '2026-09-22', daysOpen: 27, experience: '2-5 yrs', avgMatch: 81, skills: ['Financial Modeling', 'SaaS Metrics (LTV/CAC)', 'Excel / VBA', 'SQL Queries', 'Budget Forecasting', 'Investor Reporting'], hiringManager: 'David Chen', score: 0 },
+  { id: 24, title: 'Solutions Architect', company: 'Amazon AWS', department: 'Engineering', location: 'Singapore', type: 'Full-time', status: 'Open', applicants: 72, newApplicants: 8, postedDate: '2026-09-24', daysOpen: 25, experience: '8-12 yrs', avgMatch: 96, skills: ['AWS Well-Architected', 'Cloud Migration', 'Kubernetes', 'Enterprise Security', 'Client Demos', 'Terraform'], hiringManager: 'Amit Sharma', score: 98 },
+  { id: 25, title: 'Content & Social Lead', company: 'Figma', department: 'Marketing', location: 'Remote', type: 'Full-time', status: 'Closed', applicants: 240, newApplicants: 0, postedDate: '2026-07-20', daysOpen: 91, experience: '4-7 yrs', avgMatch: 88, skills: ['Content Strategy', 'Community Building', 'Social Copywriting', 'SEO Content', 'Figma Design', 'Brand Storytelling'], hiringManager: 'David Chen', score: 90 },
+  { id: 26, title: 'Talent Acquisition Specialist', company: 'Meta', department: 'HR', location: 'Bangalore, India', type: 'Contract', status: 'Open', applicants: 95, newApplicants: 16, postedDate: '2026-09-28', daysOpen: 21, experience: '3-6 yrs', avgMatch: 85, skills: ['Tech Sourcing', 'LinkedIn Recruiter', 'Boolean Search', 'Candidate Screening', 'ATS Management', 'Offer Negotiation'], hiringManager: 'Sarah Jenkins', score: 87 },
+  { id: 27, title: 'Infrastructure SRE', company: 'Uber Technologies', department: 'Engineering', location: 'Austin, TX', type: 'Full-time', status: 'Open', applicants: 68, newApplicants: 9, postedDate: '2026-10-02', daysOpen: 17, experience: '4-8 yrs', avgMatch: 93, skills: ['Linux Kernel', 'Observability / Grafana', 'Prometheus', 'Terraform', 'Incident Management', 'Golang'], hiringManager: 'Amit Sharma', score: 92 },
+  { id: 28, title: 'VP of Product Strategy', company: 'OpenAI', department: 'Product', location: 'San Francisco, CA', type: 'Full-time', status: 'Open', applicants: 112, newApplicants: 31, postedDate: '2026-10-05', daysOpen: 14, experience: '12+ yrs', avgMatch: 97, skills: ['AI Product Strategy', 'P&L Ownership', 'Team Scaling', 'Ecosystem Strategy', 'Executive Comms', 'Roadmap Governance'], hiringManager: 'Sarah Jenkins', score: 99 },
+  { id: 29, title: 'Senior Cloud Security Architect', company: 'Palo Alto Networks', department: 'Engineering', location: 'Austin, TX', type: 'Full-time', status: 'Closed', applicants: 110, newApplicants: 0, postedDate: '2026-06-15', daysOpen: 125, experience: '7-10 yrs', avgMatch: 93, skills: ['Cloud Security', 'Kubernetes', 'AWS Cloud', 'Terraform', 'CI/CD Pipelines'], hiringManager: 'Amit Sharma', score: 94 },
+  { id: 30, title: 'Senior Backend Engineer', company: 'Databricks', department: 'Engineering', location: 'Remote', type: 'Full-time', status: 'Closed', applicants: 175, newApplicants: 0, postedDate: '2026-06-28', daysOpen: 112, experience: '5-8 yrs', avgMatch: 91, skills: ['Python / AI', 'PostgreSQL / SQL', 'Docker & K8s', 'AWS Cloud'], hiringManager: 'Sarah Jenkins', score: 92 }
 ];
+
+
+export const getJobPipelineData = (job) => {
+  if (job.pipeline) {
+    const p = job.pipeline;
+    const total = (p.applied || 0) + (p.screen || 0) + (p.interview || 0) + (p.offer || 0) + (p.hired || 0);
+    return { ...p, total: total || job.applicants || 0 };
+  }
+
+  // Individual realistic candidate stage counts per job
+  const stageDistributionMap = {
+    1: { applied: 210, screen: 130, interview: 80, offer: 22, hired: 8 },   // Senior AI Research Scientist (450)
+    2: { applied: 0, screen: 0, interview: 0, offer: 0, hired: 0 },          // Product Design Lead (0)
+    3: { applied: 24, screen: 32, interview: 22, offer: 8, hired: 3 },       // VP of Marketing (Closed, 89)
+    4: { applied: 8, screen: 3, interview: 1, offer: 0, hired: 0 },          // Data Engineer (On Hold, 12)
+    5: { applied: 110, screen: 60, interview: 30, offer: 8, hired: 2 },      // Frontend Developer (210)
+    6: { applied: 48, screen: 22, interview: 11, offer: 3, hired: 1 },       // DevOps Engineer (85)
+    7: { applied: 3, screen: 2, interview: 0, offer: 0, hired: 0 },          // HR Business Partner (Draft, 5)
+    8: { applied: 35, screen: 45, interview: 28, offer: 8, hired: 4 },       // Sales Executive (Closed, 120)
+    9: { applied: 26, screen: 14, interview: 6, offer: 2, hired: 0 },        // Product Manager (On Hold, 48)
+    10: { applied: 36, screen: 18, interview: 8, offer: 2, hired: 0 },       // Cloud Infrastructure Architect (64)
+    11: { applied: 185, screen: 82, interview: 40, offer: 10, hired: 3 },    // Full Stack Engineer (320)
+    12: { applied: 95, screen: 52, interview: 28, offer: 8, hired: 2 },      // Machine Learning Engineer (185)
+    13: { applied: 38, screen: 22, interview: 11, offer: 3, hired: 0 },      // Senior UX Researcher (74)
+    14: { applied: 32, screen: 16, interview: 8, offer: 2, hired: 0 },       // Security Operations Lead (58)
+    15: { applied: 80, screen: 38, interview: 18, offer: 5, hired: 1 },      // Growth Marketing Manager (142)
+    16: { applied: 45, screen: 28, interview: 17, offer: 5, hired: 1 },      // Backend Software Architect (96)
+    17: { applied: 0, screen: 0, interview: 0, offer: 0, hired: 0 },          // Technical Program Manager (Draft, 0)
+    18: { applied: 32, screen: 18, interview: 9, offer: 2, hired: 1 },       // Customer Success Team Lead (62)
+    19: { applied: 65, screen: 32, interview: 14, offer: 3, hired: 1 },      // Senior Data Analyst (115)
+    20: { applied: 22, screen: 11, interview: 4, offer: 1, hired: 0 },       // QA Automation Lead (On Hold, 38)
+    21: { applied: 46, screen: 25, interview: 13, offer: 3, hired: 1 },      // Enterprise Account Executive (88)
+    22: { applied: 78, screen: 42, interview: 22, offer: 6, hired: 2 },      // Senior iOS Developer (150)
+    23: { applied: 2, screen: 0, interview: 0, offer: 0, hired: 0 },          // Finance & Strategy Analyst (Draft, 2)
+    24: { applied: 40, screen: 20, interview: 9, offer: 2, hired: 1 },       // Solutions Architect (72)
+    25: { applied: 110, screen: 75, interview: 40, offer: 12, hired: 3 },     // Content & Social Lead (Closed, 240)
+    26: { applied: 52, screen: 26, interview: 13, offer: 3, hired: 1 },      // Talent Acquisition Specialist (95)
+    27: { applied: 35, screen: 20, interview: 10, offer: 2, hired: 1 },      // Infrastructure SRE (68)
+    28: { applied: 42, screen: 38, interview: 22, offer: 7, hired: 3 },      // VP of Product Strategy (112)
+    29: { applied: 32, screen: 42, interview: 26, offer: 8, hired: 2 },      // Senior Cloud Security Architect (Closed, 110)
+    30: { applied: 65, screen: 60, interview: 38, offer: 9, hired: 3 }       // Senior Backend Engineer (Closed, 175)
+  };
+
+  if (stageDistributionMap[job.id]) {
+    const p = stageDistributionMap[job.id];
+    return { ...p, total: job.applicants || 0 };
+  }
+
+  const total = job.applicants || 0;
+  if (total === 0) {
+    return { applied: 0, screen: 0, interview: 0, offer: 0, hired: 0, total: 0 };
+  }
+
+  // Fallback for new / created jobs
+  const hired = job.status === 'Closed' ? Math.max(1, Math.min(3, Math.round(total * 0.02))) : (job.status === 'Open' ? Math.max(0, Math.floor(total * 0.01)) : 0);
+  const offer = Math.max(0, Math.round(total * 0.05));
+  const interview = Math.max(1, Math.round(total * 0.18));
+  const screen = Math.max(1, Math.round(total * 0.25));
+  const applied = Math.max(0, total - (hired + offer + interview + screen));
+  return { applied, screen, interview, offer, hired, total };
+};
 
 const DEFAULT_CHATBOT_WIDTH = 320;
 const MAX_CHATBOT_WIDTH = 600;
 
+function JobPipelineDisplay({ job, width = "w-[330px]" }) {
+  const pipe = getJobPipelineData(job);
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const containerRef = useRef(null);
+
+  const stages = [
+    { key: 'applied', label: 'Applied', count: pipe.applied, color: '#1890FF' },
+    { key: 'screen', label: 'Screen', count: pipe.screen, color: '#00B8D9' },
+    { key: 'interview', label: 'Interview', count: pipe.interview, color: '#00A76F' },
+    { key: 'offer', label: 'Offer', count: pipe.offer, color: '#FFAB00' },
+    { key: 'hired', label: 'Hired', count: pipe.hired, color: '#059669' }
+  ];
+
+  const handleHover = (stage, e) => {
+    if (containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const targetRect = e.currentTarget.getBoundingClientRect();
+      const x = (targetRect.left + targetRect.width / 2) - containerRect.left;
+      setActiveTooltip({ ...stage, x });
+    }
+  };
+
+  return (
+    <div ref={containerRef} className={`${width} space-y-1.5 relative select-none`}>
+      {/* Custom unified floating tooltip - only one tooltip displayed */}
+      {activeTooltip && (
+        <div 
+          className="absolute z-50 pointer-events-none transform -translate-x-1/2 transition-all duration-75 animate-fade-in"
+          style={{ 
+            left: `${activeTooltip.x}px`,
+            top: '-28px'
+          }}
+        >
+          <div className="bg-gray-900/95 dark:bg-gray-800 text-white text-[11px] font-semibold px-2 py-0.5 rounded-md shadow-lg whitespace-nowrap flex items-center gap-1.5 border border-gray-700/60">
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: activeTooltip.color }}></span>
+            <span>{activeTooltip.label}:</span>
+            <span className="font-bold text-white tabular-nums">{activeTooltip.count}</span>
+          </div>
+          <div className="w-1.5 h-1.5 bg-gray-900/95 dark:bg-gray-800 rotate-45 mx-auto -mt-0.5 border-r border-b border-gray-700/60"></div>
+        </div>
+      )}
+
+      {/* Segmented Pipeline Bar */}
+      <div className="flex h-2.5 w-full rounded-full overflow-hidden gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 shadow-2xs">
+        {pipe.total === 0 ? (
+          <div className="w-full h-full bg-gray-200 dark:bg-gray-700/60 rounded-full" />
+        ) : (
+          stages.map(stage => {
+            if (stage.count <= 0) return null;
+            return (
+              <div
+                key={stage.key}
+                style={{ flexGrow: stage.count, flexShrink: 1, flexBasis: '0%', backgroundColor: stage.color }}
+                className="h-full first:rounded-l-full last:rounded-r-full hover:brightness-110 transition-all cursor-pointer"
+                onMouseEnter={(e) => handleHover(stage, e)}
+                onMouseLeave={() => setActiveTooltip(null)}
+              />
+            );
+          })
+        )}
+      </div>
+
+      {/* Stage Legend */}
+      <div className="grid grid-cols-5 text-center text-[10px] font-medium gap-1 pt-0.5">
+        {stages.map(stage => (
+          <div
+            key={stage.key}
+            className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 transition-colors cursor-pointer py-1 rounded hover:bg-gray-100/70 dark:hover:bg-gray-800/70"
+            style={{ color: activeTooltip?.key === stage.key ? stage.color : undefined }}
+            onMouseEnter={(e) => handleHover(stage, e)}
+            onMouseLeave={() => setActiveTooltip(null)}
+          >
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: stage.color }}></span>
+            <span className="truncate">{stage.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function JobsPage() {
  const navigate = useNavigate();
- const [searchQuery, setSearchQuery] = useState('');
- const [statusFilter, setStatusFilter] = useState('All');
+  const rightPanelRef = useRef(null);
+  const base10JobsHeightRef = useRef({ grid: 980, card: 980 });
+  const [filterPanelHeight, setFilterPanelHeight] = useState(980);
+  const [jobs, setJobs] = useState(MOCK_JOBS);
+  const [searchQuery, setSearchQuery] = useState('');
+ const [sortBy, setSortBy] = useState('recommended');
+ const [viewMode, setViewMode] = useState('grid');
+ const [selectedFilters, setSelectedFilters] = useState({
+    department: [],
+    position: [],
+    location: [],
+    experience: [],
+    company: [],
+    employmentType: [],
+    workMode: [],
+    aiHealth: [],
+    posted: []
+  });
+
+  const [quickFilters, setQuickFilters] = useState({
+    status: [],
+    skills: [],
+    priority: [],
+    hiringManager: [],
+    recruiter: [],
+    openings: [],
+    shift: [],
+    topSource: [],
+    education: [],
+    noticePeriod: []
+  });
+
+  const handleFilterChange = (categoryKey, value) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [categoryKey]: value
+    }));
+  };
+
+  const handleQuickFilterChange = (key, value) => {
+    setQuickFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleResetFilters = () => {
+    setSelectedFilters({
+      department: [],
+      position: [],
+      location: [],
+      experience: [],
+      company: [],
+      employmentType: [],
+      workMode: [],
+      aiHealth: [],
+      posted: []
+    });
+    setQuickFilters({
+      status: [],
+      skills: [],
+      priority: [],
+      hiringManager: [],
+      recruiter: [],
+      openings: [],
+      shift: [],
+      topSource: [],
+      education: [],
+      noticePeriod: []
+    });
+    setSearchQuery('');
+    setSortBy('recommended');
+  };
+
+  const handleClearAllQuickFilters = () => {
+    setQuickFilters({
+      status: [],
+      skills: [],
+      priority: [],
+      hiringManager: [],
+      recruiter: [],
+      openings: [],
+      shift: [],
+      topSource: [],
+      education: [],
+      noticePeriod: []
+    });
+  };
+
+  // Dynamic status counts and parameter options for JobQuickFilterBar
+  const dynamicQuickParameters = useMemo(() => {
+    const openCount = jobs.filter(j => j.status === 'Open' || j.status === 'Published' || j.status === 'Internal').length;
+    const closedCount = jobs.filter(j => j.status === 'Closed').length;
+    const draftCount = jobs.filter(j => j.status === 'Draft').length;
+    const onHoldCount = jobs.filter(j => j.status === 'On Hold' || j.status === 'Hold' || j.status === 'On-Hold').length;
+
+    return {
+      ...QUICK_PARAMETERS_DATA,
+      status: [
+        { id: 'Open', label: 'Open', count: openCount },
+        { id: 'Closed', label: 'Closed', count: closedCount },
+        { id: 'Draft', label: 'Draft', count: draftCount },
+        { id: 'On Hold', label: 'On Hold', count: onHoldCount }
+      ]
+    };
+  }, [jobs]);
  
  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
  const [successMessage, setSuccessMessage] = useState(null);
@@ -35,11 +306,17 @@ export default function JobsPage() {
  const [sendAgencyData, setSendAgencyData] = useState({ agency: '', message: '' });
  const [customAlert, setCustomAlert] = useState(null);
  const [openActionMenuId, setOpenActionMenuId] = useState(null);
- const [jobs, setJobs] = useState(MOCK_JOBS);
+  const [followedJobIds, setFollowedJobIds] = useState([1, 5]);
+
+  const handleToggleFollow = (jobId) => {
+    setFollowedJobIds(prev => 
+      prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId]
+    );
+  };
  const [editingJobId, setEditingJobId] = useState(null);
 
  const [currentPage, setCurrentPage] = useState(1);
- const itemsPerPage = 5;
+ const itemsPerPage = 10;
 
  const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
  const [selectedJobToView, setSelectedJobToView] = useState(null);
@@ -128,30 +405,220 @@ export default function JobsPage() {
  };
  
  
- const filteredJobs = jobs.filter(job => {
- const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
- job.department.toLowerCase().includes(searchQuery.toLowerCase());
- const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
- return matchesSearch && matchesStatus;
+ const filteredJobs = useMemo(() => {
+ const list = jobs.filter(job => {
+ const matchesSearch = !searchQuery || 
+ job.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+ job.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+ (job.location && job.location.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Status filtering:
+    // By default "Closed" jobs should NOT be visible. User can see Closed jobs by selecting "Closed" in the Status filter.
+    let matchesStatus = true;
+    if (quickFilters.status && quickFilters.status.length > 0) {
+      matchesStatus = quickFilters.status.some(st => {
+        const s = st.toLowerCase();
+        if (s === 'open') return job.status === 'Open' || job.status === 'Published' || job.status === 'Internal';
+        if (s === 'on hold') return job.status === 'On Hold' || job.status === 'Hold' || job.status === 'On-Hold';
+        return job.status.toLowerCase() === s;
+      });
+    } else {
+      // By default (All), exclude Closed jobs
+      matchesStatus = job.status !== 'Closed';
+    }
+
+ // Multi-select department filter
+ let matchesDept = true;
+ if (selectedFilters.department && selectedFilters.department.length > 0) {
+ const activeLabels = FILTER_DATA.department
+ .filter(d => selectedFilters.department.includes(d.id))
+ .map(d => d.label.toLowerCase());
+ matchesDept = activeLabels.some(lbl => lbl.includes(job.department.toLowerCase()) || job.department.toLowerCase().includes(lbl.split(' ')[0]));
+ }
+
+ // Multi-select location filter
+ let matchesLoc = true;
+ if (selectedFilters.location && selectedFilters.location.length > 0) {
+ const activeLocs = FILTER_DATA.location
+ .filter(l => selectedFilters.location.includes(l.id))
+ .map(l => l.label.toLowerCase());
+ matchesLoc = activeLocs.some(lbl => job.location && (lbl.includes(job.location.toLowerCase()) || job.location.toLowerCase().includes(lbl.split(',')[0])));
+ }
+
+ // Multi-select employment type filter
+ let matchesType = true;
+ if (selectedFilters.employmentType && selectedFilters.employmentType.length > 0) {
+ const activeTypes = FILTER_DATA.employmentType
+ .filter(t => selectedFilters.employmentType.includes(t.id))
+ .map(t => t.label.toLowerCase());
+ matchesType = activeTypes.some(lbl => job.type && (lbl.includes(job.type.toLowerCase()) || job.type.toLowerCase().includes(lbl.split(' ')[0])));
+ }
+
+ // Quick Filter: Hiring Manager
+ let matchesHM = true;
+ if (quickFilters.hiringManager && quickFilters.hiringManager.length > 0) {
+ const activeHMs = QUICK_PARAMETERS_DATA.hiringManager
+ .filter(hm => quickFilters.hiringManager.includes(hm.id))
+ .map(hm => hm.label.toLowerCase());
+ matchesHM = activeHMs.some(hm => job.hiringManager && job.hiringManager.toLowerCase().includes(hm));
+ }
+
+    // Quick Filter: Skills
+    let matchesSkills = true;
+    if (quickFilters.skills && quickFilters.skills.length > 0) {
+      const activeSkills = QUICK_PARAMETERS_DATA.skills
+        .filter(s => quickFilters.skills.includes(s.id))
+        .map(s => s.label.toLowerCase());
+      matchesSkills = activeSkills.some(skill => 
+        job.skills && job.skills.some(js => js.toLowerCase().includes(skill) || skill.includes(js.toLowerCase()))
+      );
+    }
+
+ return matchesSearch && matchesStatus && matchesDept && matchesLoc && matchesType && matchesHM && matchesSkills;
  });
 
- // Reset to page 1 when filters change
+ // Apply Sort
+ return list.sort((a, b) => {
+ switch (sortBy) {
+ case 'newest':
+ return new Date(b.postedDate) - new Date(a.postedDate);
+ case 'oldest':
+ return new Date(a.postedDate) - new Date(b.postedDate);
+ case 'applicants_desc':
+ return b.applicants - a.applicants;
+ case 'score_desc':
+ return (b.score || 0) - (a.score || 0);
+ case 'title_asc':
+ return a.title.localeCompare(b.title);
+ case 'recommended':
+ default:
+ return (b.score || 0) - (a.score || 0) || a.id - b.id;
+ }
+ });
+ }, [jobs, searchQuery, selectedFilters, quickFilters, sortBy]);
+
+ // Reset to page 1 when filters or sort change
  useEffect(() => {
  setCurrentPage(1);
- }, [searchQuery, statusFilter]);
+ }, [searchQuery, selectedFilters, quickFilters, sortBy]);
 
  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
  const paginatedJobs = filteredJobs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
  const getStatusColor = (status) => {
  switch(status) {
- case 'Published': return 'bg-[#00A76F]/10 text-[#00A76F]';
- case 'Draft': return 'bg-[#FFC107]/10 text-[#b78103] dark:text-[#FFC107]';
- case 'Closed': return 'bg-[#FF5630]/10 text-[#FF5630]';
- case 'Internal': return 'bg-[#1890FF]/10 text-[#1890FF]';
+ case 'Open':
+ case 'Published':
+ case 'Internal': return 'bg-[#00A76F]/10 text-[#00A76F] dark:text-[#22c55e]';
+ case 'Draft': return 'bg-[#FFAB00]/10 text-[#b78103] dark:text-[#FFAB00]';
+ case 'On Hold': return 'bg-[#8E33FF]/10 text-[#8E33FF] dark:text-[#a855f7]';
+ case 'Closed': return 'bg-[#FF5630]/10 text-[#FF5630] dark:text-[#ff5630]';
  default: return 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
  }
  };
+
+ // KPI Cards Data: All Jobs, Open, Draft, On Hold, Closed
+ const kpiStats = useMemo(() => {
+ const total = jobs.filter(j => j.status !== 'Closed').length;
+ const open = jobs.filter(j => j.status === 'Open' || j.status === 'Published' || j.status === 'Internal').length;
+ const draft = jobs.filter(j => j.status === 'Draft').length;
+ const onHold = jobs.filter(j => j.status === 'On Hold' || j.status === 'Hold' || j.status === 'On-Hold').length;
+ const closed = jobs.filter(j => j.status === 'Closed').length;
+
+ return [
+ { 
+ id: 'All', 
+ title: 'All Jobs', 
+ count: total, 
+ icon: Briefcase, 
+ color: 'text-[#1890FF]', 
+ bgColor: 'bg-[#1890FF]/10', 
+ borderColor: 'border-[#1890FF]/20',
+ subtext: 'Active requisitions' 
+ },
+ { 
+ id: 'Open', 
+ title: 'Open', 
+ count: open, 
+ icon: CheckCircle2, 
+ color: 'text-[#00A76F] dark:text-[#22c55e]', 
+ bgColor: 'bg-[#00A76F]/10', 
+ borderColor: 'border-[#00A76F]/20',
+ subtext: 'Active & published' 
+ },
+ { 
+ id: 'Draft', 
+ title: 'Draft', 
+ count: draft, 
+ icon: FileText, 
+ color: 'text-[#b78103] dark:text-[#FFAB00]', 
+ bgColor: 'bg-[#FFAB00]/10', 
+ borderColor: 'border-[#FFAB00]/20',
+ subtext: 'Unpublished listings' 
+ },
+ { 
+ id: 'On Hold', 
+ title: 'On Hold', 
+ count: onHold, 
+ icon: Clock, 
+ color: 'text-[#8E33FF]', 
+ bgColor: 'bg-[#8E33FF]/10', 
+ borderColor: 'border-[#8E33FF]/20',
+ subtext: 'Paused hiring' 
+ },
+ { 
+ id: 'Closed', 
+ title: 'Closed', 
+ count: closed, 
+ icon: AlertCircle, 
+ color: 'text-[#FF5630]', 
+ bgColor: 'bg-[#FF5630]/10', 
+ borderColor: 'border-[#FF5630]/20',
+ subtext: 'Archived / filled' 
+ }
+ ];
+ }, [jobs]);
+  // Maintain Left Filter Panel height fixed to the height of the job list with 10 jobs.
+  // When applying filters and the job list gets smaller, height of the filter is NOT reduced.
+  useEffect(() => {
+    if (!rightPanelRef.current) return;
+
+    const measureHeight = () => {
+      if (window.innerWidth >= 1024 && rightPanelRef.current) {
+        const currentH = rightPanelRef.current.offsetHeight;
+
+        // If the right panel currently has 10 jobs displayed (or hasn't recorded yet),
+        // update the 10-job benchmark height for this view mode
+        if (paginatedJobs.length >= 10 || !base10JobsHeightRef.current[viewMode]) {
+          if (currentH > 400) {
+            base10JobsHeightRef.current[viewMode] = Math.max(
+              base10JobsHeightRef.current[viewMode] || 0,
+              currentH
+            );
+          }
+        }
+
+        const benchmarkHeight = base10JobsHeightRef.current[viewMode] || 980;
+        setFilterPanelHeight(Math.max(benchmarkHeight, currentH));
+      } else {
+        setFilterPanelHeight(null);
+      }
+    };
+
+    const timer = setTimeout(measureHeight, 60);
+
+    const observer = new ResizeObserver(() => {
+      measureHeight();
+    });
+
+    observer.observe(rightPanelRef.current);
+    window.addEventListener('resize', measureHeight);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+      window.removeEventListener('resize', measureHeight);
+    };
+  }, [paginatedJobs.length, viewMode]);
 
  return (
  <>
@@ -175,322 +642,489 @@ export default function JobsPage() {
  </div>
  </div>
 
- {/* Stats Cards */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
- {[
- { label: 'Total Active Jobs', value: '34', icon: Briefcase, color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
- { label: 'Total Candidates', value: '12,450', icon: Users, color: 'text-[#00A76F]', bg: 'bg-[#00A76F]/10' },
- { label: 'Pending Reviews', value: '84', icon: Clock, color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' },
- { label: 'Interviews This Week', value: '12', icon: Calendar, color: 'text-[#8E33FF]', bg: 'bg-[#8E33FF]/10' }
- ].map((stat, i) => (
- <div key={i} className="bg-white dark:bg-[#161c24] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
- <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
- <stat.icon size={24} className={stat.color} />
+ {/* 5 KPI CARDS ROW (All Jobs, Open, Draft, On Hold, Closed) */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+  {kpiStats.map((kpi) => {
+  const Icon = kpi.icon;
+
+  return (
+  <div
+  key={kpi.id}
+  className="bg-white dark:bg-[#161c24] p-4 rounded-2xl shadow-xs border border-gray-100 dark:border-gray-800/80 flex flex-col justify-between transition-all duration-200"
+ >
+ {/* Top Row: Icon badge + Title on left, Fixed/Total Count on right */}
+ <div className="flex items-center justify-between gap-2 min-h-[32px]">
+ <div className="flex items-center gap-2.5 min-w-0">
+ <div className={`w-8 h-8 rounded-xl ${kpi.bgColor} flex items-center justify-center shrink-0 border ${kpi.borderColor}`}>
+ <Icon size={17} className={kpi.color} />
  </div>
- <div>
- <h3 className="text-2xl font-bold text-[#212b36] dark:text-white">{stat.value}</h3>
- <p className="text-sm font-medium text-black dark:text-gray-400">{stat.label}</p>
- </div>
- </div>
- ))}
+ <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate uppercase tracking-wider">
+ {kpi.title}
+ </h4>
  </div>
 
- <div className="flex flex-col xl:flex-row gap-6 relative items-start overflow-x-hidden">
- <div className="flex-1 min-w-0 space-y-6">
- {/* Filters & Search */}
- <div className="bg-white dark:bg-[#161c24] p-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm flex flex-col xl:flex-row gap-4 justify-between items-center">
- <div className="flex flex-wrap gap-2 w-full xl:w-auto">
- {['All', 'Published', 'Draft', 'Internal', 'Closed'].map(status => (
- <button
- key={status}
- onClick={() => setStatusFilter(status)}
- className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
- statusFilter === status 
- ? 'bg-[#212b36] dark:bg-white text-white dark:text-[#212b36]' 
- : 'bg-gray-50 dark:bg-gray-800/50 text-black dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
- }`}
- >
- {status}
- </button>
- ))}
+ <span className="text-xl sm:text-2xl font-extrabold text-[#212b36] dark:text-white tracking-tight leading-none shrink-0">
+ {kpi.count}
+ </span>
  </div>
- 
- <div className="flex gap-3 w-full md:w-auto">
- <div className="relative md:w-64">
- <input 
- type="text" 
- placeholder="Search jobs..." 
- value={searchQuery}
- onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full px-4 py-2 text-xs bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-lg focus:ring-2 focus:ring-[#1890FF]/20 focus:border-[#1890FF] outline-none text-[#212b36] dark:text-white transition-all"
+
+ {/* Bottom Subtext Row */}
+ <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+ <span className="truncate">
+ {kpi.subtext}
+ </span>
+ </div>
+ </div>
+ );
+ })}
+ </div>
+
+ {/* MAIN CONTENT ROW: Left Filter Panel + Main Jobs Content */}
+ <div className="flex flex-col lg:flex-row gap-6 relative items-start">
+ {/* LEFT FILTER PANEL */}
+ <JobFilterPanel
+ selectedFilters={selectedFilters}
+ onFilterChange={handleFilterChange}
+ onResetAll={handleResetFilters}
+ totalResultsCount={filteredJobs.length}
+          panelHeight={filterPanelHeight}
+        />
+
+ {/* MAIN CONTENT AREA: Jobs Table & Pagination */}
+ <div ref={rightPanelRef} className="flex-1 min-w-0 space-y-4 w-full">
+ {/* Horizontal Filter Bar with Quick Parameters & Custom Sort By */}
+ <JobQuickFilterBar
+ quickFilters={quickFilters}
+ onQuickFilterChange={handleQuickFilterChange}
+ onClearAll={handleClearAllQuickFilters}
+ parameterOptions={dynamicQuickParameters}
+ sortBy={sortBy}
+ viewMode={viewMode}
+ onViewModeChange={setViewMode}
+ onSortChange={setSortBy}
  />
- </div>
- </div>
- </div>
 
- {/* Jobs List */}
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
- <div className="overflow-x-auto">
- <table className="w-full text-left border-collapse">
- <thead>
- <tr className="bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
- <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Job Details</th>
- <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 ">Active Candidates</th>
- <th className="px-6 py-4 text-center text-xs font-bold text-black dark:text-gray-400 ">Actions</th>
- </tr>
- </thead>
- <tbody className="divide-y divide-gray-100 dark:divide-gray-800/50">
- {paginatedJobs.length > 0 ? paginatedJobs.map((job, index) => (
- <tr 
- key={job.id} 
- onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
- className="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group cursor-pointer"
- >
- <td className="px-6 py-4">
- <div className="flex items-start gap-3">
- <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-[#1890FF] shrink-0">
- <Briefcase size={20} />
- </div>
- <div>
-  <div className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors cursor-pointer">{job.title}</div>
- <div className="flex items-center gap-2 mt-1 mb-1">
- <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${getStatusColor(job.status)} inline-flex items-center gap-1`}>
- <span className="w-1 h-1 rounded-full bg-current"></span>
- {job.status}
- </span>
- <span className="text-[11px] text-gray-500 font-medium border-l border-gray-300 dark:border-gray-600 pl-2">Posted: {job.postedDate}</span>
- </div>
- <div className="flex items-center gap-2 mt-0.5 text-xs font-medium text-black dark:text-gray-400">
- <span className="flex items-center gap-1"><MapPin size={12} /> {job.location}</span>
- <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
- <span>{job.department}</span>
- <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
- <span>{job.type}</span>
- </div>
- </div>
- </div>
- </td>
- <td className="px-6 py-4">
- <div className="flex items-center gap-3">
- {job.applicants === 0 ? (
- <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 ring-2 ring-white dark:ring-[#161c24] flex items-center justify-center text-[11px] font-bold text-gray-400 dark:text-gray-500">
- N/A
- </div>
- ) : (
- <div className="flex -space-x-2">
- <img src={`https://i.pravatar.cc/150?u=${job.id + 1}`} alt="Candidate" className="w-8 h-8 rounded-full ring-2 ring-white dark:ring-[#161c24] z-30 relative object-cover" />
- {job.applicants > 1 && (
- <img src={`https://i.pravatar.cc/150?u=${job.id + 2}`} alt="Candidate" className="w-8 h-8 rounded-full ring-2 ring-white dark:ring-[#161c24] z-20 relative object-cover" />
- )}
- {job.applicants > 2 && (
- <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 ring-2 ring-white dark:ring-[#161c24] flex items-center justify-center text-[11px] font-bold text-gray-600 dark:text-gray-300 z-10 relative">
- +{job.applicants - 2 > 99 ? '99' : job.applicants - 2}
- </div>
- )}
- </div>
- )}
- <div>
- <div className="text-sm font-bold text-[#212b36] dark:text-white">{job.applicants.toLocaleString()}</div>
- {job.newApplicants > 0 && (
- <div className="text-[11px] font-bold text-[#00A76F]">+{job.newApplicants} new</div>
- )}
- </div>
- </div>
- </td>
- <td className="px-6 py-4">
- <div className="flex items-center justify-center gap-2 relative">
- <button 
- onClick={(e) => {
- e.stopPropagation();
- setOpenActionMenuId(openActionMenuId === job.id ? null : job.id);
- }}
- className="p-2 text-black hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
- title="Actions"
- >
- <MoreVertical size={16} />
- </button>
 
- {openActionMenuId === job.id && (
- <div className={`absolute right-0 ${index >= paginatedJobs.length - 2 && paginatedJobs.length > 2 ? 'bottom-full mb-1' : 'top-10 mt-1'} w-48 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in`}>
- <button 
- onClick={(e) => {
- e.stopPropagation();
- setSelectedJobForAgency(job);
- setIsSendAgencyModalOpen(true);
- setOpenActionMenuId(null);
- }}
- className="w-full px-4 py-2 text-left text-sm font-medium text-[#00A76F] hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
- >
- <Send size={14} />
- Send to Agency
- </button>
- <button 
- onClick={(e) => {
- e.stopPropagation();
- setSelectedJobToView(job);
- setIsViewJobModalOpen(true);
- setOpenActionMenuId(null);
- }}
- className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
- >
- <FileText size={14} />
- View Job
- </button>
- <button 
- onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
- className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
- >
- <Copy size={14} />
- Copy Link
- </button>
- <button 
- onClick={(e) => {
- e.stopPropagation();
- setOpenActionMenuId(null);
- navigate('/dashboard/agencies', { state: { jobData: job, tab: 'Job Setup' } });
- }}
- className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
- >
- <Edit size={14} />
- Edit Job
- </button>
- <div className="my-1 border-t border-gray-100 dark:border-gray-800/50"></div>
- <button 
- onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
- className="w-full px-4 py-2 text-left text-sm font-medium text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/10 flex items-center gap-2 transition-colors cursor-pointer"
- >
- <Trash2 size={14} />
- Delete
- </button>
- </div>
- )}
- </div>
- </td>
- </tr>
- )) : (
- <tr>
- <td colSpan="5" className="px-6 py-16 text-center">
- <div className="flex flex-col items-center justify-center">
- <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
- <Briefcase size={32} className="text-gray-400" />
- </div>
- <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-1">No jobs found</h3>
- <p className="text-black dark:text-gray-400 text-sm max-w-sm">
- We couldn't find any jobs matching your current search and filter criteria.
- </p>
- <button className="mt-4 text-[#1890FF] font-bold text-sm hover:underline" onClick={() => {setSearchQuery(''); setStatusFilter('All');}}>
- Clear filters
- </button>
- </div>
- </td>
- </tr>
- )}
- </tbody>
- </table>
- </div>
- 
- {filteredJobs.length > 0 && (
- <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800/50 flex items-center justify-between bg-gray-50 dark:bg-gray-800/10">
- <span className="text-sm text-black dark:text-gray-400 font-medium">
- Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredJobs.length)} of {filteredJobs.length} jobs
- </span>
- <div className="flex gap-1 items-center">
- <span className="text-sm text-black dark:text-gray-400 font-medium mr-2">
- Page {currentPage} of {totalPages}
- </span>
- <button 
- onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
- disabled={currentPage === 1}
- className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
- >
- Previous
- </button>
- <button 
- onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
- disabled={currentPage === totalPages}
- className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
- >
- Next
- </button>
- </div>
- </div>
- )}
- </div>
- </div>
+ {/* Jobs Display: Grid View (Default) or List / Table View */}
+{filteredJobs.length === 0 ? (
+  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 p-12 text-center shadow-xs">
+    <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+      <Briefcase size={32} className="text-gray-400" />
+    </div>
+    <h3 className="text-lg font-bold text-[#212b36] dark:text-white mb-1">No jobs found</h3>
+    <p className="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto">
+      We couldn't find any jobs matching your current search and filter criteria.
+    </p>
+    <button 
+      onClick={handleResetFilters}
+      className="mt-4 px-4 py-2 bg-[#1890FF] text-white rounded-xl text-xs font-bold hover:bg-[#096dd9] transition-colors cursor-pointer"
+    >
+      Clear all filters
+    </button>
+  </div>
+) : viewMode === 'card' ? (
+  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    {paginatedJobs.map((job, index) => {
+      const isFollowed = followedJobIds.includes(job.id);
 
- {/* Right Sidebar */}
- <div className="w-full xl:w-[320px] shrink-0 space-y-6">
- {/* Recent Activity */}
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
- <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3">Recent Activity</h3>
- <div className="space-y-3">
- {[
- { time: '2h ago', action: 'New applicant', target: 'Frontend Engineer', icon: Users, color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
- { time: '4h ago', action: 'Offer accepted', target: 'UX Researcher', icon: CheckCircle, color: 'text-[#00A76F]', bg: 'bg-[#00A76F]/10' },
- { time: '1d ago', action: 'Job published', target: 'DevOps Engineer', icon: Briefcase, color: 'text-[#8E33FF]', bg: 'bg-[#8E33FF]/10' },
- { time: '2d ago', action: 'Interview scheduled', target: 'Product Manager', icon: Calendar, color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' },
- ].map((activity, i) => (
- <div key={i} className="flex gap-2.5">
- <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${activity.bg}`}>
- <activity.icon size={12} className={activity.color} />
- </div>
- <div>
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{activity.action}</p>
- <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{activity.target} • {activity.time}</p>
- </div>
- </div>
- ))}
- </div>
- <button className="w-full mt-3 py-1.5 text-xs font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors cursor-pointer">View All Activity</button>
- </div>
+      return (
+        <div 
+          key={job.id} 
+          onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
+          className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-xs hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between group cursor-pointer relative"
+        >
+          {/* Card Top Header: Briefcase, Job Title + Status, Subtitle (Company, Location, Dept, Type, Exp), and Actions */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-blue-50/80 dark:bg-gray-800 flex items-center justify-center text-[#1890FF] shrink-0 border border-blue-100/50 dark:border-gray-700/60 shadow-xs mt-0.5">
+                <Briefcase size={18} />
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                {/* First line: Job Title + Status */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors leading-snug">
+                    {job.title}
+                  </h3>
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${getStatusColor(job.status)} inline-flex items-center gap-1 shrink-0`}>
+                    <span className="w-1 h-1 rounded-full bg-current"></span>
+                    {job.status}
+                  </span>
+                </div>
 
- {/* Upcoming Interviews */}
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
- <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3">Upcoming Interviews</h3>
- <div className="space-y-2.5">
- {[
- { candidate: 'Sarah Jenkins', role: 'UX', time: 'Today, 2:00 PM', type: 'Tech', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026024d' },
- { candidate: 'Michael Lee', role: 'Frontend', time: 'Tmrw, 10:30 AM', type: 'Culture', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }
- ].map((interview, i) => (
- <div key={i} className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
- <img src={interview.avatar} alt={interview.candidate} className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-800" />
- <div className="flex-1 min-w-0">
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white truncate">{interview.candidate}</p>
- <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{interview.role} • {interview.type}</p>
- </div>
- </div>
- ))}
- </div>
- <button className="w-full mt-3 py-1.5 text-xs font-bold text-[#1890FF] hover:bg-[#1890FF]/5 rounded-lg transition-colors cursor-pointer">View Schedule</button>
- </div>
+                {/* Subtitle Line 1: Company Name & Location */}
+                <div className="flex items-center gap-2 flex-wrap text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <span className="inline-flex items-center gap-1 font-semibold text-gray-700 dark:text-gray-200">
+                    <Building2 size={12} className="text-gray-400 shrink-0" />
+                    {job.company}
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                  <span className="flex items-center gap-1">
+                    <MapPin size={12} className="text-gray-400 shrink-0" /> {job.location}
+                  </span>
+                </div>
 
- {/* Action Items */}
- <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm p-4">
- <h3 className="text-base font-bold text-[#212b36] dark:text-white mb-3 flex items-center gap-2">
- <AlertCircle size={16} className="text-[#FF5630]" /> Needs Attention
- </h3>
- <div className="space-y-2">
- {[
- { title: 'Review candidates', desc: '5 new applicants', action: 'Review', color: 'text-[#1890FF]', bg: 'bg-[#1890FF]/10' },
- { title: 'Draft expires soon', desc: 'Expires in 2 days', action: 'Publish', color: 'text-[#FFC107]', bg: 'bg-[#FFC107]/10' }
- ].map((item, i) => (
- <div key={i} className="flex flex-col gap-1.5 p-2.5 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
- <div>
- <p className="text-[13px] font-bold text-[#212b36] dark:text-white">{item.title}</p>
- <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</p>
- </div>
- <button className={`self-start mt-0.5 px-2.5 py-1 rounded-md text-[11px] font-bold ${item.color} ${item.bg} hover:opacity-80 transition-opacity cursor-pointer`}>
- {item.action}
- </button>
- </div>
- ))}
- </div>
- </div>
- </div>
- </div>
- </div>
+                {/* Subtitle Line 2: Department, Employment Type and Experience in a single line */}
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  <span>{job.department}</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                  <span>{job.type}</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                  <span className="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded text-[11px]">
+                    <Award size={11} className="shrink-0" /> {job.experience} exp
+                  </span>
+                </div>
+              </div>
+            </div>
 
- {/* Send to Agency Modal */}
+            {/* Action Buttons: Follow Bookmark & 3-Dots Menu */}
+            <div className="flex items-center gap-1 relative shrink-0">
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleFollow(job.id);
+                }}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  isFollowed 
+                    ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40' 
+                    : 'text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+                title={isFollowed ? 'Following (click to unfollow)' : 'Follow this job'}
+              >
+                <Bookmark size={16} className={isFollowed ? 'fill-current' : ''} />
+              </button>
+
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenActionMenuId(openActionMenuId === job.id ? null : job.id);
+                }}
+                className="p-1.5 text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                title="Actions"
+              >
+                <MoreVertical size={16} />
+              </button>
+
+              {openActionMenuId === job.id && (
+                <div className="absolute right-0 top-9 w-48 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in text-left">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedJobForAgency(job);
+                      setIsSendAgencyModalOpen(true);
+                      setOpenActionMenuId(null);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-[#00A76F] hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Send size={14} /> Send to Agency
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedJobToView(job);
+                      setIsViewJobModalOpen(true);
+                      setOpenActionMenuId(null);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <FileText size={14} /> View Job
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Copy size={14} /> Copy Link
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenActionMenuId(null);
+                      navigate('/dashboard/agencies', { state: { jobData: job, tab: 'Job Setup' } });
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Edit size={14} /> Edit Job
+                  </button>
+                  <div className="my-1 border-t border-gray-100 dark:border-gray-800/50"></div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/10 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Skills (5/6 pills) */}
+          {job.skills && job.skills.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/60">
+              {job.skills.map((skill, sIdx) => (
+                <span 
+                  key={sIdx}
+                  className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60 hover:border-[#1890FF]/40 hover:text-[#1890FF] transition-colors"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Card Pipeline Bar */}
+          <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800/60">
+            <JobPipelineDisplay job={job} width="w-full" />
+          </div>
+
+          {/* Card Bottom: Stats */}
+          <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800/60 flex items-center justify-between flex-wrap gap-2 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="text-gray-500 dark:text-gray-400 font-medium">Total Application:</span>
+              <span className="font-bold text-[#212b36] dark:text-white tabular-nums">{job.applicants.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-gray-500 dark:text-gray-400 font-medium">Open:</span>
+              <span className="font-semibold text-gray-700 dark:text-gray-300 tabular-nums">{job.daysOpen} days</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-gray-500 dark:text-gray-400 font-medium">Average match:</span>
+              <span className="font-bold text-[#00A76F] dark:text-[#22c55e] tabular-nums">{job.avgMatch}</span>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+) : (
+  <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-gray-50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
+            <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 min-w-[360px]">Job Details</th>
+            <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 min-w-[330px]">Pipeline</th>
+            <th className="px-6 py-4 text-xs font-bold text-black dark:text-gray-400 min-w-[200px]">Stats</th>
+            <th className="px-6 py-4 text-center text-xs font-bold text-black dark:text-gray-400 w-24">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700/70">
+          {paginatedJobs.map((job, index) => {
+            const isFollowed = followedJobIds.includes(job.id);
+
+            return (
+              <tr 
+                key={job.id} 
+                onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
+                className="hover:bg-gray-50/80 dark:hover:bg-gray-800/30 transition-colors group cursor-pointer border-b border-gray-200 dark:border-gray-700/70 last:border-b-0"
+              >
+                <td className="px-6 py-4.5 min-w-[360px]">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50/80 dark:bg-gray-800 flex items-center justify-center text-[#1890FF] shrink-0 mt-0.5 border border-blue-100/50 dark:border-gray-700/60 shadow-xs">
+                      <Briefcase size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      {/* Line 1: Title, Company, Status */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-[#212b36] dark:text-white group-hover:text-[#1890FF] transition-colors cursor-pointer">
+                          {job.title}
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                          <Building2 size={11} className="text-gray-400" />
+                          {job.company}
+                        </span>
+
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${getStatusColor(job.status)} inline-flex items-center gap-1`}>
+                          <span className="w-1 h-1 rounded-full bg-current"></span>
+                          {job.status}
+                        </span>
+                      </div>
+
+                      {/* Line 2: Location, Dept, Type, Experience, Days open, Average match */}
+                      <div className="flex items-center gap-2 flex-wrap text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <MapPin size={12} className="text-gray-400" /> {job.location}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        <span>{job.department}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        <span>{job.type}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+
+                        {/* Experience */}
+                        <span className="inline-flex items-center gap-1 font-semibold text-gray-700 dark:text-gray-200 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded text-[11px]">
+                          <Award size={11} /> {job.experience} exp
+                        </span>
+                      </div>
+
+                      {/* Line 3: Skills (5/6 tags) */}
+                      {job.skills && job.skills.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                          {job.skills.map((skill, sIdx) => (
+                            <span 
+                              key={sIdx}
+                              className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700/60 hover:border-[#1890FF]/40 hover:text-[#1890FF] transition-colors"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                {/* Pipeline Stage Funnel Bar Column */}
+                <td className="px-6 py-4.5 whitespace-nowrap min-w-[330px]">
+                  <JobPipelineDisplay job={job} width="w-[330px]" />
+                </td>
+
+                <td className="px-6 py-4.5 whitespace-nowrap">
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium">Total Application:</span>
+                      <span className="font-bold text-[#212b36] dark:text-white tabular-nums">
+                        {job.applicants.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium">Open:</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-300 tabular-nums">
+                        {job.daysOpen} days
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium">Average match:</span>
+                      <span className="font-bold text-[#00A76F] dark:text-[#22c55e] tabular-nums">
+                        {job.avgMatch}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4.5">
+                  <div className="flex items-center justify-center gap-1.5 relative">
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleFollow(job.id);
+                      }}
+                      className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                        isFollowed 
+                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40' 
+                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                      title={isFollowed ? 'Following (click to unfollow)' : 'Follow this job'}
+                    >
+                      <Bookmark size={16} className={isFollowed ? 'fill-current' : ''} />
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenActionMenuId(openActionMenuId === job.id ? null : job.id);
+                      }}
+                      className="p-2 text-black hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                      title="Actions"
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+
+                    {openActionMenuId === job.id && (
+                      <div className={`absolute right-0 ${index >= paginatedJobs.length - 2 && paginatedJobs.length > 2 ? 'bottom-full mb-1' : 'top-10 mt-1'} w-48 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in`}>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedJobForAgency(job);
+                            setIsSendAgencyModalOpen(true);
+                            setOpenActionMenuId(null);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm font-medium text-[#00A76F] hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Send size={14} />
+                          Send to Agency
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedJobToView(job);
+                            setIsViewJobModalOpen(true);
+                            setOpenActionMenuId(null);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <FileText size={14} />
+                          View Job
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                          className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Copy size={14} />
+                          Copy Link
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenActionMenuId(null);
+                            navigate('/dashboard/agencies', { state: { jobData: job, tab: 'Job Setup' } });
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm font-medium text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Edit size={14} />
+                          Edit Job
+                        </button>
+                        <div className="my-1 border-t border-gray-100 dark:border-gray-800/50"></div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setOpenActionMenuId(null); }}
+                          className="w-full px-4 py-2 text-left text-sm font-medium text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-900/10 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+{filteredJobs.length > 0 && (
+  <div className="bg-white dark:bg-[#161c24] px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-xs flex items-center justify-between">
+    <span className="text-sm text-black dark:text-gray-400 font-medium">
+      Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredJobs.length)} of {filteredJobs.length} jobs
+    </span>
+    <div className="flex gap-1 items-center">
+      <span className="text-sm text-black dark:text-gray-400 font-medium mr-2">
+        Page {currentPage} of {totalPages}
+      </span>
+      <button 
+        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+        className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
+      >
+        Previous
+      </button>
+      <button 
+        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages}
+        className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
+      >
+        Next
+      </button>
+    </div>
+  </div>
+)}
+        </div>
+      </div>
+    </div>
+
+    {/* Send to Agency Modal */}
  {isSendAgencyModalOpen && createPortal(
  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
  <div className="bg-white dark:bg-[#212b36] rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col scale-in-center">
