@@ -40,7 +40,10 @@ export default function DashboardPage() {
  element={
  <AgencyLayout>
  <Routes>
- <Route path="notifications" element={<NotificationsPage />} />
+ <Route index element={<PlaceholderPage title="Dashboard" />} />
+                <Route path="" element={<PlaceholderPage title="Dashboard" />} />
+                <Route path="overview" element={<PlaceholderPage title="Dashboard" />} />
+                <Route path="notifications" element={<NotificationsPage />} />
  <Route path="agencies" element={<JobDashboardPage />} />
  <Route path="jobs" element={<JobsPage />} />
  <Route path="job" element={<PlaceholderPage title="Job Page" />} />

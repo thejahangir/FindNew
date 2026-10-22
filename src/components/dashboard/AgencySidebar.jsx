@@ -44,6 +44,7 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  }, [currentPath]);
 
  const sidebarLinks = [
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
  { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
  { name: 'Job Dashboard', path: '/dashboard/agencies', icon: LayoutDashboard },
  { name: 'Sourcing', path: '/dashboard/sourcing', icon: Search },
@@ -75,7 +76,9 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  const subItems = getSubItems(link.name);
  const hasSubItems = subItems !== null;
  const isExpanded = expandedMenu === link.name;
- const isActive = currentPath === link.path || (link.path !== '/dashboard/agencies' && currentPath.includes(link.path));
+ const isActive = link.path === '/dashboard'
+    ? (currentPath === '/dashboard' || currentPath === '/dashboard/')
+    : (currentPath === link.path || (link.path !== '/dashboard/agencies' && currentPath.startsWith(link.path)));
  
  const renderLinkContent = () => (
  <>
