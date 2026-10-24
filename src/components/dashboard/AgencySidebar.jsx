@@ -24,7 +24,8 @@ import {
  Star,
  FileSignature,
  Mail,
-  LayoutTemplate
+  LayoutTemplate,
+  Bookmark
 } from 'lucide-react';
 import UserMenu from './UserMenu';
 
@@ -44,11 +45,12 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  }, [currentPath]);
 
  const sidebarLinks = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Hiring Overview', path: '/dashboard', icon: LayoutDashboard },
  { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
  { name: 'Job Dashboard', path: '/dashboard/agencies', icon: LayoutDashboard },
  { name: 'Sourcing', path: '/dashboard/sourcing', icon: Search },
- { name: 'Candidates', path: '/dashboard/candidates', icon: Users },
+ { name: 'Candidate List', path: '/dashboard/candidates', icon: Users },
+ { name: 'My List', path: '/dashboard/my-lists', icon: Bookmark },
  { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },
  { name: 'Approvals', path: '/dashboard/approvals', icon: CheckSquare },
  { name: 'Interview Kits', path: '/dashboard/interview-kits', icon: ClipboardList },

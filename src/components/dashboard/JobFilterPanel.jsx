@@ -394,8 +394,11 @@ export default function JobFilterPanel({
   onResetAll,
   totalResultsCount,
   currency = '$',
-  panelHeight
+  panelHeight,
+  filterData = FILTER_DATA
 }) {
+  const activeFilterData = filterData || FILTER_DATA;
+
   // Generic multi-select toggle
   const handleToggleOption = (categoryKey, id) => {
     const currentList = selectedFilters[categoryKey] || [];
@@ -484,7 +487,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Department"
           icon={Briefcase}
-          items={FILTER_DATA.department}
+          items={activeFilterData.department || FILTER_DATA.department}
           selectedIds={selectedFilters.department || []}
           onToggle={(id) => handleToggleOption('department', id)}
           defaultExpanded={true}
@@ -496,7 +499,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Position"
           icon={Award}
-          items={FILTER_DATA.position}
+          items={activeFilterData.position || FILTER_DATA.position}
           selectedIds={selectedFilters.position || []}
           onToggle={(id) => handleToggleOption('position', id)}
           defaultExpanded={true}
@@ -508,7 +511,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Location"
           icon={MapPin}
-          items={FILTER_DATA.location}
+          items={activeFilterData.location || FILTER_DATA.location}
           selectedIds={selectedFilters.location || []}
           onToggle={(id) => handleToggleOption('location', id)}
           defaultExpanded={true}
@@ -520,7 +523,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Experience"
           icon={Clock}
-          items={FILTER_DATA.experience}
+          items={activeFilterData.experience || FILTER_DATA.experience}
           selectedIds={selectedFilters.experience || []}
           onToggle={(id) => handleToggleOption('experience', id)}
           defaultExpanded={false}
@@ -532,7 +535,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Company"
           icon={Building2}
-          items={FILTER_DATA.company}
+          items={activeFilterData.company || FILTER_DATA.company}
           selectedIds={selectedFilters.company || []}
           onToggle={(id) => handleToggleOption('company', id)}
           defaultExpanded={false}
@@ -544,7 +547,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Employment Type"
           icon={Briefcase}
-          items={FILTER_DATA.employmentType}
+          items={activeFilterData.employmentType || FILTER_DATA.employmentType}
           selectedIds={selectedFilters.employmentType || []}
           onToggle={(id) => handleToggleOption('employmentType', id)}
           defaultExpanded={false}
@@ -556,7 +559,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Work Mode"
           icon={Laptop}
-          items={FILTER_DATA.workMode}
+          items={activeFilterData.workMode || FILTER_DATA.workMode}
           selectedIds={selectedFilters.workMode || []}
           onToggle={(id) => handleToggleOption('workMode', id)}
           defaultExpanded={false}
@@ -568,7 +571,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="AI Job Health"
           icon={Sparkles}
-          items={FILTER_DATA.aiHealth}
+          items={activeFilterData.aiHealth || FILTER_DATA.aiHealth}
           selectedIds={selectedFilters.aiHealth || []}
           onToggle={(id) => handleToggleOption('aiHealth', id)}
           defaultExpanded={false}
@@ -580,7 +583,7 @@ export default function JobFilterPanel({
         <FilterCategoryItem
           title="Posted"
           icon={Calendar}
-          items={FILTER_DATA.posted}
+          items={activeFilterData.posted || FILTER_DATA.posted}
           selectedIds={selectedFilters.posted || []}
           onToggle={(id) => handleToggleOption('posted', id)}
           defaultExpanded={false}

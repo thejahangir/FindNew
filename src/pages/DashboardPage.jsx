@@ -11,6 +11,9 @@ import ApprovalsPage from './ApprovalsPage';
 import CandidateProfilePage from './CandidateProfilePage';
 import InterviewKitsPage from './InterviewKitsPage';
 import OrgTemplatesPage from './OrgTemplatesPage';
+import HiringOverviewPage from './HiringOverviewPage';
+import CandidatesPage from './CandidatesPage';
+import MyListsPage from './MyListsPage';
 
 const PlaceholderPage = ({ title }) => (
  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center min-h-[400px]">
@@ -40,9 +43,9 @@ export default function DashboardPage() {
  element={
  <AgencyLayout>
  <Routes>
- <Route index element={<PlaceholderPage title="Dashboard" />} />
-                <Route path="" element={<PlaceholderPage title="Dashboard" />} />
-                <Route path="overview" element={<PlaceholderPage title="Dashboard" />} />
+ <Route index element={<HiringOverviewPage />} />
+                <Route path="" element={<HiringOverviewPage />} />
+                <Route path="overview" element={<HiringOverviewPage />} />
                 <Route path="notifications" element={<NotificationsPage />} />
  <Route path="agencies" element={<JobDashboardPage />} />
  <Route path="jobs" element={<JobsPage />} />
@@ -52,7 +55,8 @@ export default function DashboardPage() {
  
  {/* Main Sidebar Routes */}
  <Route path="candidates/:id" element={<CandidateProfilePage />} />
- <Route path="candidates" element={<PlaceholderPage title="Candidates" />} />
+ <Route path="candidates" element={<CandidatesPage />} />
+ <Route path="my-lists" element={<MyListsPage />} />
  <Route path="sourcing" element={<PlaceholderPage title="Sourcing" />} />
  <Route path="pipeline" element={<PlaceholderPage title="Pipeline" />} />
  <Route path="approvals" element={<ApprovalsPage />} />

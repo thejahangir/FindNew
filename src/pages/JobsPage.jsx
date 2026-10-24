@@ -694,6 +694,9 @@ export default function JobsPage() {
  <div ref={rightPanelRef} className="flex-1 min-w-0 space-y-4 w-full">
  {/* Horizontal Filter Bar with Quick Parameters & Custom Sort By */}
  <JobQuickFilterBar
+ searchQuery={searchQuery}
+ onSearchChange={setSearchQuery}
+ searchPlaceholder="Search jobs, title, department, location..."
  quickFilters={quickFilters}
  onQuickFilterChange={handleQuickFilterChange}
  onClearAll={handleClearAllQuickFilters}
