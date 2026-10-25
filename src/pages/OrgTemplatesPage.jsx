@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Plus,
@@ -21,7 +22,8 @@ import {
   FileText,
   Globe,
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { useChatbot } from '../contexts/ChatbotContext';
 
@@ -485,7 +487,44 @@ export default function OrgTemplatesPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 animate-fade-in w-full min-w-0">
+    <div className="p-6 space-y-5 relative animate-fade-in w-full min-w-0 font-sans">
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">Organization Templates</span>
+      </nav>
+
+      {/* ORG TEMPLATES HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                Organization Templates
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
+                {templates.length} Prompts & Templates
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              Standardize job description structures, scorecard catalogs, and Trinity AI prompt templates.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={openAddModal}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
+            >
+              <Plus size={15} />
+              <span>New Template</span>
+            </button>
+          </div>
+        </div>
+      </div>
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl shadow-xl text-sm font-medium animate-fade-in border border-gray-700 dark:border-gray-200">
@@ -549,92 +588,7 @@ export default function OrgTemplatesPage() {
       {/* ========================================================= */}
       {activeTab === 'trinity' && (
         <div className="space-y-5 w-full">
-          {/* Header Section: Matches standard page headers */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-[#212b36] dark:text-white">
-                Trinity Templates
-              </h1>
-              <p className="text-sm text-black dark:text-gray-400 mt-1 max-w-3xl">
-                Manage your company’s prompts for Trinity. Enabled ones appear for everyone in the Trinity panel.
-              </p>
-            </div>
-
-            {/* CTA "Add New Template" */}
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={openAddModal}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1890FF] hover:bg-[#0077e6] text-white text-sm font-bold rounded-xl shadow-[0_4px_12px_rgba(24,144,255,0.24)] transition-all transform active:scale-95 cursor-pointer"
-              >
-                <Plus size={16} strokeWidth={2.5} />
-                <span>Add New Template</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Three Compact KPI Cards: Total, Enabled, Disabled */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-            {/* KPI 1: Total */}
-            <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/70 shadow-2xs hover:border-gray-200 dark:hover:border-gray-700 transition-all flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
-                <Layers size={18} />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[#212b36] dark:text-white leading-none">
-                    {totalCount}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Total
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                  All prompt templates in library
-                </p>
-              </div>
-            </div>
-
-            {/* KPI 2: Enabled */}
-            <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/70 shadow-2xs hover:border-gray-200 dark:hover:border-gray-700 transition-all flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-lg bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[#1890FF] leading-none">
-                    {enabledCount}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#1890FF]">
-                    Enabled
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                  Active & visible in Trinity panel
-                </p>
-              </div>
-            </div>
-
-            {/* KPI 3: Disabled */}
-            <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-[#161c24] border border-gray-100 dark:border-gray-800/70 shadow-2xs hover:border-gray-200 dark:hover:border-gray-700 transition-all flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center shrink-0">
-                <XCircle size={18} />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[#212b36] dark:text-white leading-none">
-                    {disabledCount}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Disabled
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                  Hidden from Trinity panel
-                </p>
-              </div>
-            </div>
-          </div>
+          
 
           {/* ========================================================= */}
           {/* CONTROLS BAR: SEARCH, AREA DROPDOWN, CATEGORY DROPDOWN, VIEW TOGGLE */}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Bookmark,
@@ -32,8 +32,15 @@ import {
   UserPlus,
   UserMinus,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  SquareMinus,
+  ChevronUp,
+  ChevronDown,
+  ListPlus
 } from 'lucide-react';
+import CustomCheckbox from '../components/ui/CustomCheckbox';
+import SearchableSelect from '../components/ui/SearchableSelect';
+import { useChatbot } from '../contexts/ChatbotContext';
 import {
   CANDIDATES_POOL,
   INITIAL_LISTS,
@@ -41,8 +48,19 @@ import {
   saveStoredLists
 } from '../data/candidateListsData';
 
+const CATEGORY_OPTIONS = [
+  { value: 'Engineering', label: 'Engineering' },
+  { value: 'Leadership', label: 'Leadership & Architecture' },
+  { value: 'Design & UX', label: 'Design & UX' },
+  { value: 'Fast-Track', label: 'Fast-Track Hiring' },
+  { value: 'Executive', label: 'Executive / VP' },
+  { value: 'Marketing', label: 'Growth & Marketing' },
+  { value: 'General', label: 'General Talent Pool' }
+];
+
 export default function MyListsPage() {
   const navigate = useNavigate();
+  const { compareCandidates } = useChatbot();
 
   // -------------------------------------------------------------
   // 1. STATE & PERSISTENCE
@@ -76,49 +94,135 @@ export default function MyListsPage() {
   // -------------------------------------------------------------
   // Left Panel: Filter Lists
   const [searchListQuery, setSearchListQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  // Categories list
-  const categories = useMemo(() => {
-    const set = new Set();
-    lists.forEach(l => {
-      if (l.category) set.add(l.category);
-    });
-    return ['All', ...Array.from(set)];
-  }, [lists]);
 
   const filteredLists = useMemo(() => {
     return lists.filter(list => {
-      const matchesSearch =
-        list.name.toLowerCase().includes(searchListQuery.toLowerCase()) ||
-        (list.description && list.description.toLowerCase().includes(searchListQuery.toLowerCase())) ||
-        (list.tags && list.tags.some(t => t.toLowerCase().includes(searchListQuery.toLowerCase())));
-      const matchesCategory = selectedCategory === 'All' || list.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+      if (!searchListQuery.trim()) return true;
+      const q = searchListQuery.toLowerCase();
+      return (
+        list.name.toLowerCase().includes(q) ||
+        (list.description && list.description.toLowerCase().includes(q)) ||
+        (list.tags && list.tags.some(t => t.toLowerCase().includes(q)))
+      );
     });
-  }, [lists, searchListQuery, selectedCategory]);
+  }, [lists, searchListQuery]);
 
-  // Right Panel: Filter Candidates within active list
+  // Right Panel: Column Visibility State matching Candidate List page
+  const DEFAULT_COLUMN_VISIBILITY = useMemo(() => ({
+    candidate: true,
+    role: true,
+    location: false,
+    experience: true,
+    noticePeriod: false,
+    status: false,
+    applied: false,
+    matchScore: false,
+    stage: true,
+    source: false,
+    updated: false,
+    action: true
+  }), []);
+
+  const columnOptions = [
+    { key: 'candidate', label: 'Candidate', description: 'Name, avatar & email', required: true },
+    { key: 'role', label: 'Role Applied', description: 'Role & department' },
+    { key: 'experience', label: 'Experience & Company', description: 'Company & tenure' },
+    { key: 'applied', label: 'Applied', description: 'Application date' },
+    { key: 'stage', label: 'Pipeline Stage', description: 'Interview & hiring stage' },
+    { key: 'source', label: 'Source', description: 'Source channel / agency' },
+    { key: 'updated', label: 'Profile Updated', description: 'Last profile activity' },
+    { key: 'location', label: 'Location', description: 'City & location' },
+    { key: 'noticePeriod', label: 'Notice Period', description: 'Availability timeframe' },
+    { key: 'status', label: 'Status', description: 'Active / Offer / On Hold' },
+    { key: 'matchScore', label: 'Match Score', description: 'AI candidate match score' }
+  ];
+
+  const [columnVisibility, setColumnVisibility] = useState(DEFAULT_COLUMN_VISIBILITY);
+  const [isColumnPickerOpen, setIsColumnPickerOpen] = useState(false);
+  const columnPickerRef = useRef(null);
+
+  // Close column picker on outside click
+  useEffect(() => {
+    const handleClickOutsidePicker = (e) => {
+      if (columnPickerRef.current && !columnPickerRef.current.contains(e.target)) {
+        setIsColumnPickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsidePicker);
+    return () => document.removeEventListener('mousedown', handleClickOutsidePicker);
+  }, []);
+
+  // Candidate Search & View Mode
   const [searchCandidateQuery, setSearchCandidateQuery] = useState('');
-  const [selectedStageFilter, setSelectedStageFilter] = useState('All');
-  const [selectedNoticeFilter, setSelectedNoticeFilter] = useState('All');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
 
   const filteredCandidates = useMemo(() => {
     return activeCandidates.filter(candidate => {
+      if (!searchCandidateQuery.trim()) return true;
       const q = searchCandidateQuery.toLowerCase();
-      const matchesSearch =
+      return (
         candidate.name.toLowerCase().includes(q) ||
         candidate.role.toLowerCase().includes(q) ||
         candidate.company.toLowerCase().includes(q) ||
-        (candidate.skills && candidate.skills.some(s => s.toLowerCase().includes(q)));
-
-      const matchesStage = selectedStageFilter === 'All' || candidate.stage === selectedStageFilter;
-      const matchesNotice = selectedNoticeFilter === 'All' || candidate.noticePeriod === selectedNoticeFilter;
-
-      return matchesSearch && matchesStage && matchesNotice;
+        (candidate.email && candidate.email.toLowerCase().includes(q)) ||
+        (candidate.location && candidate.location.toLowerCase().includes(q)) ||
+        (candidate.skills && candidate.skills.some(s => s.toLowerCase().includes(q)))
+      );
     });
-  }, [activeCandidates, searchCandidateQuery, selectedStageFilter, selectedNoticeFilter]);
+  }, [activeCandidates, searchCandidateQuery]);
+
+  // Candidate selection & bulk actions lifecycle
+  const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
+  const [isPanelDismissed, setIsPanelDismissed] = useState(false);
+  const [isActionPanelMounted, setIsActionPanelMounted] = useState(false);
+  const [isActionPanelVisible, setIsActionPanelVisible] = useState(false);
+  const [lastSelectedCount, setLastSelectedCount] = useState(0);
+
+  // Reset selection when switching active list
+  useEffect(() => {
+    setSelectedCandidateIds([]);
+    setIsPanelDismissed(false);
+  }, [selectedListId]);
+
+  useEffect(() => {
+    let timer;
+    if (selectedCandidateIds.length > 0) {
+      setLastSelectedCount(selectedCandidateIds.length);
+      setIsActionPanelMounted(true);
+      const animFrame = requestAnimationFrame(() => {
+        setIsActionPanelVisible(true);
+      });
+      return () => cancelAnimationFrame(animFrame);
+    } else {
+      setIsActionPanelVisible(false);
+      timer = setTimeout(() => {
+        setIsActionPanelMounted(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedCandidateIds.length > 0]);
+
+  const displayCount = selectedCandidateIds.length > 0 ? selectedCandidateIds.length : lastSelectedCount;
+
+  const isAllSelected = filteredCandidates.length > 0 && filteredCandidates.every(c => selectedCandidateIds.includes(c.id));
+  const isIndeterminate = filteredCandidates.some(c => selectedCandidateIds.includes(c.id)) && !isAllSelected;
+
+  const toggleSelectAll = () => {
+    setIsPanelDismissed(false);
+    if (isAllSelected) {
+      setSelectedCandidateIds(prev => prev.filter(id => !filteredCandidates.some(c => c.id === id)));
+    } else {
+      const pageIds = filteredCandidates.map(c => c.id);
+      setSelectedCandidateIds(prev => Array.from(new Set([...prev, ...pageIds])));
+    }
+  };
+
+  const toggleSelectCandidate = (id) => {
+    setIsPanelDismissed(false);
+    setSelectedCandidateIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   // -------------------------------------------------------------
   // 3. TOAST NOTIFICATIONS
@@ -166,6 +270,12 @@ export default function MyListsPage() {
   const [selectedCandidatePoolIds, setSelectedCandidatePoolIds] = useState([]);
   const [poolSearchQuery, setPoolSearchQuery] = useState('');
   const [poolStageFilter, setPoolStageFilter] = useState('All');
+
+  // Add Selected Candidates to Another List Modal
+  const [isAddAnotherListModalOpen, setIsAddAnotherListModalOpen] = useState(false);
+  const [targetBatchListId, setTargetBatchListId] = useState('');
+  const [isCreatingNewBatchList, setIsCreatingNewBatchList] = useState(false);
+  const [newBatchListName, setNewBatchListName] = useState('');
 
   // Quick View Modal
   const [quickViewCandidate, setQuickViewCandidate] = useState(null);
@@ -286,6 +396,92 @@ export default function MyListsPage() {
     showToast(`Removed ${candidateName} from "${activeList.name}"`);
   };
 
+  // Remove Selected Candidates from List
+  const handleRemoveSelectedCandidatesFromList = () => {
+    if (!activeList || selectedCandidateIds.length === 0) return;
+    const count = selectedCandidateIds.length;
+    setLists(prev =>
+      prev.map(l => {
+        if (l.id === activeList.id) {
+          return {
+            ...l,
+            candidateIds: l.candidateIds.filter(id => !selectedCandidateIds.includes(id)),
+            updatedAt: 'Just now'
+          };
+        }
+        return l;
+      })
+    );
+    setSelectedCandidateIds([]);
+    showToast(`Removed ${count} candidate${count > 1 ? 's' : ''} from "${activeList.name}"`);
+  };
+
+  // Add Selected Candidates to Another List
+  const handleConfirmAddSelectedToAnotherList = (e) => {
+    e.preventDefault();
+    if (selectedCandidateIds.length === 0) return;
+
+    if (isCreatingNewBatchList) {
+      if (!newBatchListName.trim()) {
+        showToast('Please enter a list name');
+        return;
+      }
+      const newList = {
+        id: `list-${Date.now()}`,
+        name: newBatchListName.trim(),
+        description: 'Created from bulk candidate selection.',
+        category: 'General',
+        tags: ['Talent Pool'],
+        color: '#1890FF',
+        candidateIds: [...selectedCandidateIds],
+        createdAt: 'Just now',
+        updatedAt: 'Just now'
+      };
+      setLists(prev => [newList, ...prev]);
+      showToast(`Created "${newList.name}" and added ${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`);
+    } else {
+      if (!targetBatchListId) {
+        showToast('Please select a candidate list');
+        return;
+      }
+      const targetListObj = lists.find(l => l.id === targetBatchListId);
+      if (!targetListObj) return;
+
+      setLists(prev =>
+        prev.map(l => {
+          if (l.id === targetBatchListId) {
+            const currentIds = new Set(l.candidateIds || []);
+            selectedCandidateIds.forEach(id => currentIds.add(id));
+            return {
+              ...l,
+              candidateIds: Array.from(currentIds),
+              updatedAt: 'Just now'
+            };
+          }
+          return l;
+        })
+      );
+      showToast(`Added ${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''} to "${targetListObj.name}"`);
+    }
+
+    setIsAddAnotherListModalOpen(false);
+    setTargetBatchListId('');
+    setIsCreatingNewBatchList(false);
+    setNewBatchListName('');
+    setSelectedCandidateIds([]);
+  };
+
+  // Compare candidates with AI
+  const handleCompareWithAI = () => {
+    const selectedObjs = activeCandidates.filter(c => selectedCandidateIds.includes(c.id));
+    if (selectedObjs.length < 2) {
+      showToast('Select at least 2 candidates to compare');
+      return;
+    }
+    compareCandidates(selectedObjs);
+    showToast(`Comparing ${selectedObjs.length} candidates in FindNeo AI Assistant`);
+  };
+
   // Available Candidates to Add (those in CANDIDATES_POOL not yet in this list)
   const availablePoolCandidates = useMemo(() => {
     if (!activeList) return [];
@@ -372,14 +568,72 @@ export default function MyListsPage() {
     }
   };
 
-  const getNoticeBadgeStyle = (notice) => {
-    if (notice === 'Immediate') {
-      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+  const getNoticePeriodBadgeStyle = (notice) => {
+    switch (notice) {
+      case 'Immediate':
+        return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/60';
+      case '15 Days':
+        return 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400 border-sky-200/80 dark:border-sky-800/60';
+      case '30 Days':
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
+      case '60 Days':
+      case '90 Days':
+        return 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/60';
+      default:
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
     }
-    if (notice === '15 Days') {
-      return 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800';
+  };
+
+  const getScoreBadge = (numeric) => {
+    if (numeric >= 9.0) {
+      return {
+        badge: 'bg-[#00A76F]/10 text-[#00A76F] border border-[#00A76F]/30',
+        dot: 'bg-[#00A76F]',
+        label: 'Top Match'
+      };
     }
-    return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700';
+    if (numeric >= 8.0) {
+      return {
+        badge: 'bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/30',
+        dot: 'bg-[#1890FF]',
+        label: 'Strong'
+      };
+    }
+    return {
+      badge: 'bg-[#FFAB00]/10 text-[#b78103] dark:text-[#FFAB00] border border-[#FFAB00]/30',
+      dot: 'bg-[#FFAB00]',
+      label: 'Moderate'
+    };
+  };
+
+  const getStatusBadgeStyle = (status) => {
+    switch (status) {
+      case 'Active':
+        return {
+          badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
+          dot: 'bg-emerald-500'
+        };
+      case 'Offer Pending':
+        return {
+          badge: 'bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400 border-teal-200 dark:border-teal-900/50',
+          dot: 'bg-teal-500'
+        };
+      case 'Needs Review':
+        return {
+          badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border-blue-200 dark:border-blue-900/50',
+          dot: 'bg-blue-500'
+        };
+      case 'Hired':
+        return {
+          badge: 'bg-green-600/10 text-green-700 dark:text-green-300 border-green-600/30',
+          dot: 'bg-green-600'
+        };
+      default:
+        return {
+          badge: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+          dot: 'bg-gray-400'
+        };
+    }
   };
 
   // Color options for list themes
@@ -414,7 +668,7 @@ export default function MyListsPage() {
   // 8. RENDER VIEW
   // -------------------------------------------------------------
   return (
-    <div className="p-6 space-y-6 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in font-sans">
+    <div className="p-6 space-y-5 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in font-sans">
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (
@@ -424,45 +678,45 @@ export default function MyListsPage() {
         </div>
       )}
 
-      {/* ============================================================== */}
-      {/* 1. TOP HEADER & KPI STATS BANNER                               */}
-      {/* ============================================================== */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-gray-100 dark:border-gray-800/60">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
-            <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors">Dashboard</Link>
-            <ChevronRight size={12} />
-            <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors">Candidates</Link>
-            <ChevronRight size={12} />
-            <span className="text-[#212b36] dark:text-white font-semibold">My List</span>
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Candidates
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">My Candidate Lists</span>
+      </nav>
+
+      {/* MY LISTS HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                My Candidate Lists
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
+                {lists.length} Lists
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#212b36] dark:text-white flex items-center gap-2.5">
-            <span>My Candidate Lists</span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1890FF]/10 text-[#1890FF] border border-[#1890FF]/20">
-              {lists.length} Lists
-            </span>
-          </h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 font-medium mt-1 max-w-3xl">
-            Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <Link
-            to="/dashboard/candidates"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs"
-          >
-            <Users size={14} className="text-gray-500" />
-            <span>Browse All Candidates</span>
-          </Link>
-
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer"
-          >
-            <Plus size={14} />
-            <span>Create New List</span>
-          </button>
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
+            >
+              <Plus size={15} />
+              <span>Create New List</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -517,81 +771,63 @@ export default function MyListsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
         {/* ------------------------------------------------------------ */}
-        {/* LEFT COLUMN: LIST OF LISTS RECRUITER HAS CREATED (4 COLS)     */}
+        {/* LEFT COLUMN: LIST OF LISTS RECRUITER HAS CREATED (3 COLS)     */}
         {/* ------------------------------------------------------------ */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-xs flex flex-col overflow-hidden">
+        <div className="lg:col-span-3 bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-xs flex flex-col overflow-hidden">
 
           {/* Left Header */}
-          <div className="p-4 border-b border-gray-100 dark:border-gray-800/80 space-y-3">
+          <div className="p-3.5 border-b border-gray-100 dark:border-gray-800/80 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bookmark size={18} className="text-[#1890FF]" />
-                <h2 className="text-base font-bold text-[#212b36] dark:text-white">
+                <Bookmark size={16} className="text-[#1890FF]" />
+                <h2 className="text-sm font-bold text-[#212b36] dark:text-white">
                   Recruiter Lists
                 </h2>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                   {filteredLists.length}
                 </span>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
                 title="Create a new candidate list"
-                className="p-1.5 rounded-lg text-[#1890FF] hover:bg-[#1890FF]/10 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-[#1890FF] hover:bg-[#1890FF]/10 transition-colors cursor-pointer"
               >
-                <Plus size={18} />
+                <Plus size={16} />
               </button>
             </div>
 
             {/* Search Lists */}
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search lists, tags, notes..."
                 value={searchListQuery}
                 onChange={(e) => setSearchListQuery(e.target.value)}
-                className="w-full pl-8.5 pr-8 py-2 text-xs bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/80 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white transition-colors"
+                className="w-full pl-8 pr-7 py-1.5 text-xs bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/80 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white transition-colors"
               />
               {searchListQuery && (
                 <button
                   onClick={() => setSearchListQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
                 >
-                  <X size={13} />
+                  <X size={12} />
                 </button>
               )}
             </div>
-
-            {/* Category Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-[#1890FF] text-white shadow-2xs'
-                      : 'bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
           </div>
 
-          {/* List Cards Container */}
-          <div className="p-3 space-y-2.5 max-h-[720px] overflow-y-auto custom-scrollbar">
+          {/* List Cards Container - Compact cards for maximum visibility */}
+          <div className="p-2 space-y-1.5 max-h-[720px] overflow-y-auto custom-scrollbar">
             {filteredLists.length === 0 ? (
-              <div className="p-8 text-center">
-                <Bookmark size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
-                <p className="text-sm font-bold text-gray-600 dark:text-gray-300">No lists found</p>
-                <p className="text-xs text-gray-400 mt-1">Try adjusting your search query or category filter</p>
+              <div className="p-6 text-center">
+                <Bookmark size={28} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+                <p className="text-xs font-bold text-gray-600 dark:text-gray-300">No lists found</p>
                 <button
-                  onClick={() => { setSearchListQuery(''); setSelectedCategory('All'); }}
-                  className="mt-3 text-xs font-bold text-[#1890FF] hover:underline"
+                  onClick={() => setSearchListQuery('')}
+                  className="mt-2 text-xs font-bold text-[#1890FF] hover:underline"
                 >
-                  Reset filters
+                  Clear search
                 </button>
               </div>
             ) : (
@@ -603,114 +839,90 @@ export default function MyListsPage() {
                   <div
                     key={list.id}
                     onClick={() => setSelectedListId(list.id)}
-                    className={`group relative p-3.5 rounded-xl border transition-all cursor-pointer ${
+                    className={`group relative p-2.5 px-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#1890FF] shadow-sm'
-                        : 'bg-white dark:bg-[#161c24] border-gray-100 dark:border-gray-800/90 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
+                        ? 'bg-[#1890FF]/10 dark:bg-[#1890FF]/15 border-[#1890FF]/40 shadow-2xs'
+                        : 'bg-white dark:bg-[#161c24] border-gray-100 dark:border-gray-800/80 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-800/40'
                     }`}
                   >
-                    {/* Active Left Indicator Bar */}
-                    {isSelected && (
-                      <div className="absolute left-0 top-3 bottom-3 w-1 bg-[#1890FF] rounded-r-full" />
-                    )}
-
-                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <div className="flex items-center justify-between gap-2 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
                         <span
                           className="w-2.5 h-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: list.color || '#1890FF' }}
                         />
-                        <h3 className={`text-sm font-bold truncate ${
-                          isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white'
+                        <h3 className={`text-xs sm:text-[13px] font-bold truncate ${
+                          isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover:text-[#1890FF]'
                         }`}>
                           {list.name}
                         </h3>
                       </div>
 
-                      {/* Candidate count badge */}
-                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${
-                        isSelected
-                          ? 'bg-[#1890FF] text-white'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
-                      }`}>
-                        {candidateCount} {candidateCount === 1 ? 'candidate' : 'candidates'}
-                      </span>
-                    </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Quick Edit/Delete buttons on hover */}
+                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenEditModal(list);
+                            }}
+                            title="Edit List"
+                            className="p-1 text-gray-400 hover:text-[#1890FF] hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded-md transition-colors cursor-pointer"
+                          >
+                            <Edit3 size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteListModal({
+                                isOpen: true,
+                                listId: list.id,
+                                listName: list.name
+                              });
+                            }}
+                            title="Delete List"
+                            className="p-1 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
 
-                    {/* Description preview */}
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed mb-2.5 font-normal">
-                      {list.description || 'No description added.'}
-                    </p>
-
-                    {/* Tags & Meta Row */}
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-800/60 text-[11px]">
-                      <div className="flex items-center gap-1.5 overflow-hidden">
-                        <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800/70 text-gray-500 dark:text-gray-400 font-semibold truncate max-w-[120px]">
-                          {list.category || 'General'}
-                        </span>
-                        <span className="text-gray-400">•</span>
-                        <span className="text-gray-400 font-medium truncate">
-                          {list.updatedAt || 'Recent'}
+                        {/* Candidate count badge */}
+                        <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold shrink-0 ${
+                          isSelected
+                            ? 'bg-[#1890FF] text-white shadow-2xs'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {candidateCount}
                         </span>
                       </div>
-
-                      {/* Quick Edit/Delete buttons on hover/select */}
-                      <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenEditModal(list);
-                          }}
-                          title="Edit List"
-                          className="p-1 text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors cursor-pointer"
-                        >
-                          <Edit3 size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteListModal({
-                              isOpen: true,
-                              listId: list.id,
-                              listName: list.name
-                            });
-                          }}
-                          title="Delete List"
-                          className="p-1 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
                     </div>
+
+                    {list.description && (
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-1 pl-4.5 font-normal">
+                        {list.description}
+                      </p>
+                    )}
                   </div>
                 );
               })
             )}
-
-            {/* Bottom Create Button inside Card */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="w-full mt-2 py-2.5 px-3 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-[#1890FF] hover:border-[#1890FF] dark:hover:border-[#1890FF] hover:bg-[#1890FF]/5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <FolderPlus size={15} />
-              <span>Create Another List</span>
-            </button>
           </div>
 
         </div>
 
         {/* ------------------------------------------------------------ */}
-        {/* RIGHT COLUMN: SHOWING CANDIDATES LISTED FOR PARTICULAR LIST  */}
+        {/* RIGHT COLUMN: SHOWING CANDIDATES LISTED FOR PARTICULAR LIST (9 COLS) */}
         {/* ------------------------------------------------------------ */}
-        <div className="lg:col-span-8 space-y-4">
+        <div className="lg:col-span-9 space-y-4">
 
           {activeList ? (
-            <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-xs overflow-hidden">
+            <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 shadow-xs relative min-h-[440px]">
 
               {/* ACTIVE LIST BANNER HEADER */}
-              <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800/80 bg-gradient-to-r from-gray-50/80 via-white to-white dark:from-gray-900/40 dark:via-[#161c24] dark:to-[#161c24]">
+              <div className="p-5 sm:p-6 rounded-t-2xl border-b border-gray-100 dark:border-gray-800/80 bg-gradient-to-r from-gray-50/80 via-white to-white dark:from-gray-900/40 dark:via-[#161c24] dark:to-[#161c24]">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -721,11 +933,6 @@ export default function MyListsPage() {
                       <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1890FF]/10 text-[#1890FF]">
                         {activeList.category || 'Recruiter Talent Pool'}
                       </span>
-                      {activeList.tags && activeList.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                          #{tag}
-                        </span>
-                      ))}
                     </div>
 
                     <h2 className="text-xl sm:text-2xl font-bold text-[#212b36] dark:text-white flex items-center gap-2">
@@ -773,99 +980,38 @@ export default function MyListsPage() {
                     </button>
                   </div>
                 </div>
-
-                {/* Quick Stage Breakdown Pills */}
-                {activeCandidates.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/60 flex items-center gap-2 flex-wrap text-xs">
-                    <span className="text-gray-400 font-semibold mr-1">Stage distribution:</span>
-                    {Array.from(new Set(activeCandidates.map(c => c.stage))).map(stg => {
-                      const count = activeCandidates.filter(c => c.stage === stg).length;
-                      return (
-                        <button
-                          key={stg}
-                          onClick={() => setSelectedStageFilter(selectedStageFilter === stg ? 'All' : stg)}
-                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                            selectedStageFilter === stg
-                              ? 'bg-[#1890FF] text-white border-[#1890FF] shadow-2xs'
-                              : `${getStageBadgeStyle(stg)} hover:opacity-80`
-                          }`}
-                        >
-                          {stg}: <span className="underline ml-0.5">{count}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
 
-              {/* SEARCH & FILTERS BAR FOR ACTIVE LIST */}
-              <div className="p-4 border-b border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#161c24] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 flex-1 flex-wrap">
-                  {/* Search Candidate */}
-                  <div className="relative flex-1 min-w-[200px] max-w-sm">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Filter by candidate, role, skills..."
-                      value={searchCandidateQuery}
-                      onChange={(e) => setSearchCandidateQuery(e.target.value)}
-                      className="w-full pl-8.5 pr-8 py-2 text-xs bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white"
-                    />
-                    {searchCandidateQuery && (
-                      <button
-                        onClick={() => setSearchCandidateQuery('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                      >
-                        <X size={13} />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Stage Filter */}
-                  <select
-                    value={selectedStageFilter}
-                    onChange={(e) => setSelectedStageFilter(e.target.value)}
-                    className="px-3 py-2 text-xs font-semibold bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white cursor-pointer"
-                  >
-                    <option value="All">All Pipeline Stages</option>
-                    {stageOptions.map(stage => (
-                      <option key={stage} value={stage}>{stage}</option>
-                    ))}
-                  </select>
-
-                  {/* Notice Period Filter */}
-                  <select
-                    value={selectedNoticeFilter}
-                    onChange={(e) => setSelectedNoticeFilter(e.target.value)}
-                    className="px-3 py-2 text-xs font-semibold bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white cursor-pointer"
-                  >
-                    <option value="All">All Notice Periods</option>
-                    <option value="Immediate">Immediate</option>
-                    <option value="15 Days">&lt;= 15 Days</option>
-                    <option value="30 Days">30 Days</option>
-                    <option value="60 Days">60+ Days</option>
-                  </select>
-
-                  {(searchCandidateQuery || selectedStageFilter !== 'All' || selectedNoticeFilter !== 'All') && (
+              {/* SEARCH & CONTROLS BAR (No Horizontal Filter Panel, with Search, Columns, Grid/Card View) */}
+              <div className="p-3.5 sm:p-4 border-b border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#161c24] flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-20">
+                {/* Search */}
+                <div className="relative flex-1 min-w-[200px] max-w-md">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search candidates, skills, role, company..."
+                    value={searchCandidateQuery}
+                    onChange={(e) => setSearchCandidateQuery(e.target.value)}
+                    className="w-full pl-8.5 pr-8 py-2 text-xs bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-[#212b36] dark:text-white transition-colors"
+                  />
+                  {searchCandidateQuery && (
                     <button
-                      onClick={() => {
-                        setSearchCandidateQuery('');
-                        setSelectedStageFilter('All');
-                        setSelectedNoticeFilter('All');
-                      }}
-                      className="text-xs font-bold text-[#1890FF] hover:underline cursor-pointer"
+                      onClick={() => setSearchCandidateQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
                     >
-                      Clear
+                      <X size={13} />
                     </button>
                   )}
                 </div>
 
-                {/* View Mode Toggle */}
-                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
-                  <span className="text-xs font-semibold text-gray-400 mr-1">
+                {/* Right controls: Results count, View mode toggle, Columns popover */}
+                <div className="flex items-center gap-2.5 shrink-0 flex-wrap justify-between sm:justify-end">
+                  <span className="text-xs font-semibold text-gray-400 hidden md:inline">
                     Showing {filteredCandidates.length} of {activeCandidates.length}
                   </span>
-                  <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+
+                  {/* View Mode Toggle: Table / Grid */}
+                  <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
                     <button
                       onClick={() => setViewMode('table')}
                       title="Table View"
@@ -888,6 +1034,77 @@ export default function MyListsPage() {
                     >
                       <LayoutGrid size={14} />
                     </button>
+                  </div>
+
+                  {/* Columns Picker Popover (After Grid/Card View Icon) */}
+                  <div ref={columnPickerRef} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsColumnPickerOpen(prev => !prev)}
+                      title="Customize Columns"
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer h-[34px] ${
+                        isColumnPickerOpen
+                          ? 'bg-[#1890FF]/10 text-[#1890FF] border-[#1890FF]/30 font-bold'
+                          : 'bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:text-[#1890FF] hover:border-[#1890FF]/40'
+                      }`}
+                    >
+                      <SlidersHorizontal size={13} />
+                      <span className="hidden sm:inline">Columns</span>
+                    </button>
+
+                    {/* Column Visibility Popover */}
+                    {isColumnPickerOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 z-[150] animate-fade-in text-left">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-xs font-bold text-[#212b36] dark:text-white uppercase tracking-wider">
+                            Table Columns
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setColumnVisibility(DEFAULT_COLUMN_VISIBILITY)}
+                            className="text-[11px] font-semibold text-[#1890FF] hover:underline cursor-pointer"
+                          >
+                            Reset Defaults
+                          </button>
+                        </div>
+
+                        <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                          {columnOptions.map((col) => {
+                            const isChecked = !!columnVisibility[col.key];
+                            return (
+                              <label
+                                key={col.key}
+                                className={`flex items-center justify-between p-1.5 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors select-none ${
+                                  col.required ? 'opacity-60 cursor-not-allowed' : ''
+                                }`}
+                              >
+                                <div className="min-w-0 pr-2">
+                                  <span className="font-semibold text-[#212b36] dark:text-gray-200 block truncate">
+                                    {col.label}
+                                  </span>
+                                  <span className="text-[10px] text-gray-400 block truncate">
+                                    {col.description}
+                                  </span>
+                                </div>
+                                <CustomCheckbox
+                                  checked={isChecked}
+                                  disabled={col.required}
+                                  size="sm"
+                                  onChange={(e) => {
+                                    if (col.required) return;
+                                    setColumnVisibility(prev => ({
+                                      ...prev,
+                                      [col.key]: e.target.checked
+                                    }));
+                                  }}
+                                  aria-label={`Toggle ${col.label} column`}
+                                />
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -928,234 +1145,381 @@ export default function MyListsPage() {
                 <div className="p-12 text-center space-y-3">
                   <Search size={32} className="mx-auto text-gray-300 dark:text-gray-600" />
                   <p className="text-base font-bold text-gray-700 dark:text-gray-200">
-                    No candidates match your filters
+                    No candidates match your search
                   </p>
                   <p className="text-xs text-gray-400">
-                    Try searching for different keywords, stage, or notice period.
+                    Try searching for different keywords or clear the search query.
                   </p>
                   <button
-                    onClick={() => {
-                      setSearchCandidateQuery('');
-                      setSelectedStageFilter('All');
-                      setSelectedNoticeFilter('All');
-                    }}
+                    onClick={() => setSearchCandidateQuery('')}
                     className="text-xs font-bold text-[#1890FF] hover:underline pt-1 cursor-pointer"
                   >
-                    Reset Candidate Filters
+                    Clear Search
                   </button>
                 </div>
               ) : viewMode === 'table' ? (
-                /* TABLE VIEW OF CANDIDATES */
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/75 dark:bg-gray-800/40 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px]">
-                        <th className="py-3 px-4">Candidate</th>
-                        <th className="py-3 px-4">Role Applied</th>
-                        <th className="py-3 px-4">Experience & Company</th>
-                        <th className="py-3 px-4">Pipeline Stage</th>
-                        <th className="py-3 px-4">Notice Period</th>
-                        <th className="py-3 px-4">Source</th>
-                        <th className="py-3 px-4 text-right">Actions</th>
+                /* TABLE VIEW OF CANDIDATES (Same as Candidate List page) */
+                <div className="overflow-x-auto rounded-b-2xl">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-gray-50/80 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase font-bold text-[11px] border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
+                      <tr>
+                        <th className="p-3.5 pl-5 w-10">
+                          <CustomCheckbox
+                            checked={isAllSelected}
+                            indeterminate={isIndeterminate}
+                            onChange={toggleSelectAll}
+                            aria-label="Select all candidates"
+                          />
+                        </th>
+                        {columnVisibility.candidate && (
+                          <th className="p-3.5 min-w-[210px]">Candidate</th>
+                        )}
+                        {columnVisibility.role && (
+                          <th className="p-3.5 min-w-[170px]">Role Applied</th>
+                        )}
+                        {columnVisibility.location && (
+                          <th className="p-3.5 min-w-[140px]">Location</th>
+                        )}
+                        {columnVisibility.experience && (
+                          <th className="p-3.5 min-w-[170px]">Experience & Company</th>
+                        )}
+                        {columnVisibility.noticePeriod && (
+                          <th className="p-3.5 min-w-[120px]">Notice Period</th>
+                        )}
+                        {columnVisibility.status && (
+                          <th className="p-3.5 min-w-[120px]">Status</th>
+                        )}
+                        {columnVisibility.applied && (
+                          <th className="p-3.5 min-w-[100px]">Applied</th>
+                        )}
+                        {columnVisibility.matchScore && (
+                          <th className="p-3.5 min-w-[110px] text-center">Match Score</th>
+                        )}
+                        {columnVisibility.stage && (
+                          <th className="p-3.5 min-w-[150px]">Pipeline Stage</th>
+                        )}
+                        {columnVisibility.source && (
+                          <th className="p-3.5 min-w-[140px]">Source</th>
+                        )}
+                        {columnVisibility.updated && (
+                          <th className="p-3.5 min-w-[120px]">Profile Updated</th>
+                        )}
+                        {columnVisibility.action && (
+                          <th className="p-3.5 pr-5 min-w-[100px] text-right sticky right-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)]">
+                            Action
+                          </th>
+                        )}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
-                      {filteredCandidates.map((candidate) => (
-                        <tr
-                          key={candidate.id}
-                          className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition-colors group"
-                        >
-                          {/* Candidate Name & Avatar */}
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#1890FF] to-[#8E33FF] text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">
-                                {candidate.name.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <div className="min-w-0">
-                                <Link
-                                  to={`/dashboard/candidates/${candidate.id}`}
-                                  className="font-bold text-[#212b36] dark:text-white hover:text-[#1890FF] dark:hover:text-[#1890FF] transition-colors block truncate"
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs whitespace-nowrap">
+                      {filteredCandidates.map((cand) => {
+                        const isChecked = selectedCandidateIds.includes(cand.id);
+                        const scoreConfig = getScoreBadge(cand.numericScore || 9.0);
+                        const initials = cand.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                        const statusStyle = getStatusBadgeStyle(cand.status || 'Active');
+
+                        return (
+                          <tr
+                            key={cand.id}
+                            className={`transition-colors group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 ${
+                              isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                            }`}
+                          >
+                            {/* Checkbox */}
+                            <td className="p-3.5 pl-5">
+                              <CustomCheckbox
+                                checked={isChecked}
+                                onChange={() => toggleSelectCandidate(cand.id)}
+                                aria-label={`Select ${cand.name}`}
+                              />
+                            </td>
+
+                            {/* 1. Candidate */}
+                            {columnVisibility.candidate && (
+                              <td className="p-3.5">
+                                <div
+                                  onClick={() => setQuickViewCandidate(cand)}
+                                  className="flex items-center gap-3 cursor-pointer group/cand"
+                                  title="Click to view candidate profile"
                                 >
-                                  {candidate.name}
-                                </Link>
-                                <span className="text-[11px] text-gray-400 truncate block">
-                                  {candidate.email}
+                                  <div className="w-8 h-8 rounded-full bg-[#1890FF]/15 dark:bg-[#1890FF]/25 text-[#1890FF] border border-[#1890FF]/25 dark:border-[#1890FF]/35 font-extrabold text-[11px] flex items-center justify-center shrink-0 shadow-2xs group-hover/cand:scale-105 transition-transform">
+                                    {initials}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF] transition-colors truncate">
+                                      {cand.name}
+                                    </div>
+                                    <div className="text-[11px] text-gray-400 dark:text-gray-500 truncate flex items-center gap-1">
+                                      <Mail size={11} className="shrink-0 text-gray-400" />
+                                      <span className="truncate">{cand.email}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            )}
+
+                            {/* 2. Role Applied */}
+                            {columnVisibility.role && (
+                              <td className="p-3.5">
+                                <div className="font-semibold text-[#212b36] dark:text-gray-200">
+                                  {cand.role}
+                                </div>
+                                <div className="text-[11px] text-gray-400">
+                                  {cand.department || 'Engineering'}
+                                </div>
+                              </td>
+                            )}
+
+                            {/* 3. Location */}
+                            {columnVisibility.location && (
+                              <td className="p-3.5">
+                                <div className="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 font-medium">
+                                  <MapPin size={13} className="text-gray-400 shrink-0" />
+                                  <span>{cand.location || 'Bangalore, India'}</span>
+                                </div>
+                              </td>
+                            )}
+
+                            {/* 4. Experience & Company */}
+                            {columnVisibility.experience && (
+                              <td className="p-3.5">
+                                <div className="font-medium text-[#212b36] dark:text-gray-200">
+                                  {cand.company}
+                                </div>
+                                <div className="text-[11px] text-gray-400">
+                                  {cand.experience}
+                                </div>
+                              </td>
+                            )}
+
+                            {/* 5. Notice Period */}
+                            {columnVisibility.noticePeriod && (
+                              <td className="p-3.5">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getNoticePeriodBadgeStyle(cand.noticePeriod)}`}>
+                                  {cand.noticePeriod || '30 Days'}
                                 </span>
-                              </div>
-                            </div>
-                          </td>
+                              </td>
+                            )}
 
-                          {/* Role Applied */}
-                          <td className="py-3.5 px-4">
-                            <span className="font-semibold text-gray-800 dark:text-gray-200 block truncate">
-                              {candidate.role}
-                            </span>
-                            <span className="text-[11px] text-gray-400 block truncate">
-                              {candidate.department || 'Engineering'}
-                            </span>
-                          </td>
+                            {/* 6. Status */}
+                            {columnVisibility.status && (
+                              <td className="p-3.5">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusStyle.badge}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
+                                  <span>{cand.status || 'Active'}</span>
+                                </span>
+                              </td>
+                            )}
 
-                          {/* Experience & Company */}
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-1.5 font-semibold text-gray-700 dark:text-gray-300">
-                              <Building2 size={13} className="text-gray-400 shrink-0" />
-                              <span className="truncate">{candidate.company}</span>
-                            </div>
-                            <span className="text-[11px] text-gray-400 block ml-4.5">
-                              {candidate.experience}
-                            </span>
-                          </td>
+                            {/* 7. Applied */}
+                            {columnVisibility.applied && (
+                              <td className="p-3.5 text-gray-600 dark:text-gray-300 font-medium">
+                                {cand.date || 'Recent'}
+                              </td>
+                            )}
 
-                          {/* Pipeline Stage */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border inline-block ${getStageBadgeStyle(candidate.stage)}`}>
-                              {candidate.stage}
-                            </span>
-                          </td>
+                            {/* 8. Match Score */}
+                            {columnVisibility.matchScore && (
+                              <td className="p-3.5 text-center">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${scoreConfig.badge}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${scoreConfig.dot}`} />
+                                  {cand.score || '9.0/10'}
+                                </span>
+                              </td>
+                            )}
 
-                          {/* Notice Period */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${getNoticeBadgeStyle(candidate.noticePeriod)}`}>
-                              {candidate.noticePeriod || '30 Days'}
-                            </span>
-                          </td>
+                            {/* 9. Pipeline Stage */}
+                            {columnVisibility.stage && (
+                              <td className="p-3.5">
+                                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${getStageBadgeStyle(cand.stage)}`}>
+                                  {cand.stage}
+                                </span>
+                              </td>
+                            )}
 
-                          {/* Source */}
-                          <td className="py-3.5 px-4 text-gray-500 dark:text-gray-400 whitespace-nowrap font-medium text-[11px]">
-                            {candidate.source || 'Direct Careers'}
-                          </td>
+                            {/* 10. Source */}
+                            {columnVisibility.source && (
+                              <td className="p-3.5 text-gray-600 dark:text-gray-300 font-medium">
+                                {cand.source || 'Direct Careers'}
+                              </td>
+                            )}
 
-                          {/* Actions: Quick View, View Details, and Remove from List */}
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1.5">
-                              {/* Quick View (Icon only) */}
-                              <button
-                                onClick={() => setQuickViewCandidate(candidate)}
-                                title="Quick View"
-                                className="p-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                              >
-                                <Eye size={15} />
-                              </button>
+                            {/* 11. Profile Updated */}
+                            {columnVisibility.updated && (
+                              <td className="p-3.5 text-gray-500 dark:text-gray-400">
+                                {cand.updated || cand.date || 'Recent'}
+                              </td>
+                            )}
 
-                              {/* View Details Profile Page */}
-                              <Link
-                                to={`/dashboard/candidates/${candidate.id}`}
-                                title="View Full Profile"
-                                className="p-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                              >
-                                <ExternalLink size={15} />
-                              </Link>
-
-                              {/* Remove from List (Reddish trash) */}
-                              <button
-                                onClick={() => handleRemoveCandidateFromList(candidate.id, candidate.name)}
-                                title="Remove from this list"
-                                className="p-1.5 rounded-lg text-[#FF5630] hover:bg-[#FF5630]/10 transition-colors cursor-pointer"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            {/* 12. Actions: Quick View, View Full Profile, and Remove from this list */}
+                            {columnVisibility.action && (
+                              <td className="p-3.5 pr-5 text-right sticky right-0 bg-white/95 dark:bg-[#161c24]/95 group-hover:bg-gray-50/95 dark:group-hover:bg-gray-800/95 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)]">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => setQuickViewCandidate(cand)}
+                                    title="Quick View"
+                                    aria-label="Quick View"
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] transition-all cursor-pointer shadow-2xs border border-transparent hover:border-[#1890FF]/25"
+                                  >
+                                    <Eye size={15} />
+                                  </button>
+                                  <Link
+                                    to={`/dashboard/candidates/${cand.id}`}
+                                    title="View Full Profile"
+                                    aria-label="View Full Profile"
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] transition-all shadow-2xs border border-transparent hover:border-[#1890FF]/25"
+                                  >
+                                    <ExternalLink size={14} />
+                                  </Link>
+                                  <button
+                                    onClick={() => handleRemoveCandidateFromList(cand.id, cand.name)}
+                                    title="Remove from this list"
+                                    aria-label="Remove from this list"
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#FF5630] hover:text-[#d33a18] bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/70 dark:border-red-900/40 transition-all cursor-pointer shadow-2xs"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                /* GRID / CARD VIEW OF CANDIDATES */
-                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {filteredCandidates.map((candidate) => (
-                    <div
-                      key={candidate.id}
-                      className="p-4 rounded-xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#161c24] hover:shadow-md transition-all space-y-3 relative group"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#1890FF] to-[#8E33FF] text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">
-                            {candidate.name.split(' ').map(n => n[0]).join('')}
+                /* GRID / CARD VIEW OF CANDIDATES (Same as Candidate List page) */
+                <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-b-2xl">
+                  {filteredCandidates.map((cand) => {
+                    const isChecked = selectedCandidateIds.includes(cand.id);
+                    const scoreConfig = getScoreBadge(cand.numericScore || 9.0);
+                    const initials = cand.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+
+                    return (
+                      <div
+                        key={cand.id}
+                        className={`p-5 rounded-2xl border transition-all bg-white dark:bg-[#161c24] flex flex-col justify-between shadow-xs hover:shadow-md ${
+                          isChecked
+                            ? 'border-[#1890FF] ring-2 ring-[#1890FF]/20'
+                            : 'border-gray-100 dark:border-gray-800'
+                        }`}
+                      >
+                        <div>
+                          {/* Card Top: Checkbox, Avatar, Name & Score */}
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex items-center gap-3">
+                              <CustomCheckbox
+                                checked={isChecked}
+                                onChange={() => toggleSelectCandidate(cand.id)}
+                                aria-label={`Select ${cand.name}`}
+                              />
+                              <div
+                                onClick={() => setQuickViewCandidate(cand)}
+                                className="w-10 h-10 rounded-full bg-[#1890FF]/15 dark:bg-[#1890FF]/25 text-[#1890FF] border border-[#1890FF]/25 dark:border-[#1890FF]/35 font-bold text-xs flex items-center justify-center shrink-0 cursor-pointer shadow-2xs"
+                              >
+                                {initials}
+                              </div>
+                              <div>
+                                <h4
+                                  onClick={() => setQuickViewCandidate(cand)}
+                                  className="font-bold text-sm text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors cursor-pointer"
+                                >
+                                  {cand.name}
+                                </h4>
+                                <div className="text-xs text-gray-400 font-medium truncate max-w-[170px]">
+                                  {cand.company} · {cand.experience}
+                                </div>
+                              </div>
+                            </div>
+
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${scoreConfig.badge}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${scoreConfig.dot}`} />
+                              {cand.score || '9.0/10'}
+                            </span>
                           </div>
-                          <div className="min-w-0">
-                            <Link
-                              to={`/dashboard/candidates/${candidate.id}`}
-                              className="font-bold text-sm text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors block truncate"
+
+                          {/* Role & Stage */}
+                          <div className="space-y-1.5 my-3">
+                            <div className="text-xs font-bold text-gray-700 dark:text-gray-200">
+                              {cand.role}
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${getStageBadgeStyle(cand.stage)}`}>
+                                {cand.stage}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${getNoticePeriodBadgeStyle(cand.noticePeriod)}`}>
+                                {cand.noticePeriod || '30 Days'}
+                              </span>
+                              {(() => {
+                                const statusStyle = getStatusBadgeStyle(cand.status || 'Active');
+                                return (
+                                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${statusStyle.badge}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
+                                    <span>{cand.status || 'Active'}</span>
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          </div>
+
+                          {/* Skills tags */}
+                          <div className="flex flex-wrap gap-1 my-3">
+                            {cand.skills?.slice(0, 4).map((skill, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded text-[10.5px] font-medium"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                            {(cand.skills?.length || 0) > 4 && (
+                              <span className="px-1.5 py-0.5 text-gray-400 text-[10px] font-bold">
+                                +{cand.skills.length - 4}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Card Footer: Source & Actions */}
+                        <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2 mt-2">
+                          <div className="text-[11px] text-gray-400 truncate max-w-[120px]">
+                            Via <span className="font-semibold text-gray-600 dark:text-gray-300">{cand.source || 'Direct'}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => setQuickViewCandidate(cand)}
+                              title="Quick View"
+                              aria-label="Quick View"
+                              className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] border border-gray-200/60 dark:border-gray-700/60 hover:border-[#1890FF]/30 transition-all cursor-pointer shadow-2xs"
                             >
-                              {candidate.name}
+                              <Eye size={15} />
+                            </button>
+                            <Link
+                              to={`/dashboard/candidates/${cand.id}`}
+                              title="View Full Profile"
+                              aria-label="View Full Profile"
+                              className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] border border-gray-200/60 dark:border-gray-700/60 hover:border-[#1890FF]/30 transition-all shadow-2xs"
+                            >
+                              <ExternalLink size={14} />
                             </Link>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                              {candidate.role}
-                            </p>
+                            <button
+                              onClick={() => handleRemoveCandidateFromList(cand.id, cand.name)}
+                              title="Remove from list"
+                              aria-label="Remove from list"
+                              className="w-8 h-8 rounded-xl flex items-center justify-center text-[#FF5630] hover:text-[#d33a18] bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/70 dark:border-red-900/40 transition-all cursor-pointer shadow-2xs"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         </div>
-
-                        {/* Remove from List button */}
-                        <button
-                          onClick={() => handleRemoveCandidateFromList(candidate.id, candidate.name)}
-                          title="Remove candidate from this list"
-                          className="p-1 text-gray-400 hover:text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 size={15} />
-                        </button>
                       </div>
-
-                      <div className="space-y-1.5 text-xs text-gray-600 dark:text-gray-300">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Company:</span>
-                          <span className="font-semibold text-[#212b36] dark:text-white">{candidate.company}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Experience:</span>
-                          <span className="font-semibold">{candidate.experience}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Notice Period:</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${getNoticeBadgeStyle(candidate.noticePeriod)}`}>
-                            {candidate.noticePeriod}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Skills Tags */}
-                      {candidate.skills && candidate.skills.length > 0 && (
-                        <div className="flex items-center gap-1 flex-wrap pt-1">
-                          {candidate.skills.slice(0, 3).map((sk, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                              {sk}
-                            </span>
-                          ))}
-                          {candidate.skills.length > 3 && (
-                            <span className="text-[10px] text-gray-400 font-semibold">
-                              +{candidate.skills.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Card Footer */}
-                      <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${getStageBadgeStyle(candidate.stage)}`}>
-                          {candidate.stage}
-                        </span>
-
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => setQuickViewCandidate(candidate)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-[#1890FF] bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Eye size={13} />
-                            <span>Quick View</span>
-                          </button>
-                          <Link
-                            to={`/dashboard/candidates/${candidate.id}`}
-                            className="p-1 text-gray-500 hover:text-[#1890FF] rounded-lg transition-colors"
-                          >
-                            <ExternalLink size={14} />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
+
 
             </div>
           ) : (
@@ -1174,6 +1538,227 @@ export default function MyListsPage() {
         </div>
 
       </div>
+
+      {/* ============================================================== */}
+      {/* FLOATING BULK ACTIONS BAR (When candidates are selected)        */}
+      {/* ============================================================== */}
+      {isActionPanelMounted && (
+        <>
+          <div
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4 border border-gray-700/80 backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${
+              isActionPanelVisible && !isPanelDismissed
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
+            }`}
+          >
+            {/* Close / Dismiss panel pill button */}
+            <button
+              onClick={() => setIsPanelDismissed(true)}
+              title="Close panel"
+              aria-label="Close panel"
+              className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+            >
+              <X size={12} className="stroke-[2.5]" />
+            </button>
+
+            <div className="flex items-center gap-2 min-w-[125px]">
+              <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
+                {displayCount}
+              </span>
+              <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
+                {displayCount} selected
+              </span>
+            </div>
+
+            <div className="h-4 w-px bg-gray-700" />
+
+            {/* Add to another List */}
+            <button
+              onClick={() => {
+                const otherLists = lists.filter(l => l.id !== selectedListId);
+                setTargetBatchListId(otherLists.length > 0 ? otherLists[0].id : '');
+                setIsCreatingNewBatchList(false);
+                setNewBatchListName('');
+                setIsAddAnotherListModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 hover:scale-105 active:scale-95 shrink-0"
+            >
+              <ListPlus size={13} className="text-white" />
+              <span>Add to another List</span>
+            </button>
+
+            {/* Compare - Always visible like in Candidate List page */}
+            <button
+              onClick={handleCompareWithAI}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+              title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
+            >
+              <Sparkles size={13} className="text-white" />
+              <span>Compare</span>
+            </button>
+
+            {/* Remove from List */}
+            <button
+              onClick={handleRemoveSelectedCandidatesFromList}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95 shrink-0"
+            >
+              <Trash2 size={13} className="text-white" />
+              <span>Remove from List</span>
+            </button>
+
+            <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
+
+            {/* Deselect All (Uncheck all candidates) */}
+            <button
+              onClick={() => setSelectedCandidateIds([])}
+              title="Deselect All (Clear Selection)"
+              aria-label="Deselect All"
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
+            >
+              <SquareMinus size={15} className="text-white" />
+            </button>
+          </div>
+
+          {/* Minimized Pill to reopen panel when dismissed */}
+          <button
+            onClick={() => setIsPanelDismissed(false)}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${
+              isActionPanelVisible && isPanelDismissed
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
+            }`}
+            title="Reopen bulk actions panel"
+          >
+            <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
+              {displayCount}
+            </span>
+            <span>Show Actions Panel</span>
+            <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
+          </button>
+        </>
+      )}
+
+      {/* ============================================================== */}
+      {/* 2.5. MODAL: ADD CANDIDATES TO ANOTHER LIST                     */}
+      {/* ============================================================== */}
+      {isAddAnotherListModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center">
+                  <ListPlus size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    Add to Another Candidate List
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Assign selected candidates to an existing or new list
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddAnotherListModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmAddSelectedToAnotherList} className="space-y-4 text-xs">
+              {/* Selected Candidates Summary */}
+              <div className="p-3 bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Selected Candidates
+                  </p>
+                  <p className="text-xs font-bold text-[#212b36] dark:text-white mt-0.5">
+                    {selectedCandidateIds.length} candidate{selectedCandidateIds.length > 1 ? 's' : ''} from "{activeList?.name}"
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#1890FF] text-white">
+                  {selectedCandidateIds.length} selected
+                </span>
+              </div>
+
+              {/* Target List Selection */}
+              <div>
+                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
+                  Target Candidate List <span className="text-[#FF5630]">*</span>
+                </label>
+
+                {!isCreatingNewBatchList ? (
+                  <div className="space-y-2">
+                    <SearchableSelect
+                      options={lists
+                        .filter(l => l.id !== selectedListId)
+                        .map(list => ({
+                          label: list.name,
+                          value: list.id,
+                          description: `${list.candidateIds?.length || 0} candidates • ${list.category || 'General'}`
+                        }))}
+                      value={targetBatchListId}
+                      onChange={(val) => setTargetBatchListId(val)}
+                      placeholder="Select target candidate list..."
+                      searchPlaceholder="Search lists..."
+                      showSearch={true}
+                      size="default"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingNewBatchList(true)}
+                      className="inline-flex items-center gap-1.5 text-xs text-[#1890FF] font-bold hover:underline cursor-pointer pt-1"
+                    >
+                      <Plus size={13} />
+                      <span>Create a brand new list instead</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      autoFocus
+                      required
+                      placeholder="e.g. Q4 Executive Sourcing"
+                      value={newBatchListName}
+                      onChange={(e) => setNewBatchListName(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-xs font-semibold"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingNewBatchList(false)}
+                      className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline cursor-pointer"
+                    >
+                      Cancel and choose existing list
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAddAnotherListModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!isCreatingNewBatchList && !targetBatchListId}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-[#1890FF] hover:bg-[#0077e6] disabled:opacity-50 transition-all shadow-sm text-xs cursor-pointer"
+                >
+                  <ListPlus size={13} />
+                  <span>Add to List</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ============================================================== */}
       {/* 3. MODAL: CREATE NEW LIST                                      */}
@@ -1223,19 +1808,15 @@ export default function MyListsPage() {
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
                   Category
                 </label>
-                <select
+                <SearchableSelect
+                  options={CATEGORY_OPTIONS}
                   value={newListData.category}
-                  onChange={(e) => setNewListData(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] font-semibold text-[#212b36] dark:text-white cursor-pointer"
-                >
-                  <option value="Engineering">Engineering</option>
-                  <option value="Leadership">Leadership & Architecture</option>
-                  <option value="Design & UX">Design & UX</option>
-                  <option value="Fast-Track">Fast-Track Hiring</option>
-                  <option value="Executive">Executive / VP</option>
-                  <option value="Marketing">Growth & Marketing</option>
-                  <option value="General">General Talent Pool</option>
-                </select>
+                  onChange={(val) => setNewListData(prev => ({ ...prev, category: val }))}
+                  placeholder="Select Category..."
+                  searchPlaceholder="Search category..."
+                  showSearch={false}
+                  size="default"
+                />
               </div>
 
               <div>
@@ -1343,19 +1924,15 @@ export default function MyListsPage() {
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
                   Category
                 </label>
-                <select
+                <SearchableSelect
+                  options={CATEGORY_OPTIONS}
                   value={editListData.category}
-                  onChange={(e) => setEditListData(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] font-semibold text-[#212b36] dark:text-white cursor-pointer"
-                >
-                  <option value="Engineering">Engineering</option>
-                  <option value="Leadership">Leadership & Architecture</option>
-                  <option value="Design & UX">Design & UX</option>
-                  <option value="Fast-Track">Fast-Track Hiring</option>
-                  <option value="Executive">Executive / VP</option>
-                  <option value="Marketing">Growth & Marketing</option>
-                  <option value="General">General Talent Pool</option>
-                </select>
+                  onChange={(val) => setEditListData(prev => ({ ...prev, category: val }))}
+                  placeholder="Select Category..."
+                  searchPlaceholder="Search category..."
+                  showSearch={false}
+                  size="default"
+                />
               </div>
 
               <div>
@@ -1534,7 +2111,7 @@ export default function MyListsPage() {
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStageBadgeStyle(c.stage)}`}>
                           {c.stage}
                         </span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getNoticeBadgeStyle(c.noticePeriod)}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getNoticePeriodBadgeStyle(c.noticePeriod)}`}>
                           {c.noticePeriod}
                         </span>
                       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ChevronDown, Search, X, Check, LayoutGrid, Table, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, Search, X, Check, LayoutGrid, Table, RotateCcw, SlidersHorizontal, Star, CalendarClock } from 'lucide-react';
 import SearchableSelect from '../ui/SearchableSelect';
 
 // Quick parameter options data
@@ -107,7 +107,12 @@ export default function JobQuickFilterBar({
   extraActions = null,
   searchQuery = '',
   onSearchChange,
-  searchPlaceholder = 'Search...'
+  searchPlaceholder = 'Search...',
+  activeView = 'all',
+  onViewChange,
+  favoritesCount = 0,
+  followupsCount = 0,
+  showPresetFilters = false
 }) {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMoreExpanded, setIsMoreExpanded] = useState(false);
@@ -204,7 +209,6 @@ export default function JobQuickFilterBar({
     { id: 'status', label: 'Status' },
     { id: 'skills', label: 'Skills' },
     { id: 'priority', label: 'Priority' },
-    { id: 'hiringManager', label: 'Hiring manager' },
     { id: 'recruiter', label: 'Recruiter' }
   ];
 
@@ -421,6 +425,59 @@ export default function JobQuickFilterBar({
               )}
             </button>
           </div>
+
+          {/* Preset View Filters: Favorites & Follow-Ups */}
+          {showPresetFilters && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => onViewChange && onViewChange(activeView === 'favorites' ? 'all' : 'favorites')}
+                title={activeView === 'favorites' ? "Showing Favorites (Click to view all)" : "Filter by Favorites"}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer select-none h-[32px] ${
+                  activeView === 'favorites'
+                    ? 'bg-amber-500 text-white shadow-xs shadow-amber-500/20'
+                    : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700/80 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50/50 dark:hover:bg-amber-950/20'
+                }`}
+              >
+                <Star size={13} className={activeView === 'favorites' ? 'fill-white text-white' : 'fill-amber-400 text-amber-500'} />
+                <span>Favorites</span>
+                {favoritesCount > 0 && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    activeView === 'favorites'
+                      ? 'bg-white/25 text-white'
+                      : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                  }`}>
+                    {favoritesCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onViewChange && onViewChange(activeView === 'followups' ? 'all' : 'followups')}
+                title={activeView === 'followups' ? "Showing Follow-Ups (Click to view all)" : "Filter by Follow-Ups"}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer select-none h-[32px] ${
+                  activeView === 'followups'
+                    ? 'bg-[#1890FF] text-white shadow-xs shadow-[#1890FF]/20'
+                    : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700/80 hover:border-[#1890FF] hover:text-[#1890FF] hover:bg-blue-50/50 dark:hover:bg-blue-950/20'
+                }`}
+              >
+                <CalendarClock size={13} className={activeView === 'followups' ? 'text-white' : 'text-[#1890FF]'} />
+                <span>Follow-Ups</span>
+                {followupsCount > 0 && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    activeView === 'followups'
+                      ? 'bg-white/25 text-white'
+                      : 'bg-blue-100 dark:bg-blue-950/60 text-[#1890FF] dark:text-blue-300'
+                  }`}>
+                    {followupsCount}
+                  </span>
+                )}
+              </button>
+
+              <div className="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-0.5" />
+            </div>
+          )}
 
           {/* Primary Parameters (Underneath the search overlay when open) */}
           {primaryParams.map(param => renderParamButton(param))}

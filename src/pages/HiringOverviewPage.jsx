@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Sparkles, 
   Users, 
@@ -15,7 +16,8 @@ import {
   ArrowRight, 
   ClipboardList, 
   Download,
-  RefreshCw
+  RefreshCw,
+  ChevronRight
 } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
 
@@ -280,44 +282,49 @@ export default function HiringOverviewPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 relative w-full text-[#212b36] dark:text-gray-100">
+    <div className="p-6 space-y-5 relative w-full text-[#212b36] dark:text-gray-100 font-sans">
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">Hiring Overview</span>
+      </nav>
 
-      {/* TOAST POPUP */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl shadow-xl text-sm font-semibold animate-fade-in border border-gray-700 dark:border-gray-200">
-          <CheckCircle2 size={18} className="text-[#00A76F] shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {/* HIRING OVERVIEW HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                Hiring Overview
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#00A76F]/10 text-[#00A76F]">
+                Live Overview
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              A quick read on hiring health, what needs attention, and the next action for your team.
+            </p>
+          </div>
 
-      {/* ============================================================== */}
-      {/* 1. PAGE HEADER & SUBTITLE                                      */}
-      {/* ============================================================== */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-gray-100 dark:border-gray-800/60">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#212b36] dark:text-white">
-            Hiring Overview
-          </h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 font-medium max-w-3xl leading-relaxed mt-1">
-            A quick read on hiring health, what needs attention, and the next action for your team.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button 
-            onClick={() => showToast('Refreshed latest hiring signals')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs cursor-pointer"
-          >
-            <RefreshCw size={14} className="text-gray-500 dark:text-gray-400" />
-            <span>Sync</span>
-          </button>
-          <button 
-            onClick={() => showToast('Executive Brief exported as PDF')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-all shadow-sm cursor-pointer"
-          >
-            <Download size={14} />
-            <span>Export Brief</span>
-          </button>
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button 
+              onClick={() => showToast('Refreshed latest hiring signals')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs cursor-pointer h-[38px]"
+            >
+              <RefreshCw size={14} className="text-gray-500 dark:text-gray-400" />
+              <span>Sync</span>
+            </button>
+            <button 
+              onClick={() => showToast('Executive Brief exported as PDF')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#1890FF]/90 rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
+            >
+              <Download size={14} />
+              <span>Export Brief</span>
+            </button>
+          </div>
         </div>
       </div>
 

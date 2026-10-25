@@ -19,6 +19,11 @@ body {
   font-size: var(--text-sm, 14px);
 }
 
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
 /* ==========================================================================
    GLOBAL HIGH-CONTRAST TYPOGRAPHY SYSTEM
    Ensures text across the entire platform is dark grey or black for maximum

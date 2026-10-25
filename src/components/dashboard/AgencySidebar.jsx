@@ -25,7 +25,8 @@ import {
  FileSignature,
  Mail,
   LayoutTemplate,
-  Bookmark
+  Bookmark,
+  Globe
 } from 'lucide-react';
 import UserMenu from './UserMenu';
 
@@ -44,19 +45,22 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
  }
  }, [currentPath]);
 
- const sidebarLinks = [
+   const sidebarLinks = [
     { name: 'Hiring Overview', path: '/dashboard', icon: LayoutDashboard },
- { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
- { name: 'Job Dashboard', path: '/dashboard/agencies', icon: LayoutDashboard },
- { name: 'Sourcing', path: '/dashboard/sourcing', icon: Search },
- { name: 'Candidate List', path: '/dashboard/candidates', icon: Users },
- { name: 'My List', path: '/dashboard/my-lists', icon: Bookmark },
- { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },
- { name: 'Approvals', path: '/dashboard/approvals', icon: CheckSquare },
- { name: 'Interview Kits', path: '/dashboard/interview-kits', icon: ClipboardList },
-  { name: 'Org Templates', path: '/dashboard/org-templates', icon: LayoutTemplate },
- { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 }
- ];
+    { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
+    { name: 'Job Dashboard', path: '/dashboard/agencies', icon: LayoutDashboard },
+    { name: 'Sourcing', path: '/dashboard/sourcing', icon: Search },
+    { name: 'Candidate List', path: '/dashboard/candidates', icon: Users },
+    { name: 'My List', path: '/dashboard/my-lists', icon: Bookmark },
+    { name: 'Applications', path: '/dashboard/applications', icon: FileSignature },
+    { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },
+    { name: 'Approvals', path: '/dashboard/approvals', icon: CheckSquare },
+    { name: 'Interview Kits', path: '/dashboard/interview-kits', icon: ClipboardList },
+    { name: 'Org Templates', path: '/dashboard/org-templates', icon: LayoutTemplate },
+    { name: 'Career Page', path: '/dashboard/career-page', icon: Globe },
+    { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
+    { name: 'Settings', path: '/dashboard/settings', icon: Settings }
+  ];
 
  const reportsSubItems = [
  { name: 'Custom Reports', path: '/dashboard/reports/custom', icon: BarChart2 },

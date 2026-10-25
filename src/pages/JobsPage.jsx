@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Search, Plus, Filter, MoreVertical, Briefcase, MapPin, 
  Users, Clock, CheckCircle, CheckCircle2, AlertCircle, Calendar, 
- ChevronDown, ArrowUpRight, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft, GripVertical, RotateCcw, SlidersHorizontal,
+ ChevronDown, ChevronRight, ArrowUpRight, Star, CalendarClock, Copy, Edit, Trash2, X, UploadCloud, Send, BrainCircuit, FileText, Upload, Type, ArrowRight, Loader2, ChevronsRight, ChevronsLeft, GripVertical, RotateCcw, SlidersHorizontal,
   Building2, Bookmark, Award, Sparkles } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import findNewIco from '../assets/findnew-ico.png';
 import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
 import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
+import FollowUpModal from '../components/dashboard/FollowUpModal';
+import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
+import { isItemFollowedUp } from '../data/followupsData';
 
 const MOCK_JOBS = [
   { id: 1, title: 'Senior AI Research Scientist', company: 'Anthropic Labs', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Open', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', daysOpen: 70, experience: '5-8 yrs', avgMatch: 94, skills: ['PyTorch', 'Python', 'LLMs', 'Transformers', 'NLP', 'CUDA'], hiringManager: 'Amit Sharma', score: 98 },
@@ -189,11 +192,63 @@ function JobPipelineDisplay({ job, width = "w-[330px]" }) {
 }
 
 export default function JobsPage() {
- const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeViewParam = searchParams.get('view') || 'all';
+  const [jobs, setJobs] = useState(MOCK_JOBS);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [followUpTarget, setFollowUpTarget] = useState(null);
+  const [favRefreshKey, setFavRefreshKey] = useState(0);
+
+  // Sync favorites & follow-ups real-time
+  useEffect(() => {
+    const handleUpdate = () => setFavRefreshKey(k => k + 1);
+    window.addEventListener('favorites-updated', handleUpdate);
+    window.addEventListener('followups-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('favorites-updated', handleUpdate);
+      window.removeEventListener('followups-updated', handleUpdate);
+    };
+  }, []);
+
+  const favoritedJobsCount = useMemo(() => jobs.filter(j => isItemFavorited('Job', j.id)).length, [jobs, favRefreshKey]);
+  const followedJobsCount = useMemo(() => jobs.filter(j => isItemFollowedUp('Job', j.id)).length, [jobs, favRefreshKey]);
+
+  const handleViewFilterChange = (mode) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (mode === 'all') {
+      newParams.delete('view');
+    } else {
+      newParams.set('view', mode);
+    }
+    setSearchParams(newParams);
+    setCurrentPage(1);
+  };
+
+  const handleToggleFav = (job, e) => {
+    if (e) e.stopPropagation();
+    toggleFavorite({
+      relatedId: job.id,
+      type: 'Job',
+      title: job.title,
+      subtitle: `${job.department} • ${job.location}`,
+      tag: job.status
+    });
+    setFavRefreshKey(k => k + 1);
+  };
+
+  const handleOpenFollowup = (job, e) => {
+    if (e) e.stopPropagation();
+    setFollowUpTarget({
+      relatedId: job.id,
+      type: 'Job',
+      title: job.title,
+      subject: `Job: ${job.title} (${job.department})`
+    });
+  };
   const rightPanelRef = useRef(null);
   const base10JobsHeightRef = useRef({ grid: 980, card: 980 });
   const [filterPanelHeight, setFilterPanelHeight] = useState(980);
-  const [jobs, setJobs] = useState(MOCK_JOBS);
   const [searchQuery, setSearchQuery] = useState('');
  const [sortBy, setSortBy] = useState('recommended');
  const [viewMode, setViewMode] = useState('grid');
@@ -314,8 +369,6 @@ export default function JobsPage() {
     );
   };
  const [editingJobId, setEditingJobId] = useState(null);
-
- const [currentPage, setCurrentPage] = useState(1);
  const itemsPerPage = 10;
 
  const [isViewJobModalOpen, setIsViewJobModalOpen] = useState(false);
@@ -407,7 +460,15 @@ export default function JobsPage() {
  
  const filteredJobs = useMemo(() => {
  const list = jobs.filter(job => {
- const matchesSearch = !searchQuery || 
+ // View Switcher Filter: All / Favorites / Follow-Ups
+    if (activeViewParam === 'favorites' && !isItemFavorited('Job', job.id)) {
+      return false;
+    }
+    if (activeViewParam === 'followups' && !isItemFollowedUp('Job', job.id)) {
+      return false;
+    }
+
+    const matchesSearch = !searchQuery || 
  job.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
  job.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
  (job.location && job.location.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -494,7 +555,7 @@ export default function JobsPage() {
  return (b.score || 0) - (a.score || 0) || a.id - b.id;
  }
  });
- }, [jobs, searchQuery, selectedFilters, quickFilters, sortBy]);
+ }, [jobs, searchQuery, selectedFilters, quickFilters, sortBy, activeViewParam, favRefreshKey]);
 
  // Reset to page 1 when filters or sort change
  useEffect(() => {
@@ -622,25 +683,46 @@ export default function JobsPage() {
 
  return (
  <>
- <div className="p-6 space-y-6 relative">
- {/* Header */}
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
- <div>
- <h1 className="text-2xl font-bold text-[#212b36] dark:text-white">List of Jobs</h1>
- <p className="text-sm text-black dark:text-gray-400 mt-1">Manage and track all open requisitions.</p>
- </div>
- <div className="flex items-center gap-3">
- <button className="px-4 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800/50 text-[#212b36] dark:text-white rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
- <ArrowUpRight size={16} /> Export
- </button>
- <button 
- onClick={() => setIsCreateModalOpen(true)}
- className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-lg text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer"
- >
- <Plus size={16} /> Create Job
- </button>
- </div>
- </div>
+  <div className="p-6 space-y-5 relative">
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">Jobs</span>
+      </nav>
+
+      {/* JOB HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                List of Jobs
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
+                {jobs.length} Total
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              Manage and track all open requisitions across departments.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button className="px-3.5 py-2 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 text-[#212b36] dark:text-white rounded-xl text-xs sm:text-sm font-bold shadow-2xs hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2 cursor-pointer h-[38px]">
+              <ArrowUpRight size={15} /> Export
+            </button>
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer h-[38px]"
+            >
+              <Plus size={15} /> Create Job
+            </button>
+          </div>
+        </div>
+      </div>
 
  {/* 5 KPI CARDS ROW (All Jobs, Open, Draft, On Hold, Closed) */}
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -693,19 +775,24 @@ export default function JobsPage() {
  {/* MAIN CONTENT AREA: Jobs Table & Pagination */}
  <div ref={rightPanelRef} className="flex-1 min-w-0 space-y-4 w-full">
  {/* Horizontal Filter Bar with Quick Parameters & Custom Sort By */}
- <JobQuickFilterBar
- searchQuery={searchQuery}
- onSearchChange={setSearchQuery}
- searchPlaceholder="Search jobs, title, department, location..."
- quickFilters={quickFilters}
- onQuickFilterChange={handleQuickFilterChange}
- onClearAll={handleClearAllQuickFilters}
- parameterOptions={dynamicQuickParameters}
- sortBy={sortBy}
- viewMode={viewMode}
- onViewModeChange={setViewMode}
- onSortChange={setSortBy}
- />
+          <JobQuickFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search jobs, title, department, location..."
+            quickFilters={quickFilters}
+            onQuickFilterChange={handleQuickFilterChange}
+            onClearAll={handleClearAllQuickFilters}
+            parameterOptions={dynamicQuickParameters}
+            sortBy={sortBy}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onSortChange={setSortBy}
+            showPresetFilters={true}
+            activeView={activeViewParam}
+            onViewChange={handleViewFilterChange}
+            favoritesCount={favoritedJobsCount}
+            followupsCount={followedJobsCount}
+          />
 
 
  {/* Jobs Display: Grid View (Default) or List / Table View */}
@@ -779,22 +866,34 @@ export default function JobsPage() {
               </div>
             </div>
 
-            {/* Action Buttons: Follow Bookmark & 3-Dots Menu */}
-            <div className="flex items-center gap-1 relative shrink-0">
+            {/* Action Buttons: Favorite, Follow Up & 3-Dots Menu */}
+            <div className="flex items-center gap-1.5 relative shrink-0">
+              {/* Favorite Button */}
               <button 
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleFollow(job.id);
-                }}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  isFollowed 
-                    ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40' 
-                    : 'text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800'
+                onClick={(e) => handleToggleFav(job, e)}
+                title={isItemFavorited('Job', job.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                  isItemFavorited('Job', job.id)
+                    ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50'
+                    : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 border-transparent hover:border-amber-200/50'
                 }`}
-                title={isFollowed ? 'Following (click to unfollow)' : 'Follow this job'}
               >
-                <Bookmark size={16} className={isFollowed ? 'fill-current' : ''} />
+                <Star size={14} className={isItemFavorited('Job', job.id) ? 'fill-amber-400 text-amber-500' : ''} />
+              </button>
+
+              {/* Follow Up Button */}
+              <button 
+                type="button"
+                onClick={(e) => handleOpenFollowup(job, e)}
+                title={isItemFollowedUp('Job', job.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                  isItemFollowedUp('Job', job.id)
+                    ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
+                    : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
+                }`}
+              >
+                <CalendarClock size={14} />
               </button>
 
               <button 
@@ -1006,21 +1105,34 @@ export default function JobsPage() {
                 </td>
                 <td className="px-6 py-4.5">
                   <div className="flex items-center justify-center gap-1.5 relative">
+                    {/* Favorite Button */}
                     <button 
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleFollow(job.id);
-                      }}
-                      className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                        isFollowed 
-                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40' 
-                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-gray-100 dark:hover:bg-gray-800'
+                      onClick={(e) => handleToggleFav(job, e)}
+                      title={isItemFavorited('Job', job.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                        isItemFavorited('Job', job.id)
+                          ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50'
+                          : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 border-transparent hover:border-amber-200/50'
                       }`}
-                      title={isFollowed ? 'Following (click to unfollow)' : 'Follow this job'}
                     >
-                      <Bookmark size={16} className={isFollowed ? 'fill-current' : ''} />
+                      <Star size={14} className={isItemFavorited('Job', job.id) ? 'fill-amber-400 text-amber-500' : ''} />
                     </button>
+
+                    {/* Follow Up Button */}
+                    <button 
+                      type="button"
+                      onClick={(e) => handleOpenFollowup(job, e)}
+                      title={isItemFollowedUp('Job', job.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                        isItemFollowedUp('Job', job.id)
+                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
+                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
+                      }`}
+                    >
+                      <CalendarClock size={14} />
+                    </button>
+
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1518,6 +1630,14 @@ export default function JobsPage() {
           </div>,
           document.body
         )}
+
+      {/* Follow Up Modal */}
+      <FollowUpModal
+        isOpen={Boolean(followUpTarget)}
+        onClose={() => setFollowUpTarget(null)}
+        targetItem={followUpTarget}
+        onFollowupAdded={() => setFavRefreshKey(k => k + 1)}
+      />
 
       {/* View Job Modal */}
  {isViewJobModalOpen && selectedJobToView && createPortal(

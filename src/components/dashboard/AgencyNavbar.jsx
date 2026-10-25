@@ -1,18 +1,45 @@
-import React, { useState } from 'react';
-import { HelpCircle, Bell, Menu, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Bell, 
+  Menu, 
+  Star, 
+  CalendarClock 
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FindNewLogo from '../../assets/findnew-logo.png';
-import { useTheme } from '../../contexts/ThemeContext';
 import NotificationPanel from './NotificationPanel';
+import FavoritesPanel from './FavoritesPanel';
+import FollowupsPanel from './FollowupsPanel';
 import GlobalSearch from './GlobalSearch';
 import { mockNotifications } from '../../data/mockNotifications';
+import { getStoredFavorites } from '../../data/favoritesData';
+import { getStoredFollowups } from '../../data/followupsData';
 
 export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isFollowupsOpen, setIsFollowupsOpen] = useState(false);
   const [notifications] = useState(mockNotifications);
-  const { theme, toggleTheme } = useTheme();
+
+  const [favorites, setFavorites] = useState(() => getStoredFavorites());
+  const [followups, setFollowups] = useState(() => getStoredFollowups());
+
+  // Listen for storage / custom event updates in real-time
+  useEffect(() => {
+    const syncFavs = () => setFavorites(getStoredFavorites());
+    const syncFollowups = () => setFollowups(getStoredFollowups());
+
+    window.addEventListener('favorites-updated', syncFavs);
+    window.addEventListener('followups-updated', syncFollowups);
+    return () => {
+      window.removeEventListener('favorites-updated', syncFavs);
+      window.removeEventListener('followups-updated', syncFollowups);
+    };
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+  const hasFavorites = favorites && favorites.length > 0;
+  const hasFollowups = followups && followups.length > 0;
 
   return (
     <>
@@ -27,44 +54,89 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
             )}
             <button 
               onClick={toggleSidebar}
-              className="p-2 text-gray-500 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-lg transition-colors flex-shrink-0"
+              className="p-2 text-gray-500 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-lg transition-colors flex-shrink-0 cursor-pointer"
+              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <Menu size={20} />
             </button>
           </div>
         </div>
 
-  {/* Search Bar */}
-  <GlobalSearch />
+        {/* Search Bar */}
+        <GlobalSearch />
 
- <div className="flex items-center gap-3">
- <button 
- onClick={toggleTheme}
- className="p-2 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors cursor-pointer"
- title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
- >
- {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
- </button>
- <button className="p-2 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors cursor-pointer">
- <HelpCircle size={20} />
- </button>
- <button 
- onClick={() => setIsNotificationOpen(true)}
- className="relative p-2 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors cursor-pointer"
- >
- <Bell size={20} />
- {unreadCount > 0 && (
- <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF5630] rounded-full border border-white dark:border-[#161c24]"></span>
- )}
- </button>
- </div>
- </nav>
+        {/* Right Action Icons: Favorites, Follow ups, Help, Notifications */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          
+          {/* 1. Favorites Icon Button */}
+          <button 
+            onClick={() => setIsFavoritesOpen(true)}
+            className={`p-2 rounded-full transition-colors cursor-pointer relative ${
+              isFavoritesOpen
+                ? 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white'
+                : 'text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
+            }`}
+            title="Favorites"
+          >
+            <Star size={19} />
+            {hasFavorites && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full border border-white dark:border-[#161c24]"></span>
+            )}
+          </button>
 
- <NotificationPanel 
- isOpen={isNotificationOpen} 
- onClose={() => setIsNotificationOpen(false)} 
- notifications={notifications}
- />
- </>
- );
+          {/* 2. Follow ups Icon Button */}
+          <button 
+            onClick={() => setIsFollowupsOpen(true)}
+            className={`p-2 rounded-full transition-colors cursor-pointer relative ${
+              isFollowupsOpen
+                ? 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white'
+                : 'text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
+            }`}
+            title="Follow ups"
+          >
+            <CalendarClock size={19} />
+            {hasFollowups && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-[#1890FF] rounded-full border border-white dark:border-[#161c24]"></span>
+            )}
+          </button>
+
+          {/* 4. Notifications Icon Button */}
+          <button 
+            onClick={() => setIsNotificationOpen(true)}
+            className="relative p-2 text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors cursor-pointer"
+            title="Notifications"
+          >
+            <Bell size={19} />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF5630] rounded-full border border-white dark:border-[#161c24]"></span>
+            )}
+          </button>
+
+        </div>
+      </nav>
+
+      {/* ======================================================== */}
+      {/* SLIDING PANELS (ALL SLIDE IN FROM THE RIGHT)             */}
+      {/* ======================================================== */}
+      
+      {/* Favorites Panel */}
+      <FavoritesPanel 
+        isOpen={isFavoritesOpen} 
+        onClose={() => setIsFavoritesOpen(false)} 
+      />
+
+      {/* Follow ups Panel */}
+      <FollowupsPanel 
+        isOpen={isFollowupsOpen} 
+        onClose={() => setIsFollowupsOpen(false)} 
+      />
+
+      {/* Notifications Panel */}
+      <NotificationPanel 
+        isOpen={isNotificationOpen} 
+        onClose={() => setIsNotificationOpen(false)} 
+        notifications={notifications}
+      />
+    </>
+  );
 }

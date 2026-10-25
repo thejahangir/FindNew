@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -18,20 +18,28 @@ import {
   Briefcase,
   ListPlus,
   SquareMinus,
-  ChevronDown,
+  ChevronDown, ChevronRight,
+  ChevronUp,
   Eye,
   Trash2,
   MapPin,
   Mail,
   Phone,
   ArrowRight,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CalendarClock,
+  MoreVertical,
+  User
 } from 'lucide-react';
 import SearchableSelect from '../components/ui/SearchableSelect';
+import CustomCheckbox from '../components/ui/CustomCheckbox';
 import { useChatbot } from '../contexts/ChatbotContext';
 import { getStoredLists, saveStoredLists } from '../data/candidateListsData';
 import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
 import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
+import FollowUpModal from '../components/dashboard/FollowUpModal';
+import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
+import { isItemFollowedUp } from '../data/followupsData';
 
 const INITIAL_CANDIDATES = [
   {
@@ -416,6 +424,8 @@ const INITIAL_CANDIDATES = [
 
 export default function CandidatesPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeViewParam = searchParams.get('view') || 'all';
   const { compareCandidates } = useChatbot();
 
   // Candidates state
@@ -426,9 +436,94 @@ export default function CandidatesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
 
+  // Favorites & Follow-Up states & sync
+  const [followUpTarget, setFollowUpTarget] = useState(null);
+  const [favRefreshKey, setFavRefreshKey] = useState(0);
+
+  const favoritedCandidatesCount = useMemo(() => candidates.filter(c => isItemFavorited('Candidate', c.id)).length, [candidates, favRefreshKey]);
+  const followedCandidatesCount = useMemo(() => candidates.filter(c => isItemFollowedUp('Candidate', c.id)).length, [candidates, favRefreshKey]);
+
+  const handleViewFilterChange = (mode) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (mode === 'all') {
+      newParams.delete('view');
+    } else {
+      newParams.set('view', mode);
+    }
+    setSearchParams(newParams);
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    const handleUpdate = () => setFavRefreshKey(k => k + 1);
+    window.addEventListener('favorites-updated', handleUpdate);
+    window.addEventListener('followups-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('favorites-updated', handleUpdate);
+      window.removeEventListener('followups-updated', handleUpdate);
+    };
+  }, []);
+
+  const handleToggleFav = (cand, e) => {
+    if (e) e.stopPropagation();
+    const res = toggleFavorite({
+      relatedId: cand.id,
+      title: cand.name,
+      type: 'Candidate',
+      meta: `${cand.role} • ${cand.company || cand.department}`,
+      path: `/dashboard/candidates/${cand.id}`,
+      tag: cand.stage || 'Shortlisted'
+    });
+    setToastMessage(res.isFavorited ? `Added ${cand.name} to Favorites!` : `Removed ${cand.name} from Favorites.`);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
+  const handleOpenFollowup = (cand, e) => {
+    if (e) e.stopPropagation();
+    setFollowUpTarget({
+      type: 'Candidate',
+      relatedId: cand.id,
+      title: cand.name,
+      subject: `Candidate: ${cand.name} (${cand.role})`,
+      meta: `${cand.role} • ${cand.company || cand.department}`
+    });
+  };
+
+  // Floating Action Panel visibility & animation lifecycle
+  const [isActionPanelMounted, setIsActionPanelMounted] = useState(false);
+  const [isActionPanelVisible, setIsActionPanelVisible] = useState(false);
+  const [lastSelectedCount, setLastSelectedCount] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (selectedCandidateIds.length > 0) {
+      setLastSelectedCount(selectedCandidateIds.length);
+      setIsActionPanelMounted(true);
+      const animFrame = requestAnimationFrame(() => {
+        setIsActionPanelVisible(true);
+      });
+      return () => cancelAnimationFrame(animFrame);
+    } else {
+      setIsActionPanelVisible(false);
+      timer = setTimeout(() => {
+        setIsActionPanelMounted(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedCandidateIds.length > 0]);
+
+  const displayCount = selectedCandidateIds.length > 0 ? selectedCandidateIds.length : lastSelectedCount;
+
   const rightPanelRef = useRef(null);
   const base10CandidatesHeightRef = useRef({ grid: 980, table: 980 });
   const [filterPanelHeight, setFilterPanelHeight] = useState(980);
+  const [openActionMenuId, setOpenActionMenuId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenActionMenuId(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Always reset panel dismissal when candidate selection changes
   useEffect(() => {
@@ -743,6 +838,14 @@ export default function CandidatesPage() {
   // Filtering Logic
   const filteredCandidates = useMemo(() => {
     const list = candidates.filter(cand => {
+      // View Mode Filter (all | favorites | followups)
+      if (activeViewParam === 'favorites' && !isItemFavorited('Candidate', cand.id)) {
+        return false;
+      }
+      if (activeViewParam === 'followups' && !isItemFollowedUp('Candidate', cand.id)) {
+        return false;
+      }
+
       // 1. Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -933,7 +1036,7 @@ export default function CandidatesPage() {
           return (b.numericScore || 0) - (a.numericScore || 0);
       }
     });
-  }, [candidates, searchQuery, quickFilters, selectedFilters, sortBy, dynamicQuickParameters]);
+  }, [candidates, searchQuery, quickFilters, selectedFilters, sortBy, dynamicQuickParameters, activeViewParam, favRefreshKey]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredCandidates.length / itemsPerPage));
@@ -1392,46 +1495,50 @@ export default function CandidatesPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in">
+    <div className="p-6 space-y-5 relative w-full max-w-full min-w-0 overflow-x-clip text-[#212b36] dark:text-gray-100 animate-fade-in font-sans">
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">Candidates</span>
+      </nav>
 
-      {/* TOAST NOTIFICATION */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl shadow-xl text-sm font-semibold animate-fade-in border border-gray-700 dark:border-gray-200">
-          <CheckCircle2 size={18} className="text-[#00A76F] shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {/* CANDIDATES HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                List of Candidates
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
+                {candidates.length} Total
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              Search, evaluate, and track candidate profiles across all active requisitions and pipelines.
+            </p>
+          </div>
 
-      {/* ============================================================== */}
-      {/* 1. PAGE HEADER & ACTIONS                                       */}
-      {/* ============================================================== */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-gray-100 dark:border-gray-800/60">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#212b36] dark:text-white">
-            List of Candidates
-          </h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 font-medium mt-1 max-w-3xl">
-            Search, evaluate, and track candidate profiles across all active requisitions and pipelines.
-          </p>
-        </div>
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={() => showToast('Exporting candidate list as CSV...')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs cursor-pointer h-[38px]"
+            >
+              <Download size={15} className="text-gray-500" />
+              <span>Export</span>
+            </button>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-
-          <button
-            onClick={() => showToast('Exporting candidate list as CSV...')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs cursor-pointer h-[38px]"
-          >
-            <Download size={14} className="text-gray-500" />
-            <span>Export</span>
-          </button>
-
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
-          >
-            <Plus size={14} />
-            <span>Add Candidate</span>
-          </button>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
+            >
+              <Plus size={15} />
+              <span>Add Candidate</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1477,7 +1584,7 @@ export default function CandidatesPage() {
       {/* ============================================================== */}
       {/* MAIN CONTENT ROW: Left Filter Panel + Main Candidates Content  */}
       {/* ============================================================== */}
-      <div className="flex flex-col lg:flex-row gap-6 relative items-start">
+      <div className="flex flex-col lg:flex-row gap-6 relative items-start w-full max-w-full min-w-0">
         {/* LEFT FILTER PANEL (Same as List of Jobs JobFilterPanel) */}
         <JobFilterPanel
           selectedFilters={selectedFilters}
@@ -1488,7 +1595,7 @@ export default function CandidatesPage() {
         />
 
         {/* MAIN CONTENT AREA: Candidates Horizontal Filter, Table / Cards & Pagination */}
-        <div ref={rightPanelRef} className="flex-1 min-w-0 space-y-4 w-full">
+        <div ref={rightPanelRef} className="flex-1 min-w-0 max-w-full space-y-4 w-full">
           {/* Horizontal Filter Bar with Search, Quick Parameters & Custom Sort By (Same as List of Jobs) */}
           <JobQuickFilterBar
             searchQuery={searchQuery}
@@ -1503,6 +1610,11 @@ export default function CandidatesPage() {
             viewMode={viewMode === 'table' ? 'grid' : 'card'}
             onViewModeChange={(mode) => setViewMode(mode === 'grid' ? 'table' : 'grid')}
             onSortChange={setSortBy}
+            showPresetFilters={true}
+            activeView={activeViewParam}
+            onViewChange={handleViewFilterChange}
+            favoritesCount={favoritedCandidatesCount}
+            followupsCount={followedCandidatesCount}
             extraActions={
               viewMode === 'table' && (
                 <div ref={columnPickerRef} className="relative">
@@ -1554,10 +1666,10 @@ export default function CandidatesPage() {
                                   {col.description}
                                 </span>
                               </div>
-                              <input
-                                type="checkbox"
+                              <CustomCheckbox
                                 checked={isChecked}
                                 disabled={col.required}
+                                size="sm"
                                 onChange={(e) => {
                                   if (col.required) return;
                                   setColumnVisibility(prev => ({
@@ -1565,7 +1677,7 @@ export default function CandidatesPage() {
                                     [col.key]: e.target.checked
                                   }));
                                 }}
-                                className="w-4 h-4 rounded text-[#1890FF] focus:ring-[#1890FF]/20 cursor-pointer shrink-0"
+                                aria-label={`Toggle ${col.label} column`}
                               />
                             </label>
                           );
@@ -1579,7 +1691,8 @@ export default function CandidatesPage() {
           />
 
       {/* ============================================================== */}
-      {/* 4. MAIN CANDIDATES CONTENT (Table / Grid View)                 */}
+      
+                    {/* 4. MAIN CANDIDATES CONTENT (Table / Grid View)                 */}
       {/* ============================================================== */}
       {filteredCandidates.length === 0 ? (
         <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center flex flex-col items-center justify-center min-h-[350px]">
@@ -1602,62 +1715,61 @@ export default function CandidatesPage() {
       ) : viewMode === 'table' ? (
 
         /* =================== TABLE VIEW =================== */
-        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xs overflow-hidden max-w-full w-full">
+          <div className="overflow-x-auto max-w-full w-full scrollbar-thin">
             <table className="w-full text-left text-xs">
               <thead className="bg-gray-50/80 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 uppercase font-bold text-[11px] border-b border-gray-100 dark:border-gray-800 whitespace-nowrap">
                 <tr>
-                  <th className="p-3.5 pl-5 w-10">
-                    <input
-                      type="checkbox"
+                  <th className="py-3 pl-3 pr-1 w-10">
+                    <CustomCheckbox
                       checked={isAllSelected}
-                      ref={el => { if (el) el.indeterminate = isIndeterminate; }}
+                      indeterminate={isIndeterminate}
                       onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded text-[#1890FF] focus:ring-[#1890FF]/20 cursor-pointer"
+                      aria-label="Select all candidates"
                     />
                   </th>
                   {columnVisibility.candidate && (
-                    <th className="p-3.5 min-w-[210px]">Candidate</th>
+                    <th className="py-3 px-2.5 min-w-[130px]">Candidate</th>
                   )}
                   {columnVisibility.role && (
-                    <th className="p-3.5 min-w-[170px]">Role Applied</th>
+                    <th className="py-3 px-2.5 min-w-[130px]">Role Applied</th>
                   )}
                   {columnVisibility.location && (
-                    <th className="p-3.5 min-w-[140px]">Location</th>
+                    <th className="py-3 px-2 min-w-[110px]">Location</th>
                   )}
                   {columnVisibility.experience && (
-                    <th className="p-3.5 min-w-[170px]">Experience & Company</th>
+                    <th className="py-3 px-2.5 min-w-[130px]">Experience & Company</th>
                   )}
                   {columnVisibility.noticePeriod && (
-                    <th className="p-3.5 min-w-[120px]">Notice Period</th>
+                    <th className="py-3 px-2 min-w-[95px]">Notice Period</th>
                   )}
                   {columnVisibility.status && (
-                    <th className="p-3.5 min-w-[120px]">Status</th>
+                    <th className="py-3 px-2 min-w-[95px]">Status</th>
                   )}
                   {columnVisibility.applied && (
-                    <th className="p-3.5 min-w-[100px]">Applied</th>
+                    <th className="py-3 px-2 min-w-[85px]">Applied</th>
                   )}
                   {columnVisibility.matchScore && (
-                    <th className="p-3.5 min-w-[110px] text-center">Match Score</th>
+                    <th className="py-3 px-2 min-w-[90px] text-center">Match Score</th>
                   )}
                   {columnVisibility.stage && (
-                    <th className="p-3.5 min-w-[150px]">Pipeline Stage</th>
+                    <th className="py-3 px-2 min-w-[110px]">Pipeline Stage</th>
                   )}
                   {columnVisibility.source && (
-                    <th className="p-3.5 min-w-[140px]">Source</th>
+                    <th className="py-3 px-2 min-w-[105px]">Source</th>
                   )}
                   {columnVisibility.updated && (
-                    <th className="p-3.5 min-w-[120px]">Profile Updated</th>
+                    <th className="py-3 px-2 min-w-[95px]">Profile Updated</th>
                   )}
                   {columnVisibility.action && (
-                    <th className="p-3.5 pr-5 min-w-[90px] text-right sticky right-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)]">
+                    <th className="py-3 pl-2 pr-4 min-w-[105px] w-28 text-right sticky right-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)]">
                       Action
                     </th>
                   )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs whitespace-nowrap">
-                {paginatedCandidates.map((cand) => {
+                {paginatedCandidates.map((cand, index) => {
                   const isChecked = selectedCandidateIds.includes(cand.id);
                   const scoreConfig = getScoreBadge(cand.numericScore);
                   const initials = cand.name.split(' ').map(n => n[0]).join('').slice(0, 2);
@@ -1666,50 +1778,39 @@ export default function CandidatesPage() {
                   return (
                     <tr
                       key={cand.id}
-                      className={`transition-colors group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 ${isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                      className={`transition-colors group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 ${openActionMenuId === cand.id ? 'relative z-40' : ''} ${isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''}
                         }`}
                     >
                       {/* Checkbox */}
-                      <td className="p-3.5 pl-5">
-                        <input
-                          type="checkbox"
+                      <td className="py-3 pl-3 pr-1">
+                        <CustomCheckbox
                           checked={isChecked}
                           onChange={() => toggleSelectCandidate(cand.id)}
-                          className="w-4 h-4 rounded text-[#1890FF] focus:ring-[#1890FF]/20 cursor-pointer"
+                          aria-label={`Select ${cand.name}`}
                         />
                       </td>
 
-                      {/* 1. Candidate */}
+                      {/* 1. Candidate: Streamlined name link without bulky avatar & email */}
                       {columnVisibility.candidate && (
-                        <td className="p-3.5">
-                          <div
+                        <td className="py-3 px-2.5">
+                          <button
+                            type="button"
                             onClick={() => handleViewProfile(cand)}
-                            className="flex items-center gap-3 cursor-pointer group/cand"
-                            title="Click to view candidate profile"
+                            className="font-bold text-xs text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors truncate block text-left max-w-[160px] cursor-pointer"
+                            title={`View ${cand.name}'s profile`}
                           >
-                            <div className="w-8 h-8 rounded-full bg-[#1890FF]/15 dark:bg-[#1890FF]/25 text-[#1890FF] border border-[#1890FF]/25 dark:border-[#1890FF]/35 font-extrabold text-[11px] flex items-center justify-center shrink-0 shadow-2xs group-hover/cand:scale-105 transition-transform">
-                              {initials}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-bold text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF] transition-colors truncate">
-                                {cand.name}
-                              </div>
-                              <div className="text-[11px] text-gray-400 dark:text-gray-500 truncate flex items-center gap-1">
-                                <Mail size={11} className="shrink-0 text-gray-400" />
-                                <span className="truncate">{cand.email}</span>
-                              </div>
-                            </div>
-                          </div>
+                            {cand.name}
+                          </button>
                         </td>
                       )}
 
                       {/* 2. Role Applied */}
                       {columnVisibility.role && (
-                        <td className="p-3.5">
-                          <div className="font-semibold text-[#212b36] dark:text-gray-200">
+                        <td className="py-3 px-2.5">
+                          <div className="font-semibold text-[#212b36] dark:text-gray-200 truncate max-w-[150px]" title={cand.role}>
                             {cand.role}
                           </div>
-                          <div className="text-[11px] text-gray-400">
+                          <div className="text-[11px] text-gray-400 truncate max-w-[150px]">
                             {cand.department}
                           </div>
                         </td>
@@ -1717,18 +1818,18 @@ export default function CandidatesPage() {
 
                       {/* 3. Location */}
                       {columnVisibility.location && (
-                        <td className="p-3.5">
-                          <div className="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 font-medium">
-                            <MapPin size={13} className="text-gray-400 shrink-0" />
-                            <span>{cand.location}</span>
+                        <td className="py-3 px-2">
+                          <div className="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 font-medium truncate max-w-[120px]" title={cand.location}>
+                            <MapPin size={12} className="text-gray-400 shrink-0" />
+                            <span className="truncate">{cand.location}</span>
                           </div>
                         </td>
                       )}
 
                       {/* 4. Experience & Company */}
                       {columnVisibility.experience && (
-                        <td className="p-3.5">
-                          <div className="font-medium text-[#212b36] dark:text-gray-200">
+                        <td className="py-3 px-2.5">
+                          <div className="font-medium text-[#212b36] dark:text-gray-200 truncate max-w-[140px]" title={cand.company}>
                             {cand.company}
                           </div>
                           <div className="text-[11px] text-gray-400">
@@ -1739,8 +1840,8 @@ export default function CandidatesPage() {
 
                       {/* 5. Notice Period */}
                       {columnVisibility.noticePeriod && (
-                        <td className="p-3.5">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getNoticePeriodBadgeStyle(cand.noticePeriod)}`}>
+                        <td className="py-3 px-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${getNoticePeriodBadgeStyle(cand.noticePeriod)}`}>
                             {cand.noticePeriod || '30 Days'}
                           </span>
                         </td>
@@ -1748,8 +1849,8 @@ export default function CandidatesPage() {
 
                       {/* 6. Status */}
                       {columnVisibility.status && (
-                        <td className="p-3.5">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusStyle.badge}`}>
+                        <td className="py-3 px-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusStyle.badge}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
                             <span>{cand.status || 'Active'}</span>
                           </span>
@@ -1758,15 +1859,15 @@ export default function CandidatesPage() {
 
                       {/* 7. Applied */}
                       {columnVisibility.applied && (
-                        <td className="p-3.5 text-gray-600 dark:text-gray-300 font-medium">
+                        <td className="py-3 px-2 text-gray-600 dark:text-gray-300 font-medium text-xs">
                           {cand.date}
                         </td>
                       )}
 
                       {/* 8. Match Score */}
                       {columnVisibility.matchScore && (
-                        <td className="p-3.5 text-center">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${scoreConfig.badge}`}>
+                        <td className="py-3 px-2 text-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${scoreConfig.badge}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${scoreConfig.dot}`} />
                             {cand.score}
                           </span>
@@ -1775,8 +1876,8 @@ export default function CandidatesPage() {
 
                       {/* 9. Pipeline Stage */}
                       {columnVisibility.stage && (
-                        <td className="p-3.5">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${getStageBadgeStyle(cand.stage)}`}>
+                        <td className="py-3 px-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border ${getStageBadgeStyle(cand.stage)}`}>
                             {cand.stage}
                           </span>
                         </td>
@@ -1784,38 +1885,110 @@ export default function CandidatesPage() {
 
                       {/* 10. Source */}
                       {columnVisibility.source && (
-                        <td className="p-3.5 text-gray-600 dark:text-gray-300 font-medium">
+                        <td className="py-3 px-2 text-gray-600 dark:text-gray-300 font-medium truncate max-w-[120px]" title={cand.source}>
                           {cand.source}
                         </td>
                       )}
 
                       {/* 11. Profile Updated */}
                       {columnVisibility.updated && (
-                        <td className="p-3.5 text-gray-500 dark:text-gray-400">
+                        <td className="py-3 px-2 text-gray-500 dark:text-gray-400 text-xs">
                           {cand.updated || cand.date || 'Recent'}
                         </td>
                       )}
 
-                      {/* 12. Action: Quick View (icon), Delete (reddish icon) */}
+                      {/* 12. Action: Favorite, Follow Up, Quick View, Delete */}
                       {columnVisibility.action && (
-                        <td className="p-3.5 pr-5 text-right sticky right-0 bg-white/95 dark:bg-[#161c24]/95 group-hover:bg-gray-50/95 dark:group-hover:bg-gray-800/95 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)]">
-                          <div className="flex items-center justify-end gap-1.5">
+                        <td className={`py-3 pl-2 pr-4 text-right sticky right-0 bg-white dark:bg-[#161c24] group-hover:bg-gray-50 dark:group-hover:bg-gray-800 backdrop-blur-xs shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_12px_rgba(0,0,0,0.2)] ${openActionMenuId === cand.id ? 'z-40' : 'z-10'}`}>
+                          <div className="flex items-center justify-end gap-1.5 relative">
+                            {/* Favorite Button */}
                             <button
-                              onClick={() => setQuickViewCandidate(cand)}
-                              title="Quick View"
-                              aria-label="Quick View"
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] transition-all cursor-pointer shadow-2xs border border-transparent hover:border-[#1890FF]/25"
+                              type="button"
+                              onClick={(e) => handleToggleFav(cand, e)}
+                              title={isItemFavorited('Candidate', cand.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
+                              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                                isItemFavorited('Candidate', cand.id)
+                                  ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50'
+                                  : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 border-transparent hover:border-amber-200/50'
+                              }`}
                             >
-                              <Eye size={16} />
+                              <Star size={14} className={isItemFavorited('Candidate', cand.id) ? 'fill-amber-400 text-amber-500' : ''} />
                             </button>
+
+                            {/* Follow Up Button */}
                             <button
-                              onClick={() => handleOpenDeleteModal(cand.id, cand.name)}
-                              title="Delete Candidate"
-                              aria-label="Delete Candidate"
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-[#FF5630] hover:text-[#d33a18] bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/70 dark:border-red-900/40 transition-all cursor-pointer shadow-2xs"
+                              type="button"
+                              onClick={(e) => handleOpenFollowup(cand, e)}
+                              title={isItemFollowedUp('Candidate', cand.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                                isItemFollowedUp('Candidate', cand.id)
+                                  ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
+                                  : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
+                              }`}
                             >
-                              <Trash2 size={15} />
+                              <CalendarClock size={14} />
                             </button>
+
+                            {/* Kebab Menu Button */}
+                            <div className="relative">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenActionMenuId(openActionMenuId === cand.id ? null : cand.id);
+                                }}
+                                title="More Actions"
+                                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer shadow-2xs border border-transparent"
+                              >
+                                <MoreVertical size={14} />
+                              </button>
+
+                              {/* Kebab Dropdown Menu */}
+                              {openActionMenuId === cand.id && (
+                                <div className={`absolute right-0 ${index >= paginatedCandidates.length - 2 && paginatedCandidates.length > 2 ? 'bottom-full mb-1' : 'top-8 mt-1'} w-44 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in text-left`}>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setQuickViewCandidate(cand);
+                                      setOpenActionMenuId(null);
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/80 flex items-center gap-2 transition-colors cursor-pointer"
+                                  >
+                                    <Eye size={14} className="text-[#1890FF]" />
+                                    <span>Quick View</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleViewProfile(cand);
+                                      setOpenActionMenuId(null);
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/80 flex items-center gap-2 transition-colors cursor-pointer"
+                                  >
+                                    <User size={14} className="text-gray-500 dark:text-gray-400" />
+                                    <span>View Profile</span>
+                                  </button>
+
+                                  <div className="my-1 border-t border-gray-100 dark:border-gray-800/60" />
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenDeleteModal(cand.id, cand.name);
+                                      setOpenActionMenuId(null);
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-xs font-semibold text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center gap-2 transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 size={14} className="text-[#FF5630]" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
                       )}
@@ -1847,11 +2020,10 @@ export default function CandidatesPage() {
                   {/* Card Top: Checkbox, Avatar, Name & Score */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
+                      <CustomCheckbox
                         checked={isChecked}
                         onChange={() => toggleSelectCandidate(cand.id)}
-                        className="w-4 h-4 rounded text-[#1890FF] focus:ring-[#1890FF]/20 cursor-pointer"
+                        aria-label={`Select ${cand.name}`}
                       />
                       <div
                         onClick={() => handleViewProfile(cand)}
@@ -1927,22 +2099,94 @@ export default function CandidatesPage() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
+                    {/* Favorite Button */}
                     <button
-                      onClick={() => setQuickViewCandidate(cand)}
-                      title="Quick View"
-                      aria-label="Quick View"
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-500 hover:text-[#1890FF] hover:bg-[#1890FF]/10 dark:text-gray-400 dark:hover:text-[#1890FF] border border-gray-200/60 dark:border-gray-700/60 hover:border-[#1890FF]/30 transition-all cursor-pointer shadow-2xs"
+                      type="button"
+                      onClick={(e) => handleToggleFav(cand, e)}
+                      title={isItemFavorited('Candidate', cand.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                        isItemFavorited('Candidate', cand.id)
+                          ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50'
+                          : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 border-gray-200/60 dark:border-gray-700/60'
+                      }`}
                     >
-                      <Eye size={15} />
+                      <Star size={14} className={isItemFavorited('Candidate', cand.id) ? 'fill-amber-400 text-amber-500' : ''} />
                     </button>
+
+                    {/* Follow Up Button */}
                     <button
-                      onClick={() => handleOpenDeleteModal(cand.id, cand.name)}
-                      title="Delete Candidate"
-                      aria-label="Delete Candidate"
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-[#FF5630] hover:text-[#d33a18] bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/70 dark:border-red-900/40 transition-all cursor-pointer shadow-2xs"
+                      type="button"
+                      onClick={(e) => handleOpenFollowup(cand, e)}
+                      title={isItemFollowedUp('Candidate', cand.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
+                        isItemFollowedUp('Candidate', cand.id)
+                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
+                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-950/30 border-gray-200/60 dark:border-gray-700/60'
+                      }`}
                     >
-                      <Trash2 size={14} />
+                      <CalendarClock size={14} />
                     </button>
+
+                    {/* Kebab Menu Button */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenActionMenuId(openActionMenuId === cand.id ? null : cand.id);
+                        }}
+                        title="More Actions"
+                        className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-500 hover:text-[#212b36] dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer shadow-2xs border border-gray-200/60 dark:border-gray-700/60"
+                      >
+                        <MoreVertical size={15} />
+                      </button>
+
+                      {/* Kebab Dropdown Menu */}
+                      {openActionMenuId === cand.id && (
+                        <div className="absolute right-0 bottom-full mb-1.5 w-44 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in text-left">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setQuickViewCandidate(cand);
+                              setOpenActionMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/80 flex items-center gap-2 transition-colors cursor-pointer"
+                          >
+                            <Eye size={14} className="text-[#1890FF]" />
+                            <span>Quick View</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewProfile(cand);
+                              setOpenActionMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/80 flex items-center gap-2 transition-colors cursor-pointer"
+                          >
+                            <User size={14} className="text-gray-500 dark:text-gray-400" />
+                            <span>View Profile</span>
+                          </button>
+
+                          <div className="my-1 border-t border-gray-100 dark:border-gray-800/60" />
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDeleteModal(cand.id, cand.name);
+                              setOpenActionMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-left text-xs font-semibold text-[#FF5630] hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center gap-2 transition-colors cursor-pointer"
+                          >
+                            <Trash2 size={14} className="text-[#FF5630]" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2001,93 +2245,104 @@ export default function CandidatesPage() {
       {/* ============================================================== */}
       {/* 6. FLOATING BULK ACTIONS BAR (When candidates checked)         */}
       {/* ============================================================== */}
-      {selectedCandidateIds.length > 0 && !isPanelDismissed && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 animate-fade-in border border-gray-700/80 backdrop-blur-md transition-all duration-200 ease-out group">
-
-          {/* Close Panel Icon on top-right, slightly outside the panel (Visible only on panel hover, constant background) */}
-          <button
-            onClick={() => setIsPanelDismissed(true)}
-            title="Close panel"
-            aria-label="Close panel"
-            className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100"
+      {isActionPanelMounted && (
+        <>
+          {/* Main Floating Bulk Actions Bar */}
+          <div
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 border border-gray-700/80 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${
+              isActionPanelVisible && !isPanelDismissed
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
+            }`}
           >
-            <X size={12} className="stroke-[2.5]" />
-          </button>
+            {/* Close Panel Icon on top-right, slightly outside the panel (Visible only on panel hover, constant background) */}
+            <button
+              onClick={() => setIsPanelDismissed(true)}
+              title="Close panel"
+              aria-label="Close panel"
+              className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+            >
+              <X size={12} className="stroke-[2.5]" />
+            </button>
 
-          <div className="flex items-center gap-2 min-w-[125px]">
-            <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
-              {selectedCandidateIds.length}
-            </span>
-            <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
-              {selectedCandidateIds.length} selected
-            </span>
+            <div className="flex items-center gap-2 min-w-[125px]">
+              <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
+                {displayCount}
+              </span>
+              <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
+                {displayCount} selected
+              </span>
+            </div>
+
+            <div className="h-4 w-px bg-gray-700" />
+
+            {/* Add to Job */}
+            <button
+              onClick={() => handleOpenAddToJobModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+            >
+              <Briefcase size={13} />
+              <span>Add to Job</span>
+            </button>
+
+            {/* Add to List */}
+            <button
+              onClick={() => handleOpenAddToListModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
+            >
+              <ListPlus size={13} />
+              <span>Add to List</span>
+            </button>
+
+            {/* Compare - Strictly Brand Theme Color, No Purple, Stable Width */}
+            <button
+              onClick={handleCompareWithAI}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+              title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
+            >
+              <Sparkles size={13} />
+              <span>Compare</span>
+            </button>
+
+            {/* Reject Selected */}
+            <button
+              onClick={() => handleOpenRejectModal(selectedCandidateIds, `${selectedCandidateIds.length} candidates`)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95"
+            >
+              <UserX size={13} className="text-white" />
+              <span>Reject Selected</span>
+            </button>
+
+            <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
+
+            {/* Deselect All (Uncheck all candidates) - Clearly Visible by Default */}
+            <button
+              onClick={() => setSelectedCandidateIds([])}
+              title="Deselect All (Clear Selection)"
+              aria-label="Deselect All"
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
+            >
+              <SquareMinus size={15} className="text-white" />
+            </button>
           </div>
 
-          <div className="h-4 w-px bg-gray-700" />
-
-          {/* Add to Job */}
+          {/* Minimized Pill to reopen panel when dismissed */}
           <button
-            onClick={() => handleOpenAddToJobModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0"
+            onClick={() => setIsPanelDismissed(false)}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${
+              isActionPanelVisible && isPanelDismissed
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
+            }`}
+            title="Reopen bulk actions panel"
           >
-            <Briefcase size={13} />
-            <span>Add to Job</span>
+            <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
+              {displayCount}
+            </span>
+            <span>Show Actions Panel</span>
+            <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
           </button>
-
-          {/* Add to List */}
-          <button
-            onClick={() => handleOpenAddToListModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition-all cursor-pointer shadow-xs shrink-0"
-          >
-            <ListPlus size={13} />
-            <span>Add to List</span>
-          </button>
-
-          {/* Compare - Strictly Brand Theme Color, No Purple, Stable Width */}
-          <button
-            onClick={handleCompareWithAI}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0"
-            title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
-          >
-            <Sparkles size={13} />
-            <span>Compare</span>
-          </button>
-
-          {/* Reject Selected */}
-          <button
-            onClick={() => handleOpenRejectModal(selectedCandidateIds, `${selectedCandidateIds.length} candidates`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25"
-          >
-            <UserX size={13} className="text-white" />
-            <span>Reject Selected</span>
-          </button>
-
-          <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
-
-          {/* Deselect All (Uncheck all candidates) - Clearly Visible by Default */}
-          <button
-            onClick={() => setSelectedCandidateIds([])}
-            title="Deselect All (Clear Selection)"
-            aria-label="Deselect All"
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0"
-          >
-            <SquareMinus size={15} className="text-white" />
-          </button>
-        </div>
-      )}
-
-      {/* Minimized Pill to reopen panel when dismissed */}
-      {selectedCandidateIds.length > 0 && isPanelDismissed && (
-        <button
-          onClick={() => setIsPanelDismissed(false)}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-3.5 py-1.5 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 transition-all text-xs font-bold cursor-pointer animate-fade-in backdrop-blur-md"
-          title="Reopen bulk actions panel"
-        >
-          <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
-            {selectedCandidateIds.length}
-          </span>
-          <span>Show Actions Panel</span>
-        </button>
+        </>
       )}
 
       {/* ============================================================== */}
@@ -2334,9 +2589,14 @@ export default function CandidatesPage() {
                   <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
                     Select Candidate <span className="text-[#FF5630]">*</span>
                   </label>
-                  <select
-                    onChange={(e) => {
-                      const selectedId = e.target.value;
+                  <SearchableSelect
+                    options={candidates.map(c => ({
+                      label: c.name,
+                      value: c.id,
+                      description: `${c.role} • ${c.company || c.department || 'Candidate'}`
+                    }))}
+                    value={addToJobModal.candidateIds[0] || ''}
+                    onChange={(selectedId) => {
                       const candObj = candidates.find(c => c.id === selectedId);
                       setAddToJobModal(prev => ({
                         ...prev,
@@ -2344,14 +2604,11 @@ export default function CandidatesPage() {
                         candidateName: candObj ? candObj.name : ''
                       }));
                     }}
-                    defaultValue=""
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-xs font-semibold"
-                  >
-                    <option value="" disabled>Choose a candidate...</option>
-                    {candidates.map(c => (
-                      <option key={c.id} value={c.id}>{c.name} — ({c.role})</option>
-                    ))}
-                  </select>
+                    placeholder="Choose a candidate..."
+                    searchPlaceholder="Search candidates..."
+                    showSearch={true}
+                    size="default"
+                  />
                 </div>
               ) : (
                 <div className="p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700/60">
@@ -2370,15 +2627,19 @@ export default function CandidatesPage() {
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
                   Target Job Opening <span className="text-[#FF5630]">*</span>
                 </label>
-                <select
+                <SearchableSelect
+                  options={appliedJobFilterOptions.filter(j => j.value !== 'All').map(j => ({
+                    label: j.label,
+                    value: j.value,
+                    description: 'Active requisition'
+                  }))}
                   value={addToJobModal.targetJob}
-                  onChange={(e) => setAddToJobModal({ ...addToJobModal, targetJob: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-xs font-semibold"
-                >
-                  {appliedJobFilterOptions.filter(j => j.value !== 'All').map(j => (
-                    <option key={j.value} value={j.value}>{j.label}</option>
-                  ))}
-                </select>
+                  onChange={(val) => setAddToJobModal(prev => ({ ...prev, targetJob: val }))}
+                  placeholder="Select Target Job Opening..."
+                  searchPlaceholder="Search job openings..."
+                  showSearch={true}
+                  size="default"
+                />
               </div>
 
               {/* Initial Pipeline Stage */}
@@ -2386,15 +2647,24 @@ export default function CandidatesPage() {
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
                   Initial Pipeline Stage
                 </label>
-                <select
+                <SearchableSelect
+                  options={stageOptions.map(s => ({
+                    label: s.label,
+                    value: s.value,
+                    description: s.value === 'Screening' ? 'Initial recruiter screening & resume review'
+                      : s.value === 'Technical Interview' ? 'Coding & architecture deep-dive'
+                      : s.value === 'Culture Fit' ? 'Values & behavioral alignment'
+                      : s.value === 'Offer' ? 'Offer extended / under discussion'
+                      : s.value === 'Hired' ? 'Signed offer & onboarding'
+                      : 'Pipeline stage'
+                  }))}
                   value={addToJobModal.targetStage}
-                  onChange={(e) => setAddToJobModal({ ...addToJobModal, targetStage: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-xs font-semibold"
-                >
-                  {stageOptions.map(s => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
+                  onChange={(val) => setAddToJobModal(prev => ({ ...prev, targetStage: val }))}
+                  placeholder="Select Pipeline Stage..."
+                  searchPlaceholder="Search stages..."
+                  showSearch={false}
+                  size="default"
+                />
               </div>
 
               {/* Notes */}
@@ -2827,6 +3097,16 @@ export default function CandidatesPage() {
         </div>
       )}
 
+      {/* Follow-Up Schedule Modal */}
+      <FollowUpModal
+        isOpen={Boolean(followUpTarget)}
+        onClose={() => setFollowUpTarget(null)}
+        targetItem={followUpTarget}
+        onFollowupAdded={() => {
+          setToastMessage('Follow-up reminder scheduled!');
+          setTimeout(() => setToastMessage(''), 3000);
+        }}
+      />
     </div>
   );
 }

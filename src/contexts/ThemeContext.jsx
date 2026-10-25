@@ -5,23 +5,23 @@ const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
- const [theme, setTheme] = useState(() => {
- // Read from localStorage or default to 'light'
- const savedTheme = localStorage.getItem('findnew-theme');
- return savedTheme || 'light';
- });
+  const [theme, setTheme] = useState(() => {
+    // Read from localStorage or default to 'light'
+    const savedTheme = localStorage.getItem('findnew-theme');
+    return savedTheme || 'light';
+  });
 
- useEffect(() => {
- localStorage.setItem('findnew-theme', theme);
- }, [theme]);
+  useEffect(() => {
+    localStorage.setItem('findnew-theme', theme);
+  }, [theme]);
 
- const toggleTheme = () => {
- setTheme(prev => prev === 'light' ? 'dark' : 'light');
- };
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
- return (
- <ThemeContext.Provider value={{ theme, toggleTheme }}>
- {children}
- </ThemeContext.Provider>
- );
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };

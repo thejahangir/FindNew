@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown, Check } from 'lucide-react';
 
 export default function SearchableSelect({ 
   options = [], 
@@ -52,14 +52,17 @@ export default function SearchableSelect({
         <span className={`${size === 'xs' ? 'text-[11.5px]' : 'text-[13px]'} font-semibold truncate ${selectedOption ? 'text-[#212b36] dark:text-white' : 'text-gray-400 dark:text-gray-400'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <span className={`text-gray-400 font-bold px-1 ${size === 'xs' ? 'text-[10px]' : 'text-xs'}`}>
-          {isOpen ? '▲' : '▼'}
-        </span>
+        <ChevronDown 
+          size={size === 'xs' ? 12 : 14} 
+          className={`text-gray-400 dark:text-gray-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-[#1890FF]' : ''}`} 
+        />
       </div>
 
-      {/* Dropdown Menu (Downwards Only) */}
+      {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-[150] w-full top-full mt-1 origin-top bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+        <div className={`absolute z-[150] w-full ${
+          placement === 'top' ? 'bottom-full mb-1 origin-bottom' : 'top-full mt-1 origin-top'
+        } bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden animate-fade-in`}>
           
           {showSearch && (
             <div className="p-2 border-b border-gray-100 dark:border-gray-800/50">
@@ -106,7 +109,7 @@ export default function SearchableSelect({
                     )}
                   </div>
                   {value === option.value && (
-                    <span className="text-[#1890FF] font-bold text-xs shrink-0">✓</span>
+                    <Check size={14} strokeWidth={2.5} className="text-[#1890FF] shrink-0" />
                   )}
                 </div>
               ))

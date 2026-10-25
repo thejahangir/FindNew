@@ -465,3 +465,44 @@ export function saveStoredLists(lists) {
     // ignore
   }
 }
+
+export function addCandidatesToList(listId, candidateIds) {
+  const currentLists = getStoredLists();
+  const updatedLists = currentLists.map(list => {
+    if (list.id === listId) {
+      const existing = new Set(list.candidateIds || []);
+      candidateIds.forEach(id => existing.add(id));
+      return {
+        ...list,
+        candidateIds: Array.from(existing),
+        updatedAt: 'Just now'
+      };
+    }
+    return list;
+  });
+  saveStoredLists(updatedLists);
+  return updatedLists;
+}
+
+export function moveCandidatesToList(targetListId, candidateIds) {
+  const currentLists = getStoredLists();
+  const updatedLists = currentLists.map(list => {
+    if (list.id === targetListId) {
+      const existing = new Set(list.candidateIds || []);
+      candidateIds.forEach(id => existing.add(id));
+      return {
+        ...list,
+        candidateIds: Array.from(existing),
+        updatedAt: 'Just now'
+      };
+    } else {
+      return {
+        ...list,
+        candidateIds: (list.candidateIds || []).filter(id => !candidateIds.includes(id)),
+        updatedAt: 'Just now'
+      };
+    }
+  });
+  saveStoredLists(updatedLists);
+  return updatedLists;
+}

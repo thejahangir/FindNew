@@ -1,6 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CheckSquare, Settings, CheckCircle, XCircle } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { CheckSquare, Settings, ChevronRight, CheckCircle, XCircle } from 'lucide-react';
 
 const mockApprovals = [
  { id: 1, type: 'Job Offer', subject: 'Senior AI Research Scientist', candidate: 'Ananya Sharma', date: 'Today, 10:30 AM', status: 'Pending' },
@@ -11,20 +11,44 @@ export default function ApprovalsPage() {
  const navigate = useNavigate();
 
  return (
- <div className="p-6 space-y-6 animate-fade-in">
- <div className="flex items-center justify-between">
- <div>
- <h1 className="text-2xl font-bold text-[#212b36] dark:text-white">Approvals</h1>
- <p className="text-sm text-black dark:text-gray-400 mt-1">Review and approve pending requests.</p>
- </div>
- <button 
- onClick={() => navigate('/dashboard/agencies', { state: { jobData: { title: 'New Requisition', status: 'Draft' }, tab: 'Job Setup' } })}
- className="px-4 py-2 text-sm font-bold text-white bg-[#212b36] dark:bg-white dark:text-[#212b36] rounded-xl hover:bg-black dark:hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-[0_2px_10px_rgb(0,0,0,0.08)] cursor-pointer"
- title="Create a new job"
- >
- <Settings size={16} /> Create Job
- </button>
- </div>
+ <div className="p-6 space-y-5 relative animate-fade-in font-sans">
+      {/* TOP BREADCRUMBS */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+          Dashboard
+        </Link>
+        <ChevronRight size={14} className="text-gray-400 shrink-0" />
+        <span className="text-[#212b36] dark:text-white">Approvals</span>
+      </nav>
+
+      {/* APPROVALS HEADER CARD */}
+      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                Approvals
+              </h1>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#FFC107]/15 text-[#b78103] dark:text-[#FFC107]">
+                {mockApprovals.length} Pending
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+              Review and approve pending requisitions, offers, and hiring requests.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button 
+              onClick={() => navigate('/dashboard/agencies', { state: { jobData: { title: 'New Requisition', status: 'Draft' }, tab: 'Job Setup' } })}
+              className="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#212b36] dark:bg-white dark:text-[#212b36] rounded-xl hover:bg-black dark:hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-sm cursor-pointer h-[38px]"
+              title="Create a new job"
+            >
+              <Settings size={15} /> Create Job
+            </button>
+          </div>
+        </div>
+      </div>
 
  <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800/50 overflow-hidden">
  <table className="w-full text-left border-collapse">
