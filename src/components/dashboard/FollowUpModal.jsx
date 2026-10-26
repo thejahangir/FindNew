@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, CalendarClock, Clock, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { addFollowup } from '../../data/followupsData';
 
@@ -79,7 +80,7 @@ export default function FollowUpModal({ isOpen, onClose, targetItem, onFollowupA
     'Next Monday • 9:30 AM'
   ];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in font-sans">
       <div className="bg-white dark:bg-[#161c24] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 dark:border-gray-800 animate-scale-up">
         {/* Header */}
@@ -224,6 +225,7 @@ export default function FollowUpModal({ isOpen, onClose, targetItem, onFollowupA
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

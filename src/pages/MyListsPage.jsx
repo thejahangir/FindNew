@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Bookmark,
@@ -722,8 +723,8 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
 
             <div className="flex items-center gap-3 shrink-0 flex-wrap">
               {/* Switch Button (Pure button, not link) */}
-              <div 
-                role="group" 
+              <div
+                role="group"
                 aria-label="View Switcher"
                 className="inline-flex items-center bg-gray-100/90 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700/80 shadow-2xs transition-colors duration-300 select-none"
               >
@@ -832,8 +833,8 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(true)}
-                title="Create a new candidate list"
-                aria-label="Create a new candidate list"
+                title="Create a new list"
+                aria-label="Create a new list"
                 className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#1890FF] hover:bg-[#0077e6] text-white shadow-sm shadow-[#1890FF]/35 hover:scale-110 active:scale-95 transition-all cursor-pointer ring-2 ring-[#1890FF]/25"
               >
                 <Plus size={16} className="stroke-[2.5]" />
@@ -1674,8 +1675,8 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
       {/* ============================================================== */}
       {/* 2.5. MODAL: ADD CANDIDATES TO ANOTHER LIST                     */}
       {/* ============================================================== */}
-      {isAddAnotherListModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {isAddAnotherListModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-3">
@@ -1790,14 +1791,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 3. MODAL: CREATE NEW LIST                                      */}
       {/* ============================================================== */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {isCreateModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2.5">
@@ -1806,7 +1808,7 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[#212b36] dark:text-white">
-                    Create New Candidate List
+                    Create New List
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Organize target profiles for custom talent pipelines
@@ -1907,14 +1909,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 4. MODAL: EDIT LIST DETAILS                                    */}
       {/* ============================================================== */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {isEditModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2.5">
@@ -2021,14 +2024,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 5. MODAL: ADD CANDIDATES TO ACTIVE LIST                        */}
       {/* ============================================================== */}
-      {isAddCandidatesModalOpen && activeList && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {isAddCandidatesModalOpen && activeList && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-2xl w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4 max-h-[90vh] flex flex-col">
 
             {/* Header */}
@@ -2178,14 +2182,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 6. MODAL: DELETE LIST CONFIRMATION                             */}
       {/* ============================================================== */}
-      {deleteListModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {deleteListModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/30 text-[#FF5630] flex items-center justify-center mx-auto">
               <Trash2 size={24} />
@@ -2217,14 +2222,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 7. MODAL: QUICK VIEW CANDIDATE DOSSIER                         */}
       {/* ============================================================== */}
-      {quickViewCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {quickViewCandidate && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-gray-100 dark:border-gray-800 space-y-5">
 
             {/* Quick View Header */}
@@ -2346,7 +2352,8 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

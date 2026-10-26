@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import {
   Users,
@@ -2435,8 +2436,8 @@ export default function CandidatesPage({ defaultTab }) {
       {/* ============================================================== */}
       {/* 7. ADD CANDIDATE MODAL                                         */}
       {/* ============================================================== */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {isAddModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <h3 className="text-lg font-bold text-[#212b36] dark:text-white">
@@ -2582,14 +2583,15 @@ export default function CandidatesPage({ defaultTab }) {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 8. REJECT CANDIDATE MODAL                                      */}
       {/* ============================================================== */}
-      {rejectModalData.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {rejectModalData.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 text-[#FF5630] flex items-center justify-center mx-auto">
               <UserX size={24} />
@@ -2636,14 +2638,15 @@ export default function CandidatesPage({ defaultTab }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 9. ADD CANDIDATE TO JOB MODAL                                  */}
       {/* ============================================================== */}
-      {addToJobModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {addToJobModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
 
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
@@ -2788,14 +2791,15 @@ export default function CandidatesPage({ defaultTab }) {
             </form>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 10. ADD CANDIDATE TO LIST MODAL                                */}
       {/* ============================================================== */}
-      {addToListModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in">
+      {addToListModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
 
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
@@ -2914,14 +2918,15 @@ export default function CandidatesPage({ defaultTab }) {
 
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 11. CANDIDATE QUICK VIEW MODAL                                 */}
       {/* ============================================================== */}
-      {quickViewCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+      {quickViewCandidate && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-2xl w-full border border-gray-100 dark:border-gray-800 overflow-hidden my-8 animate-scale-up text-left">
             
             {/* Header with gradient banner / top accent */}
@@ -3135,14 +3140,15 @@ export default function CandidatesPage({ defaultTab }) {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================== */}
       {/* 12. DELETE CANDIDATE CONFIRMATION MODAL                        */}
       {/* ============================================================== */}
-      {deleteConfirmModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs animate-fade-in text-left">
+      {deleteConfirmModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in text-left">
           <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2.5">
@@ -3181,7 +3187,8 @@ export default function CandidatesPage({ defaultTab }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Follow-Up Schedule Modal */}
