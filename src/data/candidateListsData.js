@@ -461,6 +461,9 @@ export function getStoredLists() {
 export function saveStoredLists(lists) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('candidate-lists-updated', { detail: lists }));
+    }
   } catch {
     // ignore
   }

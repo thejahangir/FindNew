@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import {
   Users,
+  Bookmark,
   Search,
   Plus,
   Download,
@@ -38,6 +39,7 @@ import { getStoredLists, saveStoredLists } from '../data/candidateListsData';
 import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
 import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
 import FollowUpModal from '../components/dashboard/FollowUpModal';
+import MyListsPage from './MyListsPage';
 import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
 import { isItemFollowedUp } from '../data/followupsData';
 
@@ -422,11 +424,51 @@ const INITIAL_CANDIDATES = [
   }
 ];
 
-export default function CandidatesPage() {
+export default function CandidatesPage({ defaultTab }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeViewParam = searchParams.get('view') || 'all';
   const { compareCandidates } = useChatbot();
+
+  // Tab switching between 'candidates' and 'my-lists'
+  const isMyListsRoute = location.pathname.includes('/dashboard/my-lists');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (defaultTab) return defaultTab;
+    return isMyListsRoute ? 'my-lists' : 'candidates';
+  });
+
+  const [externalOpenCreateList, setExternalOpenCreateList] = useState(false);
+  const [storedListsCount, setStoredListsCount] = useState(() => getStoredLists().length);
+
+  // Sync list count in real-time
+  useEffect(() => {
+    const syncLists = () => {
+      setStoredListsCount(getStoredLists().length);
+    };
+    window.addEventListener('storage', syncLists);
+    window.addEventListener('candidate-lists-updated', syncLists);
+    return () => {
+      window.removeEventListener('storage', syncLists);
+      window.removeEventListener('candidate-lists-updated', syncLists);
+    };
+  }, []);
+
+  // Sync activeTab if location.pathname changes externally
+  useEffect(() => {
+    if (location.pathname.includes('/dashboard/my-lists')) {
+      setActiveTab('my-lists');
+    } else if (location.pathname.includes('/dashboard/candidates')) {
+      setActiveTab('candidates');
+    }
+  }, [location.pathname]);
+
+  const handleSwitchView = (targetTab) => {
+    if (targetTab === activeTab) return;
+    setActiveTab(targetTab);
+    const targetPath = targetTab === 'my-lists' ? '/dashboard/my-lists' : '/dashboard/candidates';
+    navigate(targetPath, { replace: true });
+  };
 
   // Candidates state
   const [candidates, setCandidates] = useState(INITIAL_CANDIDATES);
@@ -1502,48 +1544,93 @@ export default function CandidatesPage() {
           Dashboard
         </Link>
         <ChevronRight size={14} className="text-gray-400 shrink-0" />
-        <span className="text-[#212b36] dark:text-white">Candidates</span>
+        <span className="text-[#212b36] dark:text-white">
+          {activeTab === 'candidates' ? 'Candidates' : 'My Lists'}
+        </span>
       </nav>
 
-      {/* CANDIDATES HEADER CARD */}
+      {/* CANDIDATES / MY LISTS HEADER CARD */}
       <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                List of Candidates
+                {activeTab === 'candidates' ? 'List of Candidates' : 'My Lists'}
               </h1>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
-                {candidates.length} Total
+                {activeTab === 'candidates' ? `${candidates.length} Total` : `${storedListsCount} Lists`}
               </span>
             </div>
             <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
-              Search, evaluate, and track candidate profiles across all active requisitions and pipelines.
+              {activeTab === 'candidates'
+                ? 'Search, evaluate, and track candidate profiles across all active requisitions and pipelines.'
+                : 'Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <button
-              onClick={() => showToast('Exporting candidate list as CSV...')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors shadow-2xs cursor-pointer h-[38px]"
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            {/* Switch Button (Pure button, not link) */}
+            <div 
+              role="group" 
+              aria-label="View Switcher"
+              className="inline-flex items-center bg-gray-100/90 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700/80 shadow-2xs transition-colors duration-300 select-none"
             >
-              <Download size={15} className="text-gray-500" />
-              <span>Export</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchView('candidates')}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none ${
+                  activeTab === 'candidates'
+                    ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
+                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+                title="Switch to List of Candidates"
+              >
+                <Users size={14} className={`transition-all duration-300 ${activeTab === 'candidates' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
+                <span>List of Candidates</span>
+              </button>
 
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
-            >
-              <Plus size={15} />
-              <span>Add Candidate</span>
-            </button>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={activeTab === 'my-lists'}
+                onClick={() => handleSwitchView(activeTab === 'candidates' ? 'my-lists' : 'candidates')}
+                className={`mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 cursor-pointer ${
+                  activeTab === 'my-lists' ? 'bg-[#1890FF]/25 dark:bg-[#1890FF]/30' : 'bg-gray-300 dark:bg-gray-700'
+                }`}
+                title={activeTab === 'candidates' ? 'Switch to My Lists' : 'Switch to List of Candidates'}
+              >
+                <span
+                  className={`w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs ${
+                    activeTab === 'my-lists' ? 'translate-x-3.5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSwitchView('my-lists')}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none ${
+                  activeTab === 'my-lists'
+                    ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
+                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+                title="Switch to My Lists"
+              >
+                <Bookmark size={14} className={`transition-all duration-300 ${activeTab === 'my-lists' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
+                <span>My Lists</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* 2. 5 KPI OVERVIEW CARDS (Matching List of Jobs style)          */}
+      {/* SWITCHABLE BODY PART WITH SMOOTH TRANSITION                    */}
+      {/* ============================================================== */}
+      <div key={activeTab} className="transition-all duration-300 animate-fade-in">
+        {activeTab === 'candidates' ? (
+          <div className="space-y-5">
+          {/* 2. 5 KPI OVERVIEW CARDS (Matching List of Jobs style)          */}
       {/* ============================================================== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {kpiCards.map((kpi) => {
@@ -3107,6 +3194,15 @@ export default function CandidatesPage() {
           setTimeout(() => setToastMessage(''), 3000);
         }}
       />
+    </div>
+  ) : (
+    <MyListsPage
+      isEmbedded={true}
+      externalOpenCreateModal={externalOpenCreateList}
+      onResetCreateModal={() => setExternalOpenCreateList(false)}
+    />
+  )}
+      </div>
     </div>
   );
 }

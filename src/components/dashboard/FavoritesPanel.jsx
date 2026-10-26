@@ -76,6 +76,19 @@ export default function FavoritesPanel({ isOpen, onClose }) {
     }
   };
 
+  const getItemIconContainerStyle = (type) => {
+    switch (type) {
+      case 'Job':
+        return 'bg-blue-50/80 dark:bg-gray-800 text-[#1890FF] border border-blue-100/50 dark:border-gray-700/60 shadow-xs';
+      case 'Candidate':
+        return 'bg-amber-50 dark:bg-amber-950/40 text-amber-500 border border-amber-100/50 dark:border-amber-900/30';
+      case 'Application':
+        return 'bg-amber-50 dark:bg-amber-950/40 text-amber-500 border border-amber-100/50 dark:border-amber-900/30';
+      default:
+        return 'bg-blue-50/80 dark:bg-gray-800 text-[#1890FF] border border-blue-100/50 dark:border-gray-700/60 shadow-xs';
+    }
+  };
+
   return createPortal(
     <>
       {/* Backdrop */}
@@ -159,11 +172,13 @@ export default function FavoritesPanel({ isOpen, onClose }) {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${getItemIconContainerStyle(item.type)}`}>
                         <Icon size={18} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-500 transition-colors truncate">
+                        <h4 className={`text-xs sm:text-sm font-bold text-gray-900 dark:text-white transition-colors truncate ${
+                          item.type === 'Job' ? 'group-hover:text-[#1890FF]' : 'group-hover:text-amber-500'
+                        }`}>
                           {item.title}
                         </h4>
                         {item.meta && (
@@ -176,7 +191,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
                             {activeCat.label}
                           </span>
                           {item.tag && (
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
                               {item.tag}
                             </span>
                           )}

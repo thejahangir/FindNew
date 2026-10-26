@@ -58,7 +58,7 @@ const CATEGORY_OPTIONS = [
   { value: 'General', label: 'General Talent Pool' }
 ];
 
-export default function MyListsPage() {
+export default function MyListsPage({ isEmbedded = false, externalOpenCreateModal = false, onResetCreateModal }) {
   const navigate = useNavigate();
   const { compareCandidates } = useChatbot();
 
@@ -247,6 +247,15 @@ export default function MyListsPage() {
     color: '#1890FF',
     tags: ''
   });
+
+  useEffect(() => {
+    if (externalOpenCreateModal) {
+      setIsCreateModalOpen(true);
+      if (onResetCreateModal) {
+        onResetCreateModal();
+      }
+    }
+  }, [externalOpenCreateModal, onResetCreateModal]);
 
   // Edit List Modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -668,7 +677,7 @@ export default function MyListsPage() {
   // 8. RENDER VIEW
   // -------------------------------------------------------------
   return (
-    <div className="p-6 space-y-5 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in font-sans">
+    <div className={isEmbedded ? "space-y-5 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in font-sans" : "p-6 space-y-5 relative w-full text-[#212b36] dark:text-gray-100 animate-fade-in font-sans"}>
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (
@@ -678,47 +687,80 @@ export default function MyListsPage() {
         </div>
       )}
 
-      {/* TOP BREADCRUMBS */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
-        <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
-          Dashboard
-        </Link>
-        <ChevronRight size={14} className="text-gray-400 shrink-0" />
-        <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors cursor-pointer">
-          Candidates
-        </Link>
-        <ChevronRight size={14} className="text-gray-400 shrink-0" />
-        <span className="text-[#212b36] dark:text-white">My Candidate Lists</span>
-      </nav>
+      {/* TOP BREADCRUMBS (Only when not embedded) */}
+      {!isEmbedded && (
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] font-bold text-gray-500 dark:text-gray-400 mb-1">
+          <Link to="/dashboard" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+            Dashboard
+          </Link>
+          <ChevronRight size={14} className="text-gray-400 shrink-0" />
+          <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors cursor-pointer">
+            Candidates
+          </Link>
+          <ChevronRight size={14} className="text-gray-400 shrink-0" />
+          <span className="text-[#212b36] dark:text-white">My Lists</span>
+        </nav>
+      )}
 
-      {/* MY LISTS HEADER CARD */}
-      <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                My Candidate Lists
-              </h1>
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
-                {lists.length} Lists
-              </span>
+      {/* MY LISTS HEADER CARD (Only when not embedded) */}
+      {!isEmbedded && (
+        <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
+                  My Lists
+                </h1>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
+                  {lists.length} Lists
+                </span>
+              </div>
+              <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
+                Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.
+              </p>
             </div>
-            <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
-              Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.
-            </p>
-          </div>
 
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-[#1890FF] hover:bg-[#0077e6] rounded-xl transition-all shadow-sm cursor-pointer h-[38px]"
-            >
-              <Plus size={15} />
-              <span>Create New List</span>
-            </button>
+            <div className="flex items-center gap-3 shrink-0 flex-wrap">
+              {/* Switch Button (Pure button, not link) */}
+              <div 
+                role="group" 
+                aria-label="View Switcher"
+                className="inline-flex items-center bg-gray-100/90 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700/80 shadow-2xs transition-colors duration-300 select-none"
+              >
+                <button
+                  type="button"
+                  onClick={() => navigate('/dashboard/candidates')}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
+                  title="Switch to List of Candidates"
+                >
+                  <Users size={14} className="text-gray-400 transition-colors duration-300" />
+                  <span>List of Candidates</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={true}
+                  onClick={() => navigate('/dashboard/candidates')}
+                  className="mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 bg-[#1890FF]/25 dark:bg-[#1890FF]/30 cursor-pointer"
+                  title="Switch to List of Candidates"
+                >
+                  <span className="w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs translate-x-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]"
+                  title="My Lists (Active)"
+                >
+                  <Bookmark size={14} className="text-[#1890FF] transition-colors duration-300 scale-105" />
+                  <span>My Lists</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* QUICK SUMMARY CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
@@ -788,11 +830,13 @@ export default function MyListsPage() {
                 </span>
               </div>
               <button
+                type="button"
                 onClick={() => setIsCreateModalOpen(true)}
                 title="Create a new candidate list"
-                className="p-1 rounded-lg text-[#1890FF] hover:bg-[#1890FF]/10 transition-colors cursor-pointer"
+                aria-label="Create a new candidate list"
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#1890FF] hover:bg-[#0077e6] text-white shadow-sm shadow-[#1890FF]/35 hover:scale-110 active:scale-95 transition-all cursor-pointer ring-2 ring-[#1890FF]/25"
               >
-                <Plus size={16} />
+                <Plus size={16} className="stroke-[2.5]" />
               </button>
             </div>
 
@@ -839,11 +883,10 @@ export default function MyListsPage() {
                   <div
                     key={list.id}
                     onClick={() => setSelectedListId(list.id)}
-                    className={`group relative p-2.5 px-3 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#1890FF]/10 dark:bg-[#1890FF]/15 border-[#1890FF]/40 shadow-2xs'
-                        : 'bg-white dark:bg-[#161c24] border-gray-100 dark:border-gray-800/80 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-800/40'
-                    }`}
+                    className={`group relative p-2.5 px-3 rounded-xl border transition-all cursor-pointer ${isSelected
+                      ? 'bg-[#1890FF]/10 dark:bg-[#1890FF]/15 border-[#1890FF]/40 shadow-2xs'
+                      : 'bg-white dark:bg-[#161c24] border-gray-100 dark:border-gray-800/80 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-800/40'
+                      }`}
                   >
                     <div className="flex items-center justify-between gap-2 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
@@ -851,9 +894,8 @@ export default function MyListsPage() {
                           className="w-2.5 h-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: list.color || '#1890FF' }}
                         />
-                        <h3 className={`text-xs sm:text-[13px] font-bold truncate ${
-                          isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover:text-[#1890FF]'
-                        }`}>
+                        <h3 className={`text-xs sm:text-[13px] font-bold truncate ${isSelected ? 'text-[#1890FF]' : 'text-[#212b36] dark:text-white group-hover:text-[#1890FF]'
+                          }`}>
                           {list.name}
                         </h3>
                       </div>
@@ -890,11 +932,10 @@ export default function MyListsPage() {
                         </div>
 
                         {/* Candidate count badge */}
-                        <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold shrink-0 ${
-                          isSelected
-                            ? 'bg-[#1890FF] text-white shadow-2xs'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                        }`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold shrink-0 ${isSelected
+                          ? 'bg-[#1890FF] text-white shadow-2xs'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                          }`}>
                           {candidateCount}
                         </span>
                       </div>
@@ -1015,22 +1056,20 @@ export default function MyListsPage() {
                     <button
                       onClick={() => setViewMode('table')}
                       title="Table View"
-                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                        viewMode === 'table'
-                          ? 'bg-white dark:bg-gray-700 text-[#1890FF] shadow-2xs'
-                          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                      }`}
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${viewMode === 'table'
+                        ? 'bg-white dark:bg-gray-700 text-[#1890FF] shadow-2xs'
+                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}
                     >
                       <TableIcon size={14} />
                     </button>
                     <button
                       onClick={() => setViewMode('grid')}
                       title="Card Grid View"
-                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                        viewMode === 'grid'
-                          ? 'bg-white dark:bg-gray-700 text-[#1890FF] shadow-2xs'
-                          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                      }`}
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${viewMode === 'grid'
+                        ? 'bg-white dark:bg-gray-700 text-[#1890FF] shadow-2xs'
+                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}
                     >
                       <LayoutGrid size={14} />
                     </button>
@@ -1042,11 +1081,10 @@ export default function MyListsPage() {
                       type="button"
                       onClick={() => setIsColumnPickerOpen(prev => !prev)}
                       title="Customize Columns"
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer h-[34px] ${
-                        isColumnPickerOpen
-                          ? 'bg-[#1890FF]/10 text-[#1890FF] border-[#1890FF]/30 font-bold'
-                          : 'bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:text-[#1890FF] hover:border-[#1890FF]/40'
-                      }`}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer h-[34px] ${isColumnPickerOpen
+                        ? 'bg-[#1890FF]/10 text-[#1890FF] border-[#1890FF]/30 font-bold'
+                        : 'bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:text-[#1890FF] hover:border-[#1890FF]/40'
+                        }`}
                     >
                       <SlidersHorizontal size={13} />
                       <span className="hidden sm:inline">Columns</span>
@@ -1074,9 +1112,8 @@ export default function MyListsPage() {
                             return (
                               <label
                                 key={col.key}
-                                className={`flex items-center justify-between p-1.5 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors select-none ${
-                                  col.required ? 'opacity-60 cursor-not-allowed' : ''
-                                }`}
+                                className={`flex items-center justify-between p-1.5 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors select-none ${col.required ? 'opacity-60 cursor-not-allowed' : ''
+                                  }`}
                               >
                                 <div className="min-w-0 pr-2">
                                   <span className="font-semibold text-[#212b36] dark:text-gray-200 block truncate">
@@ -1221,9 +1258,8 @@ export default function MyListsPage() {
                         return (
                           <tr
                             key={cand.id}
-                            className={`transition-colors group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 ${
-                              isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
-                            }`}
+                            className={`transition-colors group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 ${isChecked ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                              }`}
                           >
                             {/* Checkbox */}
                             <td className="p-3.5 pl-5">
@@ -1399,11 +1435,10 @@ export default function MyListsPage() {
                     return (
                       <div
                         key={cand.id}
-                        className={`p-5 rounded-2xl border transition-all bg-white dark:bg-[#161c24] flex flex-col justify-between shadow-xs hover:shadow-md ${
-                          isChecked
-                            ? 'border-[#1890FF] ring-2 ring-[#1890FF]/20'
-                            : 'border-gray-100 dark:border-gray-800'
-                        }`}
+                        className={`p-5 rounded-2xl border transition-all bg-white dark:bg-[#161c24] flex flex-col justify-between shadow-xs hover:shadow-md ${isChecked
+                          ? 'border-[#1890FF] ring-2 ring-[#1890FF]/20'
+                          : 'border-gray-100 dark:border-gray-800'
+                          }`}
                       >
                         <div>
                           {/* Card Top: Checkbox, Avatar, Name & Score */}
@@ -1545,11 +1580,10 @@ export default function MyListsPage() {
       {isActionPanelMounted && (
         <>
           <div
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4 border border-gray-700/80 backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${
-              isActionPanelVisible && !isPanelDismissed
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
-            }`}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4 border border-gray-700/80 backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${isActionPanelVisible && !isPanelDismissed
+              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+              : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
+              }`}
           >
             {/* Close / Dismiss panel pill button */}
             <button
@@ -1622,11 +1656,10 @@ export default function MyListsPage() {
           {/* Minimized Pill to reopen panel when dismissed */}
           <button
             onClick={() => setIsPanelDismissed(false)}
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${
-              isActionPanelVisible && isPanelDismissed
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
-            }`}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${isActionPanelVisible && isPanelDismissed
+              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+              : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
+              }`}
             title="Reopen bulk actions panel"
           >
             <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
@@ -1843,9 +1876,8 @@ export default function MyListsPage() {
                       key={c.value}
                       type="button"
                       onClick={() => setNewListData(prev => ({ ...prev, color: c.value }))}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                        newListData.color === c.value ? 'ring-2 ring-offset-2 ring-[#1890FF] scale-110' : 'opacity-80 hover:opacity-100'
-                      }`}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${newListData.color === c.value ? 'ring-2 ring-offset-2 ring-[#1890FF] scale-110' : 'opacity-80 hover:opacity-100'
+                        }`}
                       style={{ backgroundColor: c.value }}
                       title={c.label}
                     >
@@ -1958,9 +1990,8 @@ export default function MyListsPage() {
                       key={c.value}
                       type="button"
                       onClick={() => setEditListData(prev => ({ ...prev, color: c.value }))}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                        editListData.color === c.value ? 'ring-2 ring-offset-2 ring-[#1890FF] scale-110' : 'opacity-80 hover:opacity-100'
-                      }`}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${editListData.color === c.value ? 'ring-2 ring-offset-2 ring-[#1890FF] scale-110' : 'opacity-80 hover:opacity-100'
+                        }`}
                       style={{ backgroundColor: c.value }}
                       title={c.label}
                     >
@@ -2083,15 +2114,14 @@ export default function MyListsPage() {
                           prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
                         );
                       }}
-                      className={`p-3 flex items-center justify-between gap-3 rounded-lg transition-colors cursor-pointer ${
-                        isChecked ? 'bg-blue-50/60 dark:bg-blue-950/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/40'
-                      }`}
+                      className={`p-3 flex items-center justify-between gap-3 rounded-lg transition-colors cursor-pointer ${isChecked ? 'bg-blue-50/60 dark:bg-blue-950/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/40'
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <input
                           type="checkbox"
                           checked={isChecked}
-                          onChange={() => {}} // handled by parent div
+                          onChange={() => { }} // handled by parent div
                           className="w-4 h-4 text-[#1890FF] rounded border-gray-300 focus:ring-[#1890FF] cursor-pointer"
                         />
                         <div className="w-8 h-8 rounded-full bg-[#1890FF]/15 text-[#1890FF] font-bold flex items-center justify-center text-xs shrink-0">

@@ -60,8 +60,8 @@ export default function DashboardPage() {
                 
                 {/* Main Sidebar Routes */}
                 <Route path="candidates/:id" element={<CandidateProfilePage />} />
-                <Route path="candidates" element={<CandidatesPage />} />
-                <Route path="my-lists" element={<MyListsPage />} />
+                <Route path="candidates" element={<CandidatesPage defaultTab="candidates" />} />
+                <Route path="my-lists" element={<CandidatesPage defaultTab="my-lists" />} />
                 <Route path="applications" element={<ApplicationsPage />} />
                 <Route path="applications/*" element={<ApplicationsPage />} />
                 <Route path="sourcing" element={<PlaceholderPage title="Sourcing" />} />
