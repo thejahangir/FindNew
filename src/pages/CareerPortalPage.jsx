@@ -26,7 +26,8 @@ import {
   Zap, 
   DollarSign, 
   SlidersHorizontal,
-  RotateCcw
+  RotateCcw,
+  ArrowDown
 } from 'lucide-react';
 import { 
   COMPANY_INFO, 
@@ -322,9 +323,36 @@ export default function CareerPortalPage() {
   ];
 
   const timeSlots = {
-    morning: ['09:30 AM', '11:00 AM'],
-    afternoon: ['01:30 PM', '03:00 PM'],
-    evening: ['04:30 PM', '05:30 PM']
+    morning: [
+      '09:00 AM',
+      '09:30 AM',
+      '10:00 AM',
+      '10:30 AM',
+      '11:00 AM',
+      '11:30 AM',
+      '12:00 PM',
+      '12:30 PM'
+    ],
+    afternoon: [
+      '01:00 PM',
+      '01:30 PM',
+      '02:00 PM',
+      '02:30 PM',
+      '03:00 PM',
+      '03:30 PM',
+      '04:00 PM',
+      '04:30 PM'
+    ],
+    evening: [
+      '05:00 PM',
+      '05:30 PM',
+      '06:00 PM',
+      '06:30 PM',
+      '07:00 PM',
+      '07:30 PM',
+      '08:00 PM',
+      '08:30 PM'
+    ]
   };
 
   return (
@@ -395,46 +423,93 @@ export default function CareerPortalPage() {
         <main className="w-full px-4 sm:px-6 lg:px-10 py-10">
           
           {/* Hero Section */}
-          <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#0A0E1A] text-white p-8 sm:p-12 lg:p-16 mb-10 shadow-2xl border border-gray-800">
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-96 h-96 bg-gradient-to-br from-[#1890FF]/25 to-[#69c0ff]/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-1/3 -mb-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <section className="relative overflow-hidden rounded-3xl bg-[#0F172A] text-white p-8 sm:p-12 lg:p-16 mb-10 border border-slate-800 shadow-xl">
+            {/* Subtle Ambient Glow */}
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-96 h-96 bg-[#1890FF]/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-1/3 -mb-16 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="relative z-10 max-w-4xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-6 backdrop-blur-sm shadow-sm shadow-emerald-500/10">
-                <Globe size={14} className="text-emerald-400" />
-                {COMPANY_INFO.teamSize}
+            {/* Right-Side Hero Image merging seamlessly with the background on the left */}
+            <div 
+              className="absolute inset-y-0 right-0 w-full sm:w-3/5 lg:w-[56%] pointer-events-none select-none overflow-hidden"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.85) 28%, black 65%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.85) 28%, black 65%)'
+              }}
+            >
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1400"
+                alt="Team working together"
+                className="w-full h-full object-cover object-center opacity-70 sm:opacity-85 lg:opacity-95"
+              />
+              {/* Smooth horizontal blend: fully opaque on left before hero text, transparent on right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/70 via-25% to-transparent"></div>
+              {/* Subtle bottom edge blend */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/60 via-transparent to-transparent"></div>
+            </div>
+
+            <div className="relative z-10 max-w-2xl lg:max-w-3xl">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-6 backdrop-blur-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>We're Hiring • {CAREER_JOBS.length} Open Roles</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-                Architect the Next Era of Enterprise Intelligence.
+
+              {/* Hero Headline */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+                Build the future of intelligence with us.
               </h1>
-              <p className="text-base sm:text-lg text-gray-300 mb-8 leading-relaxed">
-                {COMPANY_INFO.tagline} {COMPANY_INFO.description}
+
+              {/* Tagline / Subtitle */}
+              <p className="text-base sm:text-lg text-slate-300 mb-8 leading-relaxed font-normal">
+                {COMPANY_INFO.tagline} Join our team across San Francisco, London, and remote.
               </p>
 
-              {/* Key Company Highlights / Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/10 text-left">
+              {/* Primary Action Button */}
+              <div className="flex flex-wrap items-center gap-4 mb-10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    document.getElementById('search-and-jobs')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="cursor-pointer inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#1890FF] hover:bg-[#096dd9] shadow-md shadow-[#1890FF]/25 hover:-translate-y-0.5 transition-all"
+                >
+                  <span>View Open Roles</span>
+                  <ArrowDown size={15} />
+                </button>
+
+                <a
+                  href="#values"
+                  className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                >
+                  <span>Our Culture</span>
+                  <ChevronRight size={15} />
+                </a>
+              </div>
+
+              {/* Minimum Company Data */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-white/10 text-left">
                 <div>
-                  <div className="text-2xl font-bold text-white tracking-tight">Series D</div>
-                  <div className="text-xs text-gray-400">$180M Backed</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">650+</div>
+                  <div className="text-xs text-slate-400 mt-1">Team Members</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#1890FF] tracking-tight">4.9 ★</div>
-                  <div className="text-xs text-gray-400">Glassdoor Rating</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">14 Hubs</div>
+                  <div className="text-xs text-slate-400 mt-1">Global & Remote</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-emerald-400 tracking-tight">14 Hubs</div>
-                  <div className="text-xs text-gray-400">Global & Remote</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Series D</div>
+                  <div className="text-xs text-slate-400 mt-1">$7.3B Raised</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#1890FF] tracking-tight">100%</div>
-                  <div className="text-xs text-gray-400">Covered Benefits</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#1890FF] tracking-tight">4.9 ★</div>
+                  <div className="text-xs text-slate-400 mt-1">Glassdoor Rating</div>
                 </div>
               </div>
             </div>
           </section>
 
           {/* ==================== SEARCH PANEL ==================== */}
-          <section className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-800 mb-10 transition-all">
+          <section id="search-and-jobs" className="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 dark:border-gray-800 mb-10 transition-all scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1471,7 +1546,7 @@ export default function CareerPortalPage() {
       {/* ==================== INTERVIEW SLOT PICKER MODAL ==================== */}
       {isSlotModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-xl bg-white dark:bg-[#111827] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 my-8 overflow-hidden">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-[#111827] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 my-8 overflow-hidden">
             
             {!isSlotConfirmed ? (
               /* Slot Selection Screen */
@@ -1548,19 +1623,22 @@ export default function CareerPortalPage() {
                     Available Slots ({selectedTimezone.split(' ')[0]})
                   </label>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-3.5">
                     <div>
-                      <span className="text-[11px] font-semibold text-gray-400 block mb-1.5">Morning</span>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">Morning</span>
+                        <span className="text-[10px] text-gray-400 font-medium">{timeSlots.morning.length} slots</span>
+                      </div>
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                         {timeSlots.morning.map(slot => (
                           <button
                             key={slot}
                             type="button"
                             onClick={() => setSelectedSlotTime(slot)}
-                            className={`cursor-pointer py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
+                            className={`cursor-pointer py-1.5 px-1 rounded-lg text-[11px] font-semibold border transition-all text-center whitespace-nowrap ${
                               selectedSlotTime === slot
-                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm'
-                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 hover:border-[#1890FF]/40'
+                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm font-bold'
+                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/60 hover:border-[#1890FF]/40'
                             }`}
                           >
                             {slot}
@@ -1570,17 +1648,20 @@ export default function CareerPortalPage() {
                     </div>
 
                     <div>
-                      <span className="text-[11px] font-semibold text-gray-400 block mb-1.5">Afternoon</span>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">Afternoon</span>
+                        <span className="text-[10px] text-gray-400 font-medium">{timeSlots.afternoon.length} slots</span>
+                      </div>
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                         {timeSlots.afternoon.map(slot => (
                           <button
                             key={slot}
                             type="button"
                             onClick={() => setSelectedSlotTime(slot)}
-                            className={`cursor-pointer py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
+                            className={`cursor-pointer py-1.5 px-1 rounded-lg text-[11px] font-semibold border transition-all text-center whitespace-nowrap ${
                               selectedSlotTime === slot
-                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm'
-                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 hover:border-[#1890FF]/40'
+                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm font-bold'
+                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/60 hover:border-[#1890FF]/40'
                             }`}
                           >
                             {slot}
@@ -1590,17 +1671,20 @@ export default function CareerPortalPage() {
                     </div>
 
                     <div>
-                      <span className="text-[11px] font-semibold text-gray-400 block mb-1.5">Late Afternoon</span>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">Evening</span>
+                        <span className="text-[10px] text-gray-400 font-medium">{timeSlots.evening.length} slots</span>
+                      </div>
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                         {timeSlots.evening.map(slot => (
                           <button
                             key={slot}
                             type="button"
                             onClick={() => setSelectedSlotTime(slot)}
-                            className={`cursor-pointer py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
+                            className={`cursor-pointer py-1.5 px-1 rounded-lg text-[11px] font-semibold border transition-all text-center whitespace-nowrap ${
                               selectedSlotTime === slot
-                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm'
-                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 hover:border-[#1890FF]/40'
+                                ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF] dark:text-blue-300 border-[#1890FF] ring-2 ring-[#1890FF]/20 shadow-sm font-bold'
+                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/60 hover:border-[#1890FF]/40'
                             }`}
                           >
                             {slot}
