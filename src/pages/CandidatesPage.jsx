@@ -42,7 +42,7 @@ import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboar
 import FollowUpModal from '../components/dashboard/FollowUpModal';
 import MyListsPage from './MyListsPage';
 import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
-import { isItemFollowedUp } from '../data/followupsData';
+import { isItemFollowedUp, isItemFollowed, toggleFollowItem } from '../data/followupsData';
 
 const INITIAL_CANDIDATES = [
   {
@@ -521,41 +521,64 @@ export default function CandidatesPage({ defaultTab }) {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  const handleOpenFollowup = (cand, e) => {
+  const [followConfirmation, setFollowConfirmation] = useState(null);
+  const followConfirmTimerRef = useRef(null);
+
+  const handleToggleFollow = (cand, e) => {
     if (e) e.stopPropagation();
-    setFollowUpTarget({
-      type: 'Candidate',
+    const res = toggleFollowItem({
       relatedId: cand.id,
+      type: 'Candidate',
       title: cand.name,
       subject: `Candidate: ${cand.name} (${cand.role})`,
       meta: `${cand.role} • ${cand.company || cand.department}`
     });
+
+    if (followConfirmTimerRef.current) clearTimeout(followConfirmTimerRef.current);
+
+    setFollowConfirmation({
+      name: cand.name,
+      isUnfollow: !res.isFollowed,
+      message: res.isFollowed
+        ? 'You will be getting all notification of all activity.'
+        : 'You will no longer receive activity notifications.'
+    });
+
+    followConfirmTimerRef.current = setTimeout(() => {
+      setFollowConfirmation(null);
+    }, 4500);
   };
 
-  // Floating Action Panel visibility & animation lifecycle
-  const [isActionPanelMounted, setIsActionPanelMounted] = useState(false);
-  const [isActionPanelVisible, setIsActionPanelVisible] = useState(false);
-  const [lastSelectedCount, setLastSelectedCount] = useState(0);
+  const handleOpenFollowup = (cand, e) => {
+    handleToggleFollow(cand, e);
+  };
 
-  useEffect(() => {
-    let timer;
-    if (selectedCandidateIds.length > 0) {
-      setLastSelectedCount(selectedCandidateIds.length);
-      setIsActionPanelMounted(true);
-      const animFrame = requestAnimationFrame(() => {
-        setIsActionPanelVisible(true);
-      });
-      return () => cancelAnimationFrame(animFrame);
-    } else {
-      setIsActionPanelVisible(false);
-      timer = setTimeout(() => {
-        setIsActionPanelMounted(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedCandidateIds.length > 0]);
+  // Floating Action Panel batch actions & display
+  const displayCount = selectedCandidateIds.length;
 
-  const displayCount = selectedCandidateIds.length > 0 ? selectedCandidateIds.length : lastSelectedCount;
+  const handleBatchAddToFavorites = () => {
+    let addedCount = 0;
+    selectedCandidateIds.forEach(id => {
+      const cand = candidates.find(c => c.id === id);
+      if (cand && !isItemFavorited('Candidate', cand.id)) {
+        toggleFavorite({
+          relatedId: cand.id,
+          title: cand.name,
+          type: 'Candidate',
+          meta: `${cand.role} • ${cand.company || cand.department}`,
+          path: `/dashboard/candidates/${cand.id}`,
+          tag: cand.stage || 'Shortlisted'
+        });
+        addedCount++;
+      }
+    });
+    setFavRefreshKey(k => k + 1);
+    showToast(
+      addedCount > 0
+        ? `Added ${addedCount} candidate${addedCount > 1 ? 's' : ''} to Favourites!`
+        : `Selected candidate(s) are already in Favourites!`
+    );
+  };
 
   const rightPanelRef = useRef(null);
   const base10CandidatesHeightRef = useRef({ grid: 980, table: 980 });
@@ -1344,6 +1367,26 @@ export default function CandidatesPage({ defaultTab }) {
       // ignore
     }
 
+    // Also persist candidates to favoritesData store
+    try {
+      addToListModal.candidateIds.forEach(id => {
+        const cand = candidates.find(c => c.id === id);
+        if (cand && !isItemFavorited('Candidate', cand.id)) {
+          toggleFavorite({
+            relatedId: cand.id,
+            title: cand.name,
+            type: 'Candidate',
+            meta: `${cand.role} • ${cand.company || cand.department}`,
+            path: `/dashboard/candidates/${cand.id}`,
+            tag: cand.stage || 'Shortlisted'
+          });
+        }
+      });
+      setFavRefreshKey(k => k + 1);
+    } catch {
+      // ignore
+    }
+
     const count = addToListModal.candidateIds.length;
     showToast(`Added ${count} candidate${count > 1 ? 's' : ''} to "${finalListName}"`);
     setSelectedCandidateIds(prev => prev.filter(id => !addToListModal.candidateIds.includes(id)));
@@ -1546,7 +1589,7 @@ export default function CandidatesPage({ defaultTab }) {
         </Link>
         <ChevronRight size={14} className="text-gray-400 shrink-0" />
         <span className="text-[#212b36] dark:text-white">
-          {activeTab === 'candidates' ? 'Candidates' : 'My Lists'}
+          {activeTab === 'candidates' ? 'All Candidates' : 'Favourites'}
         </span>
       </nav>
 
@@ -1556,7 +1599,7 @@ export default function CandidatesPage({ defaultTab }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                {activeTab === 'candidates' ? 'List of Candidates' : 'My Lists'}
+                {activeTab === 'candidates' ? 'All Candidates' : 'Favourites'}
               </h1>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
                 {activeTab === 'candidates' ? `${candidates.length} Total` : `${storedListsCount} Lists`}
@@ -1584,10 +1627,10 @@ export default function CandidatesPage({ defaultTab }) {
                     ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
                     : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
-                title="Switch to List of Candidates"
+                title="Switch to All Candidates"
               >
                 <Users size={14} className={`transition-all duration-300 ${activeTab === 'candidates' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
-                <span>List of Candidates</span>
+                <span>All Candidates</span>
               </button>
 
               <button
@@ -1598,7 +1641,7 @@ export default function CandidatesPage({ defaultTab }) {
                 className={`mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 cursor-pointer ${
                   activeTab === 'my-lists' ? 'bg-[#1890FF]/25 dark:bg-[#1890FF]/30' : 'bg-gray-300 dark:bg-gray-700'
                 }`}
-                title={activeTab === 'candidates' ? 'Switch to My Lists' : 'Switch to List of Candidates'}
+                title={activeTab === 'candidates' ? 'Switch to Favourites' : 'Switch to All Candidates'}
               >
                 <span
                   className={`w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs ${
@@ -1615,10 +1658,10 @@ export default function CandidatesPage({ defaultTab }) {
                     ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
                     : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
-                title="Switch to My Lists"
+                title="Switch to Favourites"
               >
-                <Bookmark size={14} className={`transition-all duration-300 ${activeTab === 'my-lists' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
-                <span>My Lists</span>
+                <Star size={14} className={`transition-all duration-300 ${activeTab === 'my-lists' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
+                <span>Favourites</span>
               </button>
             </div>
           </div>
@@ -1699,6 +1742,8 @@ export default function CandidatesPage({ defaultTab }) {
             onViewModeChange={(mode) => setViewMode(mode === 'grid' ? 'table' : 'grid')}
             onSortChange={setSortBy}
             showPresetFilters={true}
+            showFavoritesFilter={true}
+            showFollowingFilter={false}
             activeView={activeViewParam}
             onViewChange={handleViewFilterChange}
             favoritesCount={favoritedCandidatesCount}
@@ -2003,19 +2048,6 @@ export default function CandidatesPage({ defaultTab }) {
                               <Star size={14} className={isItemFavorited('Candidate', cand.id) ? 'fill-amber-400 text-amber-500' : ''} />
                             </button>
 
-                            {/* Follow Up Button */}
-                            <button
-                              type="button"
-                              onClick={(e) => handleOpenFollowup(cand, e)}
-                              title={isItemFollowedUp('Candidate', cand.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
-                              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
-                                isItemFollowedUp('Candidate', cand.id)
-                                  ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
-                                  : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
-                              }`}
-                            >
-                              <CalendarClock size={14} />
-                            </button>
 
                             {/* Kebab Menu Button */}
                             <div className="relative">
@@ -2201,19 +2233,6 @@ export default function CandidatesPage({ defaultTab }) {
                       <Star size={14} className={isItemFavorited('Candidate', cand.id) ? 'fill-amber-400 text-amber-500' : ''} />
                     </button>
 
-                    {/* Follow Up Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => handleOpenFollowup(cand, e)}
-                      title={isItemFollowedUp('Candidate', cand.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
-                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
-                        isItemFollowedUp('Candidate', cand.id)
-                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
-                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-950/30 border-gray-200/60 dark:border-gray-700/60'
-                      }`}
-                    >
-                      <CalendarClock size={14} />
-                    </button>
 
                     {/* Kebab Menu Button */}
                     <div className="relative">
@@ -2284,48 +2303,51 @@ export default function CandidatesPage({ defaultTab }) {
       )}
 
       {/* ============================================================== */}
-      {/* 5. PAGINATION CONTROLS                                         */}
+      {/* 5. PAGINATION CONTROLS (Card style matching All Jobs)          */}
       {/* ============================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-100 dark:border-gray-800 text-xs">
-        <div className="text-gray-500 dark:text-gray-400 font-medium">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredCandidates.length)} to {Math.min(currentPage * itemsPerPage, filteredCandidates.length)} of {filteredCandidates.length} candidates
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">Per page:</span>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-              className="px-2 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold cursor-pointer"
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
+      {filteredCandidates.length > 0 && (
+        <div className="bg-white dark:bg-[#161c24] px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className="text-sm text-black dark:text-gray-400 font-medium">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCandidates.length)} of {filteredCandidates.length} candidates
+            </span>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+              <span>Per page:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                className="px-2.5 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-[#212b36] dark:text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#1890FF]"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            <button
+          <div className="flex gap-1 items-center">
+            <span className="text-sm text-black dark:text-gray-400 font-medium mr-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button 
+              type="button"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === 1 ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
             >
-              Prev
+              Previous
             </button>
-            <span className="px-2 font-bold text-[#212b36] dark:text-white">
-              {currentPage} / {totalPages}
-            </span>
-            <button
+            <button 
+              type="button"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-white dark:bg-[#161c24] border border-gray-200 dark:border-gray-700 rounded-lg font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className={`px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-medium transition-colors ${currentPage === totalPages ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50' : 'text-[#212b36] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer'}`}
             >
               Next
             </button>
           </div>
         </div>
-      </div>
+      )}
 
         </div>{/* Closes rightPanelRef */}
       </div>{/* Closes flex flex-col lg:flex-row gap-6 relative items-start */}
@@ -2333,104 +2355,107 @@ export default function CandidatesPage({ defaultTab }) {
       {/* ============================================================== */}
       {/* 6. FLOATING BULK ACTIONS BAR (When candidates checked)         */}
       {/* ============================================================== */}
-      {isActionPanelMounted && (
+      {selectedCandidateIds.length > 0 && createPortal(
         <>
           {/* Main Floating Bulk Actions Bar */}
-          <div
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.4)] flex items-center gap-3 border border-gray-700/80 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${
-              isActionPanelVisible && !isPanelDismissed
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
-            }`}
-          >
-            {/* Close Panel Icon on top-right, slightly outside the panel (Visible only on panel hover, constant background) */}
-            <button
-              onClick={() => setIsPanelDismissed(true)}
-              title="Close panel"
-              aria-label="Close panel"
-              className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+          {!isPanelDismissed ? (
+            <div
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.5)] flex items-center gap-3 border border-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out animate-fade-in group"
             >
-              <X size={12} className="stroke-[2.5]" />
-            </button>
+              {/* Close Panel Icon on top-right, slightly outside the panel (Visible only on panel hover, constant background) */}
+              <button
+                type="button"
+                onClick={() => setIsPanelDismissed(true)}
+                title="Minimize panel"
+                aria-label="Minimize panel"
+                className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+              >
+                <X size={12} className="stroke-[2.5]" />
+              </button>
 
-            <div className="flex items-center gap-2 min-w-[125px]">
-              <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
-                {displayCount}
-              </span>
-              <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
-                {displayCount} selected
-              </span>
+              <div className="flex items-center gap-2 min-w-[125px]">
+                <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
+                  {selectedCandidateIds.length}
+                </span>
+                <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
+                  {selectedCandidateIds.length} selected
+                </span>
+              </div>
+
+              <div className="h-4 w-px bg-gray-700" />
+
+              {/* Add to Favourite */}
+              <button
+                type="button"
+                onClick={() => handleOpenAddToListModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-amber-500/25 shrink-0 hover:scale-105 active:scale-95"
+                title="Add selected candidates to Favourites"
+              >
+                <Star size={13} className="fill-white text-white" />
+                <span>Add to Favourite</span>
+              </button>
+
+              {/* Add to Job */}
+              <button
+                type="button"
+                onClick={() => handleOpenAddToJobModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+              >
+                <Briefcase size={13} />
+                <span>Add to Job</span>
+              </button>
+
+              {/* Compare - Strictly Brand Theme Color, No Purple, Stable Width */}
+              <button
+                type="button"
+                onClick={handleCompareWithAI}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+                title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
+              >
+                <Sparkles size={13} />
+                <span>Compare</span>
+              </button>
+
+              {/* Reject Selected */}
+              <button
+                type="button"
+                onClick={() => handleOpenRejectModal(selectedCandidateIds, `${selectedCandidateIds.length} candidates`)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95"
+              >
+                <UserX size={13} className="text-white" />
+                <span>Reject Selected</span>
+              </button>
+
+              <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
+
+              {/* Deselect All (Uncheck all candidates) - Clearly Visible by Default */}
+              <button
+                type="button"
+                onClick={() => setSelectedCandidateIds([])}
+                title="Deselect All (Clear Selection)"
+                aria-label="Deselect All"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
+              >
+                <SquareMinus size={15} className="text-white" />
+              </button>
             </div>
-
-            <div className="h-4 w-px bg-gray-700" />
-
-            {/* Add to Job */}
+          ) : (
+            /* Minimized Pill to reopen panel when dismissed */
             <button
-              onClick={() => handleOpenAddToJobModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+              type="button"
+              onClick={() => setIsPanelDismissed(false)}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.4)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-105 active:scale-95 group animate-fade-in"
+              title="Reopen bulk actions panel"
             >
-              <Briefcase size={13} />
-              <span>Add to Job</span>
+              <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
+                {selectedCandidateIds.length}
+              </span>
+              <span>Show Actions Panel</span>
+              <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
             </button>
-
-            {/* Add to List */}
-            <button
-              onClick={() => handleOpenAddToListModal(selectedCandidateIds, `${selectedCandidateIds.length} candidate${selectedCandidateIds.length > 1 ? 's' : ''}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
-            >
-              <ListPlus size={13} />
-              <span>Add to List</span>
-            </button>
-
-            {/* Compare - Strictly Brand Theme Color, No Purple, Stable Width */}
-            <button
-              onClick={handleCompareWithAI}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
-              title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
-            >
-              <Sparkles size={13} />
-              <span>Compare</span>
-            </button>
-
-            {/* Reject Selected */}
-            <button
-              onClick={() => handleOpenRejectModal(selectedCandidateIds, `${selectedCandidateIds.length} candidates`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95"
-            >
-              <UserX size={13} className="text-white" />
-              <span>Reject Selected</span>
-            </button>
-
-            <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
-
-            {/* Deselect All (Uncheck all candidates) - Clearly Visible by Default */}
-            <button
-              onClick={() => setSelectedCandidateIds([])}
-              title="Deselect All (Clear Selection)"
-              aria-label="Deselect All"
-              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
-            >
-              <SquareMinus size={15} className="text-white" />
-            </button>
-          </div>
-
-          {/* Minimized Pill to reopen panel when dismissed */}
-          <button
-            onClick={() => setIsPanelDismissed(false)}
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${
-              isActionPanelVisible && isPanelDismissed
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
-            }`}
-            title="Reopen bulk actions panel"
-          >
-            <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
-              {displayCount}
-            </span>
-            <span>Show Actions Panel</span>
-            <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
-          </button>
-        </>
+          )}
+        </>,
+        document.body
       )}
 
       {/* ============================================================== */}
@@ -2796,7 +2821,7 @@ export default function CandidatesPage({ defaultTab }) {
       )}
 
       {/* ============================================================== */}
-      {/* 10. ADD CANDIDATE TO LIST MODAL                                */}
+      {/* 10. ADD CANDIDATE TO FAVOURITE MODAL                           */}
       {/* ============================================================== */}
       {addToListModal.isOpen && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
@@ -2804,15 +2829,15 @@ export default function CandidatesPage({ defaultTab }) {
 
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center">
-                  <ListPlus size={20} />
+                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center">
+                  <Star size={20} className="fill-amber-400 text-amber-500" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[#212b36] dark:text-white">
-                    Add to Candidate List
+                    Add to Favourite
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Save candidates to a talent pool or custom list
+                    Save candidates to your favourites list or talent group
                   </p>
                 </div>
               </div>
@@ -2827,12 +2852,12 @@ export default function CandidatesPage({ defaultTab }) {
             <form onSubmit={handleConfirmAddToList} className="space-y-4 text-xs">
 
               {/* Selected Candidates Summary */}
-              <div className="p-3 bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-xl flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Target Candidates</p>
                   <p className="text-sm font-bold text-[#212b36] dark:text-white mt-0.5">{addToListModal.candidateName}</p>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#1890FF] text-white">
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white">
                   {addToListModal.candidateIds.length} selected
                 </span>
               </div>
@@ -2840,7 +2865,7 @@ export default function CandidatesPage({ defaultTab }) {
               {/* Choose List Mode */}
               <div>
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
-                  Select Candidate List <span className="text-[#FF5630]">*</span>
+                  Select Favourites List <span className="text-[#FF5630]">*</span>
                 </label>
 
                 {!addToListModal.isCreatingNew ? (
@@ -2857,12 +2882,12 @@ export default function CandidatesPage({ defaultTab }) {
                               ? 'Frontend & product design talent'
                               : list === 'Immediate Available Bench'
                                 ? 'Notice period < 15 days, ready to hire'
-                                : 'Curated candidate talent pool'
+                                : 'Curated favourites candidate pool'
                       }))}
                       value={addToListModal.targetList}
                       onChange={(val) => setAddToListModal(prev => ({ ...prev, targetList: val }))}
-                      placeholder="Select a Candidate List..."
-                      searchPlaceholder="Search candidate lists..."
+                      placeholder="Select a Favourites List..."
+                      searchPlaceholder="Search favourites lists..."
                       showSearch={true}
                       size="default"
                     />
@@ -2911,8 +2936,8 @@ export default function CandidatesPage({ defaultTab }) {
                   disabled={addToListModal.isCreatingNew && !addToListModal.newListName.trim()}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-[#1890FF] hover:bg-[#0077e6] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm text-xs cursor-pointer"
                 >
-                  <ListPlus size={13} />
-                  <span>Add to List</span>
+                  <Star size={13} className="fill-white text-white" />
+                  <span>Add to Favourite</span>
                 </button>
               </div>
 
@@ -3197,10 +3222,35 @@ export default function CandidatesPage({ defaultTab }) {
         onClose={() => setFollowUpTarget(null)}
         targetItem={followUpTarget}
         onFollowupAdded={() => {
-          setToastMessage('Follow-up reminder scheduled!');
+          setToastMessage('Follow reminder scheduled!');
           setTimeout(() => setToastMessage(''), 3000);
         }}
       />
+
+      {/* CUSTOMIZED FOLLOW CONFIRMATION NOTIFICATION */}
+      {followConfirmation && (
+        <div className="fixed bottom-6 right-6 z-[9999] flex items-center gap-3.5 px-4 py-3.5 bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white rounded-2xl shadow-2xl border border-[#1890FF]/30 dark:border-gray-800 animate-fade-in max-w-md">
+          <div className="w-10 h-10 rounded-xl bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+            <Bookmark size={20} className={followConfirmation.isUnfollow ? '' : 'fill-[#1890FF]'} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs sm:text-sm font-bold text-[#212b36] dark:text-white">
+              {followConfirmation.isUnfollow ? `Unfollowed ${followConfirmation.name}` : `Following ${followConfirmation.name}`}
+            </h4>
+            <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+              {followConfirmation.message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFollowConfirmation(null)}
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
+            title="Dismiss"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
     </div>
   ) : (
     <MyListsPage

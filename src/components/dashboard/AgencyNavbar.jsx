@@ -3,7 +3,7 @@ import {
   Bell, 
   Menu, 
   Star, 
-  CalendarClock 
+  Bookmark 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FindNewLogo from '../../assets/findnew-logo.png';
@@ -38,8 +38,8 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
   }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
-  const hasFavorites = favorites && favorites.length > 0;
-  const hasFollowups = followups && followups.length > 0;
+  const hasFavorites = favorites && favorites.some(f => f.type === 'Job' || f.type === 'Candidate');
+  const hasFollowups = followups && followups.some(f => f.type === 'Application');
 
   return (
     <>
@@ -76,7 +76,7 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
                 ? 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white'
                 : 'text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
             }`}
-            title="Favorites"
+            title="Favourites"
           >
             <Star size={19} />
             {hasFavorites && (
@@ -84,7 +84,7 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
             )}
           </button>
 
-          {/* 2. Follow ups Icon Button */}
+          {/* 2. Following Icon Button */}
           <button 
             onClick={() => setIsFollowupsOpen(true)}
             className={`p-2 rounded-full transition-colors cursor-pointer relative ${
@@ -92,9 +92,9 @@ export default function AgencyNavbar({ isSidebarCollapsed, toggleSidebar }) {
                 ? 'bg-gray-100 dark:bg-gray-800 text-[#212b36] dark:text-white'
                 : 'text-gray-400 hover:text-[#212b36] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
             }`}
-            title="Follow ups"
+            title="Following"
           >
-            <CalendarClock size={19} />
+            <Bookmark size={19} />
             {hasFollowups && (
               <span className="absolute top-1 right-1 w-2 h-2 bg-[#1890FF] rounded-full border border-white dark:border-[#161c24]"></span>
             )}

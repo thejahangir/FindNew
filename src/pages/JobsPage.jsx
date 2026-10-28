@@ -11,7 +11,7 @@ import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPa
 import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
 import FollowUpModal from '../components/dashboard/FollowUpModal';
 import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
-import { isItemFollowedUp } from '../data/followupsData';
+import { isItemFollowedUp, isItemFollowed, toggleFollowItem } from '../data/followupsData';
 
 const MOCK_JOBS = [
   { id: 1, title: 'Senior AI Research Scientist', company: 'Anthropic Labs', department: 'Engineering', location: 'Bangalore, India', type: 'Full-time', status: 'Open', applicants: 450, newApplicants: 184, postedDate: '2026-08-10', daysOpen: 70, experience: '5-8 yrs', avgMatch: 94, skills: ['PyTorch', 'Python', 'LLMs', 'Transformers', 'NLP', 'CUDA'], hiringManager: 'Amit Sharma', score: 98 },
@@ -237,14 +237,36 @@ export default function JobsPage() {
     setFavRefreshKey(k => k + 1);
   };
 
-  const handleOpenFollowup = (job, e) => {
+  const [followConfirmation, setFollowConfirmation] = useState(null);
+  const followConfirmTimerRef = useRef(null);
+
+  const handleToggleFollow = (job, e) => {
     if (e) e.stopPropagation();
-    setFollowUpTarget({
+    const res = toggleFollowItem({
       relatedId: job.id,
       type: 'Job',
       title: job.title,
       subject: `Job: ${job.title} (${job.department})`
     });
+    setFavRefreshKey(k => k + 1);
+
+    if (followConfirmTimerRef.current) clearTimeout(followConfirmTimerRef.current);
+
+    setFollowConfirmation({
+      name: job.title,
+      isUnfollow: !res.isFollowed,
+      message: res.isFollowed
+        ? 'You will be getting all notification of all activity.'
+        : 'You will no longer receive activity notifications.'
+    });
+
+    followConfirmTimerRef.current = setTimeout(() => {
+      setFollowConfirmation(null);
+    }, 4500);
+  };
+
+  const handleOpenFollowup = (job, e) => {
+    handleToggleFollow(job, e);
   };
   const rightPanelRef = useRef(null);
   const base10JobsHeightRef = useRef({ grid: 980, card: 980 });
@@ -361,13 +383,6 @@ export default function JobsPage() {
  const [sendAgencyData, setSendAgencyData] = useState({ agency: '', message: '' });
  const [customAlert, setCustomAlert] = useState(null);
  const [openActionMenuId, setOpenActionMenuId] = useState(null);
-  const [followedJobIds, setFollowedJobIds] = useState([1, 5]);
-
-  const handleToggleFollow = (jobId) => {
-    setFollowedJobIds(prev => 
-      prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId]
-    );
-  };
  const [editingJobId, setEditingJobId] = useState(null);
  const itemsPerPage = 10;
 
@@ -690,7 +705,7 @@ export default function JobsPage() {
           Dashboard
         </Link>
         <ChevronRight size={14} className="text-gray-400 shrink-0" />
-        <span className="text-[#212b36] dark:text-white">Jobs</span>
+        <span className="text-[#212b36] dark:text-white">All Jobs</span>
       </nav>
 
       {/* JOB HEADER CARD */}
@@ -699,7 +714,7 @@ export default function JobsPage() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                List of Jobs
+                All Jobs
               </h1>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
                 {jobs.length} Total
@@ -716,7 +731,7 @@ export default function JobsPage() {
             </button>
             <button 
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-4 py-2 bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-[#161c24] dark:hover:bg-gray-100 transition-colors flex items-center gap-2 cursor-pointer h-[38px]"
+              className="px-4 py-2 bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm shadow-[#1890FF]/25 hover:shadow-md transition-all flex items-center gap-2 cursor-pointer h-[38px] active:scale-98"
             >
               <Plus size={15} /> Create Job
             </button>
@@ -788,6 +803,8 @@ export default function JobsPage() {
             onViewModeChange={setViewMode}
             onSortChange={setSortBy}
             showPresetFilters={true}
+            showFavoritesFilter={true}
+            showFollowingFilter={false}
             activeView={activeViewParam}
             onViewChange={handleViewFilterChange}
             favoritesCount={favoritedJobsCount}
@@ -815,7 +832,6 @@ export default function JobsPage() {
 ) : viewMode === 'card' ? (
   <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
     {paginatedJobs.map((job, index) => {
-      const isFollowed = followedJobIds.includes(job.id);
 
       return (
         <div 
@@ -882,19 +898,6 @@ export default function JobsPage() {
                 <Star size={14} className={isItemFavorited('Job', job.id) ? 'fill-amber-400 text-amber-500' : ''} />
               </button>
 
-              {/* Follow Up Button */}
-              <button 
-                type="button"
-                onClick={(e) => handleOpenFollowup(job, e)}
-                title={isItemFollowedUp('Job', job.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
-                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
-                  isItemFollowedUp('Job', job.id)
-                    ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
-                    : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
-                }`}
-              >
-                <CalendarClock size={14} />
-              </button>
 
               <button 
                 type="button"
@@ -1012,13 +1015,12 @@ export default function JobsPage() {
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700/70">
           {paginatedJobs.map((job, index) => {
-            const isFollowed = followedJobIds.includes(job.id);
 
             return (
               <tr 
                 key={job.id} 
                 onClick={() => navigate('/dashboard/agencies', { state: { jobData: job } })}
-                className="hover:bg-gray-50/80 dark:hover:bg-gray-800/30 transition-colors group cursor-pointer border-b border-gray-200 dark:border-gray-700/70 last:border-b-0"
+                className={`hover:bg-gray-50/80 dark:hover:bg-gray-800/30 transition-colors group cursor-pointer border-b border-gray-200 dark:border-gray-700/70 last:border-b-0 ${openActionMenuId === job.id ? 'relative z-40' : ''}`}
               >
                 <td className="px-6 py-4.5 min-w-[360px]">
                   <div className="flex items-start gap-3.5">
@@ -1103,7 +1105,7 @@ export default function JobsPage() {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4.5">
+                <td className={`px-6 py-4.5 ${openActionMenuId === job.id ? 'relative z-50' : ''}`}>
                   <div className="flex items-center justify-center gap-1.5 relative">
                     {/* Favorite Button */}
                     <button 
@@ -1119,21 +1121,8 @@ export default function JobsPage() {
                       <Star size={14} className={isItemFavorited('Job', job.id) ? 'fill-amber-400 text-amber-500' : ''} />
                     </button>
 
-                    {/* Follow Up Button */}
                     <button 
                       type="button"
-                      onClick={(e) => handleOpenFollowup(job, e)}
-                      title={isItemFollowedUp('Job', job.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-2xs border ${
-                        isItemFollowedUp('Job', job.id)
-                          ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50'
-                          : 'text-gray-400 hover:text-[#1890FF] hover:bg-[#1890FF]/10 border-transparent hover:border-[#1890FF]/25'
-                      }`}
-                    >
-                      <CalendarClock size={14} />
-                    </button>
-
-                    <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenActionMenuId(openActionMenuId === job.id ? null : job.id);
@@ -1145,7 +1134,7 @@ export default function JobsPage() {
                     </button>
 
                     {openActionMenuId === job.id && (
-                      <div className={`absolute right-0 ${index >= paginatedJobs.length - 2 && paginatedJobs.length > 2 ? 'bottom-full mb-1' : 'top-10 mt-1'} w-48 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in`}>
+                      <div className={`absolute right-0 ${index >= paginatedJobs.length - 2 && paginatedJobs.length > 2 ? 'bottom-full mb-1' : 'top-10 mt-1'} w-48 bg-white dark:bg-[#212b36] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-1 animate-fade-in text-left`}>
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1638,6 +1627,31 @@ export default function JobsPage() {
         targetItem={followUpTarget}
         onFollowupAdded={() => setFavRefreshKey(k => k + 1)}
       />
+
+      {/* CUSTOMIZED FOLLOW CONFIRMATION NOTIFICATION */}
+      {followConfirmation && (
+        <div className="fixed bottom-6 right-6 z-[9999] flex items-center gap-3.5 px-4 py-3.5 bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white rounded-2xl shadow-2xl border border-[#1890FF]/30 dark:border-gray-800 animate-fade-in max-w-md">
+          <div className="w-10 h-10 rounded-xl bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+            <Bookmark size={20} className={followConfirmation.isUnfollow ? '' : 'fill-[#1890FF]'} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs sm:text-sm font-bold text-[#212b36] dark:text-white">
+              {followConfirmation.isUnfollow ? `Unfollowed ${followConfirmation.name}` : `Following ${followConfirmation.name}`}
+            </h4>
+            <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+              {followConfirmation.message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFollowConfirmation(null)}
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
+            title="Dismiss"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
       {/* View Job Modal */}
  {isViewJobModalOpen && selectedJobToView && createPortal(

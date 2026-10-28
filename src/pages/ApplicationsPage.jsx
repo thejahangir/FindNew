@@ -4,7 +4,6 @@ import {
   FileCheck,
   Bookmark,
   BookmarkPlus,
-  FolderInput,
   Trash2,
   Table as TableIcon,
   LayoutGrid,
@@ -38,19 +37,17 @@ import {
   CalendarClock,
   MoreVertical
 } from 'lucide-react';
-import CustomCheckbox from '../components/ui/CustomCheckbox';
 import SearchableSelect from '../components/ui/SearchableSelect';
 import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
 import JobQuickFilterBar from '../components/dashboard/JobQuickFilterBar';
 import FollowUpModal from '../components/dashboard/FollowUpModal';
 import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
-import { isItemFollowedUp } from '../data/followupsData';
+import { isItemFollowedUp, isItemFollowed, toggleFollowItem } from '../data/followupsData';
 import {
   CANDIDATES_POOL,
   getStoredLists,
   saveStoredLists,
-  addCandidatesToList,
-  moveCandidatesToList
+  addCandidatesToList
 } from '../data/candidateListsData';
 
 // Initial Mock Applications linked to candidates pool
@@ -361,9 +358,7 @@ export default function ApplicationsPage() {
 
   // Primary Applications State
   const [applications, setApplications] = useState(INITIAL_APPLICATIONS);
-  const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
   const [availableLists, setAvailableLists] = useState(() => getStoredLists());
-  const [bulkTargetListId, setBulkTargetListId] = useState('');
 
   // View Mode: 'grid' (Table view) or 'card' (Card view)
   const [viewMode, setViewMode] = useState('grid');
@@ -488,15 +483,37 @@ export default function ApplicationsPage() {
     showToast(res.isFavorited ? `Added application to Favorites!` : `Removed from Favorites.`);
   };
 
-  const handleOpenFollowup = (app, e) => {
+  const [followConfirmation, setFollowConfirmation] = useState(null);
+  const followConfirmTimerRef = useRef(null);
+
+  const handleToggleFollow = (app, e) => {
     if (e) e.stopPropagation();
-    setFollowUpTarget({
-      type: 'Application',
+    const res = toggleFollowItem({
       relatedId: app.id,
+      type: 'Application',
       title: `${app.candidateName} (${app.jobTitle})`,
       subject: `Application: ${app.candidateName} • ${app.jobTitle}`,
       meta: `Stage: ${app.stage} • Applied: ${app.appliedOn}`
     });
+    setFavRefreshKey(k => k + 1);
+
+    if (followConfirmTimerRef.current) clearTimeout(followConfirmTimerRef.current);
+
+    setFollowConfirmation({
+      name: app.candidateName,
+      isUnfollow: !res.isFollowed,
+      message: res.isFollowed
+        ? 'You will be getting all notification of all activity.'
+        : 'You will no longer receive activity notifications.'
+    });
+
+    followConfirmTimerRef.current = setTimeout(() => {
+      setFollowConfirmation(null);
+    }, 4500);
+  };
+
+  const handleOpenFollowup = (app, e) => {
+    handleToggleFollow(app, e);
   };
 
   // Filter handlers
@@ -691,60 +708,7 @@ export default function ApplicationsPage() {
     };
   }, [viewMode, paginatedApplications.length]);
 
-  // Bulk Selection Handlers
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      const pageCandidateIds = paginatedApplications.map(a => a.candidateId);
-      setSelectedCandidateIds(Array.from(new Set([...selectedCandidateIds, ...pageCandidateIds])));
-    } else {
-      const pageCandidateIds = paginatedApplications.map(a => a.candidateId);
-      setSelectedCandidateIds(selectedCandidateIds.filter(id => !pageCandidateIds.includes(id)));
-    }
-  };
 
-  const handleSelectRow = (candidateId) => {
-    setSelectedCandidateIds(prev =>
-      prev.includes(candidateId) ? prev.filter(id => id !== candidateId) : [...prev, candidateId]
-    );
-  };
-
-  const isAllPageSelected =
-    paginatedApplications.length > 0 &&
-    paginatedApplications.every(a => selectedCandidateIds.includes(a.candidateId));
-
-  // Bulk Actions to "My List"
-  const handleBulkAddToList = () => {
-    if (!bulkTargetListId) {
-      showToast('Please choose a target list from "My List" first.');
-      return;
-    }
-    if (selectedCandidateIds.length === 0) {
-      showToast('Please select at least one candidate.');
-      return;
-    }
-
-    const updated = addCandidatesToList(bulkTargetListId, selectedCandidateIds);
-    setAvailableLists(updated);
-    const listName = updated.find(l => l.id === bulkTargetListId)?.name || 'the list';
-    showToast(`Added ${selectedCandidateIds.length} candidate(s) to "${listName}"!`);
-  };
-
-  const handleBulkMoveToList = () => {
-    if (!bulkTargetListId) {
-      showToast('Please choose a target list from "My List" first.');
-      return;
-    }
-    if (selectedCandidateIds.length === 0) {
-      showToast('Please select at least one candidate.');
-      return;
-    }
-
-    const updated = moveCandidatesToList(bulkTargetListId, selectedCandidateIds);
-    setAvailableLists(updated);
-    const listName = updated.find(l => l.id === bulkTargetListId)?.name || 'the list';
-    showToast(`Moved ${selectedCandidateIds.length} candidate(s) to "${listName}"!`);
-    setSelectedCandidateIds([]);
-  };
 
   // Single candidate Add to List modal submit
   const handleSingleAddToList = () => {
@@ -969,115 +933,13 @@ export default function ApplicationsPage() {
             onViewModeChange={setViewMode}
             onSortChange={setSortBy}
             showPresetFilters={true}
+            showFavoritesFilter={false}
+            showFollowingFilter={true}
             activeView={activeViewParam}
             onViewChange={handleViewFilterChange}
             favoritesCount={favoritedApplicationsCount}
             followupsCount={followedApplicationsCount}
           />
-
-          {/* ============================================================== */}
-          
-                    {/* PRE-GRID PANEL: Add / Move Candidates to My List              */}
-          {/* ============================================================== */}
-          <div className={`p-4 rounded-2xl border transition-all duration-200 ${
-            selectedCandidateIds.length > 0
-              ? 'bg-[#1890FF]/5 dark:bg-[#1890FF]/10 border-[#1890FF]/40 shadow-xs'
-              : 'bg-white dark:bg-[#161c24] border-gray-100 dark:border-gray-800/80 shadow-xs'
-          }`}>
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              {/* Left Info & Selection Indicator */}
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
-                  selectedCandidateIds.length > 0
-                    ? 'bg-[#1890FF] text-white border-[#1890FF]'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200/60 dark:border-gray-700/60'
-                }`}>
-                  <Bookmark size={17} />
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#212b36] dark:text-white uppercase tracking-wider">
-                      My List Actions
-                    </span>
-                    {selectedCandidateIds.length > 0 ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#1890FF] text-white shadow-xs">
-                        {selectedCandidateIds.length} candidate{selectedCandidateIds.length > 1 ? 's' : ''} selected
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">
-                        (0 selected)
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {selectedCandidateIds.length > 0
-                      ? 'Add or move the selected candidates to any custom list available in "My List"'
-                      : 'Select candidates from the grid below to add or move them directly to any list in "My List"'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Controls: List Selector Dropdown + Add to List + Move to List */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                {/* Customized Target List Dropdown from "My List" */}
-                <div className="w-56 sm:w-64">
-                  <SearchableSelect
-                    options={listSelectOptions}
-                    value={bulkTargetListId}
-                    onChange={(val) => setBulkTargetListId(val)}
-                    placeholder="Select list from My List..."
-                    searchPlaceholder="Search lists..."
-                    size="sm"
-                    showSearch={true}
-                  />
-                </div>
-
-                {/* Add to List Button */}
-                <button
-                  type="button"
-                  disabled={selectedCandidateIds.length === 0 || !bulkTargetListId}
-                  onClick={handleBulkAddToList}
-                  title={selectedCandidateIds.length === 0 ? "Select candidate(s) from table first" : !bulkTargetListId ? "Select target list" : "Add to selected list"}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs ${
-                    selectedCandidateIds.length > 0 && bulkTargetListId
-                      ? 'bg-[#1890FF] text-white hover:bg-[#096dd9]'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-gray-200/50 dark:border-gray-700/50'
-                  }`}
-                >
-                  <BookmarkPlus size={14} />
-                  <span>Add to List</span>
-                </button>
-
-                {/* Move to List Button */}
-                <button
-                  type="button"
-                  disabled={selectedCandidateIds.length === 0 || !bulkTargetListId}
-                  onClick={handleBulkMoveToList}
-                  title={selectedCandidateIds.length === 0 ? "Select candidate(s) from table first" : !bulkTargetListId ? "Select target list" : "Move to selected list"}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs ${
-                    selectedCandidateIds.length > 0 && bulkTargetListId
-                      ? 'bg-[#212b36] dark:bg-white text-white dark:text-[#212b36] hover:bg-[#161c24] dark:hover:bg-gray-100'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed border border-gray-200/50 dark:border-gray-700/50'
-                  }`}
-                >
-                  <FolderInput size={14} />
-                  <span>Move to List</span>
-                </button>
-
-                {/* Clear Selection Button */}
-                {selectedCandidateIds.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCandidateIds([])}
-                    className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-red-500 px-2 py-1.5 transition-colors cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
 
           {/* ============================================================== */}
           {/* 4. APPLICATIONS DISPLAY: GRID (TABLE) VIEW OR CARD VIEW        */}
@@ -1107,70 +969,42 @@ export default function ApplicationsPage() {
             /* ============================================================ */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {paginatedApplications.map((app, index) => {
-                const isSelected = selectedCandidateIds.includes(app.candidateId);
-
                 return (
                   <div
                     key={app.id}
-                    className={`bg-white dark:bg-[#161c24] rounded-2xl border p-5 transition-all duration-200 hover:shadow-md flex flex-col justify-between relative ${openActionMenuId === app.id ? 'z-30' : ''} ${
-                      isSelected
-                        ? 'border-[#1890FF] shadow-xs ring-1 ring-[#1890FF]/30'
-                        : 'border-gray-100 dark:border-gray-800/80'
-                    }`}
+                    className={`bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/80 p-5 transition-all duration-200 hover:shadow-md flex flex-col justify-between relative ${openActionMenuId === app.id ? 'z-30' : ''}`}
                   >
                     <div>
-                      {/* Card Header: Checkbox + Candidate Info (without initial avatar) + Actions */}
+                      {/* Card Header: Candidate Info + Actions */}
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-start gap-3">
-                          <div className="pt-0.5">
-                            <CustomCheckbox
-                              checked={isSelected}
-                              onChange={() => handleSelectRow(app.candidateId)}
-                              aria-label={`Select ${app.candidateName}`}
-                            />
-                          </div>
-                          <div>
-                            <Link
-                              to={`/dashboard/candidates/${app.candidateId}`}
-                              className="font-bold text-sm text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors line-clamp-1"
-                            >
-                              {app.candidateName}
-                            </Link>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
-                              <MapPin size={11} className="shrink-0" />
-                              <span className="truncate">{app.candidateLocation}</span>
-                            </p>
-                          </div>
+                        <div>
+                          <Link
+                            to={`/dashboard/candidates/${app.candidateId}`}
+                            className="font-bold text-sm text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors line-clamp-1"
+                          >
+                            {app.candidateName}
+                          </Link>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
+                            <MapPin size={11} className="shrink-0" />
+                            <span className="truncate">{app.candidateLocation}</span>
+                          </p>
                         </div>
 
                         {/* Row Actions: Favorite, Follow Up, Add to List, Delete */}
                         <div className="flex items-center gap-1 shrink-0">
-                          {/* Favorite {Icon} */}
-                          <button
-                            type="button"
-                            onClick={(e) => handleToggleFav(app, e)}
-                            title={isItemFavorited('Application', app.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
-                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                              isItemFavorited('Application', app.id)
-                                ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40'
-                                : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30'
-                            }`}
-                          >
-                            <Star size={15} className={isItemFavorited('Application', app.id) ? 'fill-amber-400 text-amber-500' : ''} />
-                          </button>
 
-                          {/* Follow Up {Icon} */}
+                          {/* Follow Button */}
                           <button
                             type="button"
-                            onClick={(e) => handleOpenFollowup(app, e)}
-                            title={isItemFollowedUp('Application', app.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                            onClick={(e) => handleToggleFollow(app, e)}
+                            title={isItemFollowed('Application', app.id) ? 'Following' : 'Follow'}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                              isItemFollowedUp('Application', app.id)
+                              isItemFollowed('Application', app.id)
                                 ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40'
                                 : 'text-gray-400 hover:text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-950/30'
                             }`}
                           >
-                            <CalendarClock size={15} />
+                            <Bookmark size={15} className={isItemFollowed('Application', app.id) ? 'fill-[#1890FF] text-[#1890FF]' : ''} />
                           </button>
 
                           {/* Kebab Menu Button */}
@@ -1287,46 +1121,26 @@ export default function ApplicationsPage() {
                   {/* Table Header */}
                   <thead>
                     <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/75 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px]">
-                      <th className="py-3 pl-3 pr-1 w-9">
-                        <CustomCheckbox
-                          checked={isAllPageSelected}
-                          onChange={handleSelectAll}
-                          aria-label="Select all applications on this page"
-                        />
-                      </th>
-                      <th className="py-3 px-2.5 min-w-[120px]">Candidate</th>
-                      <th className="py-3 px-2.5 min-w-[140px]">Job</th>
-                      <th className="py-3 px-2 min-w-[110px]">Stage</th>
-                      <th className="py-3 px-2 min-w-[105px]">Source</th>
-                      <th className="py-3 px-2 min-w-[90px]">Applied on</th>
-                      <th className="py-3 px-2 min-w-[95px]">Status</th>
-                      <th className="py-3 pl-2 pr-3 text-center min-w-[105px] w-28">Action</th>
+                      <th className="py-3 px-3.5 min-w-[130px]">Candidate</th>
+                      <th className="py-3 px-3 min-w-[140px]">Job</th>
+                      <th className="py-3 px-2.5 min-w-[110px]">Stage</th>
+                      <th className="py-3 px-2.5 min-w-[105px]">Source</th>
+                      <th className="py-3 px-2.5 min-w-[90px]">Applied on</th>
+                      <th className="py-3 px-2.5 min-w-[95px]">Status</th>
+                      <th className="py-3 pl-2 pr-4 text-center min-w-[105px] w-28">Action</th>
                     </tr>
                   </thead>
 
                   {/* Table Body */}
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
                     {paginatedApplications.map((app, index) => {
-                      const isSelected = selectedCandidateIds.includes(app.candidateId);
-
                       return (
                         <tr
                           key={app.id}
-                          className={`hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors ${openActionMenuId === app.id ? 'relative z-30' : ''} ${
-                            isSelected ? 'bg-[#1890FF]/5 dark:bg-[#1890FF]/10' : ''
-                          }`}
+                          className={`hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors ${openActionMenuId === app.id ? 'relative z-30' : ''}`}
                         >
-                          {/* Row Checkbox */}
-                          <td className="py-3 pl-3 pr-1">
-                            <CustomCheckbox
-                              checked={isSelected}
-                              onChange={() => handleSelectRow(app.candidateId)}
-                              aria-label={`Select ${app.candidateName}`}
-                            />
-                          </td>
-
                           {/* 1. Candidate Column: Name only */}
-                          <td className="py-3 px-2.5">
+                          <td className="py-3 px-3.5">
                             <Link
                               to={`/dashboard/candidates/${app.candidateId}`}
                               className="font-bold text-xs text-[#212b36] dark:text-white hover:text-[#1890FF] transition-colors truncate block"
@@ -1378,32 +1192,19 @@ export default function ApplicationsPage() {
                           {/* 7. Action Column: Favorite, Follow Up, Add to List, Delete */}
                           <td className={`py-3 pl-2 pr-3 text-center whitespace-nowrap relative ${openActionMenuId === app.id ? 'z-40' : ''}`}>
                             <div className="flex items-center justify-center gap-1">
-                              {/* Favorite {Icon} */}
-                              <button
-                                type="button"
-                                onClick={(e) => handleToggleFav(app, e)}
-                                title={isItemFavorited('Application', app.id) ? 'Favorited (Click to remove)' : 'Add to Favorites'}
-                                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                  isItemFavorited('Application', app.id)
-                                    ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40'
-                                    : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30'
-                                }`}
-                              >
-                                <Star size={15} className={isItemFavorited('Application', app.id) ? 'fill-amber-400 text-amber-500' : ''} />
-                              </button>
 
-                              {/* Follow Up {Icon} */}
+                              {/* Follow Button */}
                               <button
                                 type="button"
-                                onClick={(e) => handleOpenFollowup(app, e)}
-                                title={isItemFollowedUp('Application', app.id) ? 'Follow-up scheduled (Click to manage)' : 'Set Follow Up'}
+                                onClick={(e) => handleToggleFollow(app, e)}
+                                title={isItemFollowed('Application', app.id) ? 'Following' : 'Follow'}
                                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                  isItemFollowedUp('Application', app.id)
+                                  isItemFollowed('Application', app.id)
                                     ? 'text-[#1890FF] bg-blue-50 dark:bg-blue-950/40'
                                     : 'text-gray-400 hover:text-[#1890FF] hover:bg-blue-50 dark:hover:bg-blue-950/30'
                                 }`}
                               >
-                                <CalendarClock size={15} />
+                                <Bookmark size={15} className={isItemFollowed('Application', app.id) ? 'fill-[#1890FF] text-[#1890FF]' : ''} />
                               </button>
 
                               {/* Kebab Menu Button */}
@@ -1478,79 +1279,81 @@ export default function ApplicationsPage() {
           {/* ============================================================== */}
           {/* 5. PAGINATION FOOTER                                           */}
           {/* ============================================================== */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 px-1 text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex items-center gap-3">
-              <span>
-                Showing{' '}
-                <span className="font-bold text-[#212b36] dark:text-white">
-                  {filteredApplications.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}
-                </span>{' '}
-                to{' '}
-                <span className="font-bold text-[#212b36] dark:text-white">
-                  {Math.min(currentPage * pageSize, filteredApplications.length)}
-                </span>{' '}
-                of{' '}
-                <span className="font-bold text-[#212b36] dark:text-white">
-                  {filteredApplications.length}
-                </span>{' '}
-                applications
-              </span>
+          {filteredApplications.length > 0 && (
+            <div className="bg-white dark:bg-[#161c24] px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-3">
+                <span>
+                  Showing{' '}
+                  <span className="font-bold text-[#212b36] dark:text-white">
+                    {filteredApplications.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}
+                  </span>{' '}
+                  to{' '}
+                  <span className="font-bold text-[#212b36] dark:text-white">
+                    {Math.min(currentPage * pageSize, filteredApplications.length)}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-bold text-[#212b36] dark:text-white">
+                    {filteredApplications.length}
+                  </span>{' '}
+                  applications
+                </span>
 
-              {/* Customized Dropdown for Per Page */}
-              <div className="flex items-center gap-1.5 ml-2">
-                <span>Per page:</span>
-                <div className="w-28">
-                  <SearchableSelect
-                    options={pageSizeOptions}
-                    value={pageSize}
-                    onChange={(val) => {
-                      setPageSize(Number(val));
-                      setCurrentPage(1);
-                    }}
-                    size="xs"
-                    showSearch={false}
-                    placement="top"
-                  />
+                {/* Customized Dropdown for Per Page */}
+                <div className="flex items-center gap-1.5 ml-2">
+                  <span>Per page:</span>
+                  <div className="w-28">
+                    <SearchableSelect
+                      options={pageSizeOptions}
+                      value={pageSize}
+                      onChange={(val) => {
+                        setPageSize(Number(val));
+                        setCurrentPage(1);
+                      }}
+                      size="xs"
+                      showSearch={false}
+                      placement="top"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Pagination Controls */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-              >
-                Previous
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {/* Pagination Controls */}
+              <div className="flex items-center gap-1">
                 <button
-                  key={page}
                   type="button"
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg font-bold text-xs transition-colors cursor-pointer ${
-                    currentPage === page
-                      ? 'bg-[#1890FF] text-white shadow-xs'
-                      : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                 >
-                  {page}
+                  Previous
                 </button>
-              ))}
 
-              <button
-                type="button"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-              >
-                Next
-              </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-lg font-bold text-xs transition-colors cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-[#1890FF] text-white shadow-xs'
+                        : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161c24] font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -1690,8 +1493,33 @@ export default function ApplicationsPage() {
         isOpen={Boolean(followUpTarget)}
         onClose={() => setFollowUpTarget(null)}
         targetItem={followUpTarget}
-        onFollowupAdded={() => showToast('Follow-up reminder scheduled!')}
+        onFollowupAdded={() => showToast('Follow reminder scheduled!')}
       />
+
+      {/* CUSTOMIZED FOLLOW CONFIRMATION NOTIFICATION */}
+      {followConfirmation && (
+        <div className="fixed bottom-6 right-6 z-[9999] flex items-center gap-3.5 px-4 py-3.5 bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white rounded-2xl shadow-2xl border border-[#1890FF]/30 dark:border-gray-800 animate-fade-in max-w-md">
+          <div className="w-10 h-10 rounded-xl bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
+            <Bookmark size={20} className={followConfirmation.isUnfollow ? '' : 'fill-[#1890FF]'} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs sm:text-sm font-bold text-[#212b36] dark:text-white">
+              {followConfirmation.isUnfollow ? `Unfollowed ${followConfirmation.name}` : `Following ${followConfirmation.name}`}
+            </h4>
+            <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+              {followConfirmation.message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFollowConfirmation(null)}
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
+            title="Dismiss"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -282,7 +282,7 @@ export default function UserMenu({ isSidebarCollapsed }) {
                 >
                   <option value="Hiring Overview">Hiring Overview</option>
                   <option value="Jobs Dashboard">Jobs Dashboard</option>
-                  <option value="Candidate List">Candidate List</option>
+                  <option value="All Candidates">All Candidates</option>
                   <option value="Pipeline">Pipeline</option>
                   <option value="Career Page">Career Page</option>
                 </select>
@@ -984,8 +984,8 @@ export default function UserMenu({ isSidebarCollapsed }) {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400">Frequently Asked</h4>
                 <div className="text-xs text-gray-600 dark:text-gray-400 space-y-2">
                   <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
-                    <span className="font-semibold text-gray-800 dark:text-gray-200 block mb-0.5">How do favorites and follow-ups work?</span>
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400">Click the Star or Follow-up icon on any job, candidate, or application to save it. Access all items instantly from the top header panels.</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200 block mb-0.5">How do favorites and following work?</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400">Click the Star or Bookmark icon on any job, candidate, or application to follow it. Access all followed items instantly from the top header panels.</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                     <span className="font-semibold text-gray-800 dark:text-gray-200 block mb-0.5">Need help posting a new job role?</span>

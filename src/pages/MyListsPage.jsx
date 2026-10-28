@@ -172,38 +172,14 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
     });
   }, [activeCandidates, searchCandidateQuery]);
 
-  // Candidate selection & bulk actions lifecycle
   const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
   const [isPanelDismissed, setIsPanelDismissed] = useState(false);
-  const [isActionPanelMounted, setIsActionPanelMounted] = useState(false);
-  const [isActionPanelVisible, setIsActionPanelVisible] = useState(false);
-  const [lastSelectedCount, setLastSelectedCount] = useState(0);
+  const displayCount = selectedCandidateIds.length;
 
-  // Reset selection when switching active list
   useEffect(() => {
     setSelectedCandidateIds([]);
     setIsPanelDismissed(false);
   }, [selectedListId]);
-
-  useEffect(() => {
-    let timer;
-    if (selectedCandidateIds.length > 0) {
-      setLastSelectedCount(selectedCandidateIds.length);
-      setIsActionPanelMounted(true);
-      const animFrame = requestAnimationFrame(() => {
-        setIsActionPanelVisible(true);
-      });
-      return () => cancelAnimationFrame(animFrame);
-    } else {
-      setIsActionPanelVisible(false);
-      timer = setTimeout(() => {
-        setIsActionPanelMounted(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedCandidateIds.length > 0]);
-
-  const displayCount = selectedCandidateIds.length > 0 ? selectedCandidateIds.length : lastSelectedCount;
 
   const isAllSelected = filteredCandidates.length > 0 && filteredCandidates.every(c => selectedCandidateIds.includes(c.id));
   const isIndeterminate = filteredCandidates.some(c => selectedCandidateIds.includes(c.id)) && !isAllSelected;
@@ -696,21 +672,21 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
           </Link>
           <ChevronRight size={14} className="text-gray-400 shrink-0" />
           <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors cursor-pointer">
-            Candidates
+            All Candidates
           </Link>
           <ChevronRight size={14} className="text-gray-400 shrink-0" />
-          <span className="text-[#212b36] dark:text-white">My Lists</span>
+          <span className="text-[#212b36] dark:text-white">Favourites</span>
         </nav>
       )}
 
-      {/* MY LISTS HEADER CARD (Only when not embedded) */}
+      {/* FAVOURITES HEADER CARD (Only when not embedded) */}
       {!isEmbedded && (
         <div className="bg-white dark:bg-[#161c24] rounded-2xl border border-gray-100 dark:border-gray-800/70 p-5 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                 <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                  My Lists
+                  Favourites
                 </h1>
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
                   {lists.length} Lists
@@ -732,10 +708,10 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                   type="button"
                   onClick={() => navigate('/dashboard/candidates')}
                   className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
-                  title="Switch to List of Candidates"
+                  title="Switch to All Candidates"
                 >
                   <Users size={14} className="text-gray-400 transition-colors duration-300" />
-                  <span>List of Candidates</span>
+                  <span>All Candidates</span>
                 </button>
 
                 <button
@@ -744,7 +720,7 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                   aria-checked={true}
                   onClick={() => navigate('/dashboard/candidates')}
                   className="mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 bg-[#1890FF]/25 dark:bg-[#1890FF]/30 cursor-pointer"
-                  title="Switch to List of Candidates"
+                  title="Switch to All Candidates"
                 >
                   <span className="w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs translate-x-3.5" />
                 </button>
@@ -752,10 +728,10 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]"
-                  title="My Lists (Active)"
+                  title="Favourites (Active)"
                 >
-                  <Bookmark size={14} className="text-[#1890FF] transition-colors duration-300 scale-105" />
-                  <span>My Lists</span>
+                  <Star size={14} className="text-[#1890FF] transition-colors duration-300 scale-105" />
+                  <span>Favourites</span>
                 </button>
               </div>
             </div>
@@ -767,10 +743,10 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="bg-white dark:bg-[#161c24] p-4 rounded-xl border border-gray-100 dark:border-gray-800/80 shadow-2xs flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-[#1890FF]/10 text-[#1890FF] flex items-center justify-center shrink-0">
-            <Bookmark size={20} />
+            <Star size={20} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Total Recruiter Lists</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Total Recruiter Favourites</p>
             <p className="text-xl font-bold text-[#212b36] dark:text-white mt-0.5">{lists.length}</p>
           </div>
         </div>
@@ -822,9 +798,9 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
           <div className="p-3.5 border-b border-gray-100 dark:border-gray-800/80 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bookmark size={16} className="text-[#1890FF]" />
+                <Star size={16} className="text-[#1890FF]" />
                 <h2 className="text-sm font-bold text-[#212b36] dark:text-white">
-                  Recruiter Lists
+                  Recruiter Favourites
                 </h2>
                 <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                   {filteredLists.length}
@@ -833,8 +809,8 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(true)}
-                title="Create a new list"
-                aria-label="Create a new list"
+                title="Create a new favourite list"
+                aria-label="Create a new favourite list"
                 className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#1890FF] hover:bg-[#0077e6] text-white shadow-sm shadow-[#1890FF]/35 hover:scale-110 active:scale-95 transition-all cursor-pointer ring-2 ring-[#1890FF]/25"
               >
                 <Plus size={16} className="stroke-[2.5]" />
@@ -1253,7 +1229,6 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                       {filteredCandidates.map((cand) => {
                         const isChecked = selectedCandidateIds.includes(cand.id);
                         const scoreConfig = getScoreBadge(cand.numericScore || 9.0);
-                        const initials = cand.name.split(' ').map(n => n[0]).join('').slice(0, 2);
                         const statusStyle = getStatusBadgeStyle(cand.status || 'Active');
 
                         return (
@@ -1276,20 +1251,15 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                               <td className="p-3.5">
                                 <div
                                   onClick={() => setQuickViewCandidate(cand)}
-                                  className="flex items-center gap-3 cursor-pointer group/cand"
+                                  className="cursor-pointer group/cand min-w-0"
                                   title="Click to view candidate profile"
                                 >
-                                  <div className="w-8 h-8 rounded-full bg-[#1890FF]/15 dark:bg-[#1890FF]/25 text-[#1890FF] border border-[#1890FF]/25 dark:border-[#1890FF]/35 font-extrabold text-[11px] flex items-center justify-center shrink-0 shadow-2xs group-hover/cand:scale-105 transition-transform">
-                                    {initials}
+                                  <div className="font-bold text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF] transition-colors truncate">
+                                    {cand.name}
                                   </div>
-                                  <div className="min-w-0">
-                                    <div className="font-bold text-[#212b36] dark:text-white group-hover/cand:text-[#1890FF] transition-colors truncate">
-                                      {cand.name}
-                                    </div>
-                                    <div className="text-[11px] text-gray-400 dark:text-gray-500 truncate flex items-center gap-1">
-                                      <Mail size={11} className="shrink-0 text-gray-400" />
-                                      <span className="truncate">{cand.email}</span>
-                                    </div>
+                                  <div className="text-[11px] text-gray-400 dark:text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                                    <Mail size={11} className="shrink-0 text-gray-400" />
+                                    <span className="truncate">{cand.email}</span>
                                   </div>
                                 </div>
                               </td>
@@ -1578,98 +1548,101 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
       {/* ============================================================== */}
       {/* FLOATING BULK ACTIONS BAR (When candidates are selected)        */}
       {/* ============================================================== */}
-      {isActionPanelMounted && (
+      {selectedCandidateIds.length > 0 && createPortal(
         <>
-          <div
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4 border border-gray-700/80 backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group ${isActionPanelVisible && !isPanelDismissed
-              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-              : 'opacity-0 translate-y-8 scale-95 pointer-events-none'
-              }`}
-          >
-            {/* Close / Dismiss panel pill button */}
-            <button
-              onClick={() => setIsPanelDismissed(true)}
-              title="Close panel"
-              aria-label="Close panel"
-              className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+          {!isPanelDismissed ? (
+            <div
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-[#161c24] text-white px-5 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4 border border-gray-700/80 backdrop-blur-xl transition-all duration-300 ease-out animate-fade-in group"
             >
-              <X size={12} className="stroke-[2.5]" />
-            </button>
+              {/* Close / Dismiss panel pill button */}
+              <button
+                type="button"
+                onClick={() => setIsPanelDismissed(true)}
+                title="Close panel"
+                aria-label="Close panel"
+                className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[#212b36] text-gray-300 hover:text-white border border-gray-600 shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer z-50 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+              >
+                <X size={12} className="stroke-[2.5]" />
+              </button>
 
-            <div className="flex items-center gap-2 min-w-[125px]">
-              <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
+              <div className="flex items-center gap-2 min-w-[125px]">
+                <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#1890FF] text-white text-[11px] font-bold tabular-nums">
+                  {displayCount}
+                </span>
+                <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
+                  {displayCount} selected
+                </span>
+              </div>
+
+              <div className="h-4 w-px bg-gray-700" />
+
+              {/* Add to another List */}
+              <button
+                type="button"
+                onClick={() => {
+                  const otherLists = lists.filter(l => l.id !== selectedListId);
+                  setTargetBatchListId(otherLists.length > 0 ? otherLists[0].id : '');
+                  setIsCreatingNewBatchList(false);
+                  setNewBatchListName('');
+                  setIsAddAnotherListModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 hover:scale-105 active:scale-95 shrink-0"
+              >
+                <ListPlus size={13} className="text-white" />
+                <span>Add to another List</span>
+              </button>
+
+              {/* Compare - Always visible like in Candidate List page */}
+              <button
+                type="button"
+                onClick={handleCompareWithAI}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
+                title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
+              >
+                <Sparkles size={13} className="text-white" />
+                <span>Compare</span>
+              </button>
+
+              {/* Remove from List */}
+              <button
+                type="button"
+                onClick={handleRemoveSelectedCandidatesFromList}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95 shrink-0"
+              >
+                <Trash2 size={13} className="text-white" />
+                <span>Remove from List</span>
+              </button>
+
+              <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
+
+              {/* Deselect All (Uncheck all candidates) */}
+              <button
+                type="button"
+                onClick={() => setSelectedCandidateIds([])}
+                title="Deselect All (Clear Selection)"
+                aria-label="Deselect All"
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
+              >
+                <SquareMinus size={15} className="text-white" />
+              </button>
+            </div>
+          ) : (
+            /* Minimized Pill to reopen panel when dismissed */
+            <button
+              type="button"
+              onClick={() => setIsPanelDismissed(false)}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-105 active:scale-95 group animate-fade-in"
+              title="Reopen bulk actions panel"
+            >
+              <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
                 {displayCount}
               </span>
-              <span className="text-xs font-bold text-gray-200 whitespace-nowrap tabular-nums">
-                {displayCount} selected
-              </span>
-            </div>
-
-            <div className="h-4 w-px bg-gray-700" />
-
-            {/* Add to another List */}
-            <button
-              onClick={() => {
-                const otherLists = lists.filter(l => l.id !== selectedListId);
-                setTargetBatchListId(otherLists.length > 0 ? otherLists[0].id : '');
-                setIsCreatingNewBatchList(false);
-                setNewBatchListName('');
-                setIsAddAnotherListModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 hover:scale-105 active:scale-95 shrink-0"
-            >
-              <ListPlus size={13} className="text-white" />
-              <span>Add to another List</span>
+              <span>Show Actions Panel</span>
+              <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
             </button>
-
-            {/* Compare - Always visible like in Candidate List page */}
-            <button
-              onClick={handleCompareWithAI}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-[#1890FF] hover:bg-[#0077e6] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#1890FF]/25 shrink-0 hover:scale-105 active:scale-95"
-              title={selectedCandidateIds.length < 2 ? "Select at least 2 candidates to compare" : "Compare candidates with AI"}
-            >
-              <Sparkles size={13} className="text-white" />
-              <span>Compare</span>
-            </button>
-
-            {/* Remove from List */}
-            <button
-              onClick={handleRemoveSelectedCandidatesFromList}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FF5630] hover:bg-[#e04825] text-white rounded-xl transition-all cursor-pointer shadow-xs shadow-[#FF5630]/25 hover:scale-105 active:scale-95 shrink-0"
-            >
-              <Trash2 size={13} className="text-white" />
-              <span>Remove from List</span>
-            </button>
-
-            <div className="h-4 w-px bg-gray-700/80 mx-0.5" />
-
-            {/* Deselect All (Uncheck all candidates) */}
-            <button
-              onClick={() => setSelectedCandidateIds([])}
-              title="Deselect All (Clear Selection)"
-              aria-label="Deselect All"
-              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
-            >
-              <SquareMinus size={15} className="text-white" />
-            </button>
-          </div>
-
-          {/* Minimized Pill to reopen panel when dismissed */}
-          <button
-            onClick={() => setIsPanelDismissed(false)}
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161c24] text-white px-4 py-2 rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.35)] flex items-center gap-2 border border-gray-700/80 hover:bg-gray-800 text-xs font-bold cursor-pointer backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 group ${isActionPanelVisible && isPanelDismissed
-              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-              : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
-              }`}
-            title="Reopen bulk actions panel"
-          >
-            <span className="flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-[#1890FF] text-white text-[10px] font-bold">
-              {displayCount}
-            </span>
-            <span>Show Actions Panel</span>
-            <ChevronUp size={13} className="text-gray-400 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5" />
-          </button>
-        </>
+          )}
+        </>,
+        document.body
       )}
 
       {/* ============================================================== */}
@@ -1808,7 +1781,7 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[#212b36] dark:text-white">
-                    Create New List
+                    Create New Favourite List
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Organize target profiles for custom talent pipelines
@@ -1904,7 +1877,7 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-[#1890FF] hover:bg-[#0077e6] disabled:opacity-50 transition-all shadow-sm cursor-pointer"
                 >
                   <Plus size={14} />
-                  <span>Create List</span>
+                  <span>Create Favourite List</span>
                 </button>
               </div>
             </form>

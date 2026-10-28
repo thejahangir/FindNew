@@ -39,24 +39,6 @@ export const INITIAL_FAVORITES = [
     meta: '9.4 AI Match • Principal Cloud Architect', 
     path: '/dashboard/candidates',
     tag: 'Shortlisted'
-  },
-  { 
-    id: 'fav-app-1', 
-    relatedId: 'app-1',
-    title: 'Ananya Sharma - Senior AI Research Scientist', 
-    type: 'Application', 
-    meta: 'Screening Passed • Applied 24 Oct 2026', 
-    path: '/dashboard/applications',
-    tag: 'Active'
-  },
-  { 
-    id: 'fav-app-2', 
-    relatedId: 'app-2',
-    title: 'Rohan Gupta - Product Design Lead', 
-    type: 'Application', 
-    meta: 'Interview Stage • Applied 22 Oct 2026', 
-    path: '/dashboard/applications',
-    tag: 'In Review'
   }
 ];
 

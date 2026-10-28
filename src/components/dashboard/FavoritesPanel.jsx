@@ -13,9 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { getStoredFavorites, saveStoredFavorites } from '../../data/favoritesData';
 
 const CATEGORIES = [
-  { id: 'Job', label: 'Jobs', path: '/dashboard/jobs' },
-  { id: 'Candidate', label: 'Candidate', path: '/dashboard/candidates' },
-  { id: 'Application', label: 'Application', path: '/dashboard/applications' },
+  { id: 'Job', label: 'All Jobs', path: '/dashboard/jobs' },
+  { id: 'Candidate', label: 'All Candidates', path: '/dashboard/candidates' },
 ];
 
 export default function FavoritesPanel({ isOpen, onClose }) {
@@ -61,6 +60,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
 
   const activeCat = CATEGORIES.find(c => c.id === selectedCategory) || CATEGORIES[0];
   const filteredItems = favorites.filter(f => f.type === selectedCategory);
+  const relevantFavorites = favorites.filter(f => f.type === 'Job' || f.type === 'Candidate');
 
   const handleViewMore = () => {
     onClose();
@@ -113,9 +113,9 @@ export default function FavoritesPanel({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                Favorites
+                Favourites
                 <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs px-2 py-0.5 rounded-full font-bold">
-                  {favorites.length}
+                  {relevantFavorites.length}
                 </span>
               </h2>
               <p className="text-[11px] text-gray-400">Quick-access pinned items</p>
@@ -130,7 +130,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Three Compact Category Pills */}
+        {/* Compact Category Pills: All Jobs & All Candidates */}
         <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center gap-2 shrink-0 bg-gray-50/30 dark:bg-gray-900/20">
           {CATEGORIES.map(cat => {
             const isSelected = selectedCategory === cat.id;
@@ -140,7 +140,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`cursor-pointer flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`cursor-pointer flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   isSelected
                     ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/25 ring-2 ring-amber-500/20'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -167,7 +167,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
               return (
                 <div 
                   key={item.id}
-                  onClick={() => handleNavigate(item.path)}
+                  onClick={() => handleNavigate(item.path || (item.type === 'Job' ? '/dashboard/jobs' : '/dashboard/candidates'))}
                   className="p-3.5 bg-gray-50/70 dark:bg-gray-800/40 hover:bg-white dark:hover:bg-[#1E293B] border border-gray-200/80 dark:border-gray-800 rounded-2xl transition-all cursor-pointer group shadow-2xs hover:shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -203,7 +203,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
                       type="button"
                       onClick={(e) => handleRemove(item.id, e)}
                       className="cursor-pointer text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 p-1 rounded-lg transition-colors shrink-0"
-                      title="Remove from favorites"
+                      title="Remove from favourites"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -215,7 +215,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
             <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-12">
               <Star size={44} className="text-gray-200 dark:text-gray-800 mb-3" />
               <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                No favorite {activeCat.label.toLowerCase()} found
+                No favourite {activeCat.label.toLowerCase()} found
               </p>
               <p className="text-xs text-gray-400 mt-1 max-w-xs">
                 Click the Star icon on any {activeCat.label.toLowerCase()} item to save it for quick access here.
@@ -231,7 +231,7 @@ export default function FavoritesPanel({ isOpen, onClose }) {
             onClick={handleViewMore}
             className="cursor-pointer w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md shadow-amber-500/25 flex items-center justify-center gap-2 group"
           >
-            <span>View more Favorite for &apos;{activeCat.label}&apos;</span>
+            <span>View all Favourites in &apos;{activeCat.label}&apos;</span>
             <ArrowUpRight size={15} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </button>
         </div>
