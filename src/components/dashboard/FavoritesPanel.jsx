@@ -54,7 +54,9 @@ export default function FavoritesPanel({ isOpen, onClose }) {
   const handleNavigate = (path) => {
     onClose();
     if (path) {
-      navigate(path);
+      const sep = path.includes('?') ? '&' : '?';
+      const target = path.includes('view=favorites') ? path : `${path}${sep}view=favorites`;
+      navigate(target);
     }
   };
 

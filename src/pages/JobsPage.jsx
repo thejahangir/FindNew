@@ -10,7 +10,7 @@ import findNewIco from '../assets/findnew-ico.png';
 import JobFilterPanel, { FILTER_DATA } from '../components/dashboard/JobFilterPanel';
 import JobQuickFilterBar, { QUICK_PARAMETERS_DATA } from '../components/dashboard/JobQuickFilterBar';
 import FollowUpModal from '../components/dashboard/FollowUpModal';
-import { isItemFavorited, toggleFavorite } from '../data/favoritesData';
+import { isItemFavorited, toggleFavorite, getStoredFavorites, saveStoredFavorites } from '../data/favoritesData';
 import { isItemFollowedUp, isItemFollowed, toggleFollowItem } from '../data/followupsData';
 
 const MOCK_JOBS = [
@@ -225,16 +225,123 @@ export default function JobsPage() {
     setCurrentPage(1);
   };
 
-  const handleToggleFav = (job, e) => {
+  const INITIAL_JOB_LISTS = [
+    'High Priority Roles (Q4)',
+    'Engineering Leadership Pipeline',
+    'Urgent Client Requisitions',
+    'Remote-First Openings',
+    'Executive & Director Searches'
+  ];
+
+  const [jobLists, setJobLists] = useState(() => {
+    try {
+      const raw = localStorage.getItem('findneo_recruiter_job_lists');
+      return raw ? JSON.parse(raw) : INITIAL_JOB_LISTS;
+    } catch {
+      return INITIAL_JOB_LISTS;
+    }
+  });
+
+  const [addToFavModal, setAddToFavModal] = useState({
+    isOpen: false,
+    job: null,
+    targetList: 'High Priority Roles (Q4)',
+    isCreatingNew: false,
+    newListName: ''
+  });
+
+  const [unfavConfirmJob, setUnfavConfirmJob] = useState(null);
+
+  const handleOpenFavoriteModal = (job, e) => {
     if (e) e.stopPropagation();
-    toggleFavorite({
-      relatedId: job.id,
-      type: 'Job',
-      title: job.title,
-      subtitle: `${job.department} • ${job.location}`,
-      tag: job.status
+    if (isItemFavorited('Job', job.id)) {
+      setUnfavConfirmJob(job);
+      return;
+    }
+    setAddToFavModal({
+      isOpen: true,
+      job,
+      targetList: jobLists[0] || 'High Priority Roles (Q4)',
+      isCreatingNew: false,
+      newListName: ''
     });
+  };
+
+  const handleToggleFav = (job, e) => {
+    handleOpenFavoriteModal(job, e);
+  };
+
+  const handleConfirmUnfavJob = () => {
+    if (!unfavConfirmJob) return;
+    const targetJob = unfavConfirmJob;
+    if (isItemFavorited('Job', targetJob.id)) {
+      toggleFavorite({
+        relatedId: targetJob.id,
+        type: 'Job',
+        title: targetJob.title
+      });
+      setFavRefreshKey(k => k + 1);
+      setSuccessMessage(`Removed "${targetJob.title}" from Favourites`);
+      setTimeout(() => setSuccessMessage(null), 3500);
+    }
+    setUnfavConfirmJob(null);
+  };
+
+  const handleConfirmAddToFav = (e) => {
+    e?.preventDefault?.();
+    if (!addToFavModal.job) return;
+    const targetJob = addToFavModal.job;
+    const finalListName = addToFavModal.isCreatingNew ? addToFavModal.newListName.trim() : addToFavModal.targetList;
+    if (!finalListName) {
+      setSuccessMessage('Please select or enter a list name');
+      return;
+    }
+    if (addToFavModal.isCreatingNew && !jobLists.includes(finalListName)) {
+      const updatedLists = [...jobLists, finalListName];
+      setJobLists(updatedLists);
+      try {
+        localStorage.setItem('findneo_recruiter_job_lists', JSON.stringify(updatedLists));
+      } catch {}
+    }
+    
+    // Ensure job is favorited
+    if (!isItemFavorited('Job', targetJob.id)) {
+      toggleFavorite({
+        relatedId: targetJob.id,
+        type: 'Job',
+        title: targetJob.title,
+        subtitle: `${targetJob.department} • ${targetJob.location}`,
+        tag: finalListName,
+        path: '/dashboard/jobs'
+      });
+    } else {
+      const currentFavs = getStoredFavorites();
+      const updated = currentFavs.map(f => {
+        if (f.type === 'Job' && (String(f.relatedId) === String(targetJob.id) || String(f.relatedId) === `job-${targetJob.id}`)) {
+          return { ...f, tag: finalListName };
+        }
+        return f;
+      });
+      saveStoredFavorites(updated);
+    }
     setFavRefreshKey(k => k + 1);
+    setSuccessMessage(`Added "${targetJob.title}" to Favourites (${finalListName})`);
+    setAddToFavModal({ isOpen: false, job: null, targetList: '', isCreatingNew: false, newListName: '' });
+  };
+
+  const handleRemoveJobFromFav = () => {
+    if (!addToFavModal.job) return;
+    const targetJob = addToFavModal.job;
+    if (isItemFavorited('Job', targetJob.id)) {
+      toggleFavorite({
+        relatedId: targetJob.id,
+        type: 'Job',
+        title: targetJob.title
+      });
+      setFavRefreshKey(k => k + 1);
+    }
+    setSuccessMessage(`Removed "${targetJob.title}" from Favourites`);
+    setAddToFavModal({ isOpen: false, job: null, targetList: '', isCreatingNew: false, newListName: '' });
   };
 
   const [followConfirmation, setFollowConfirmation] = useState(null);
@@ -276,6 +383,7 @@ export default function JobsPage() {
  const [viewMode, setViewMode] = useState('grid');
  const [selectedFilters, setSelectedFilters] = useState({
     department: [],
+    favouriteList: [],
     position: [],
     location: [],
     experience: [],
@@ -285,6 +393,33 @@ export default function JobsPage() {
     aiHealth: [],
     posted: []
   });
+
+  const favouriteListItems = useMemo(() => {
+    const storedFavs = getStoredFavorites().filter(f => f.type === 'Job');
+    return jobLists.map((listName, idx) => {
+      const count = jobs.filter(job => {
+        return storedFavs.some(f => 
+          (String(f.relatedId) === String(job.id) || String(f.relatedId) === `job-${job.id}`) &&
+          (f.tag === listName || (!f.tag && idx === 0))
+        );
+      }).length;
+      return {
+        id: listName,
+        label: listName,
+        count
+      };
+    });
+  }, [jobLists, jobs, favRefreshKey]);
+
+  // When coming from right-side favourite drawer (?view=favorites), check all favourite lists
+  useEffect(() => {
+    if (activeViewParam === 'favorites') {
+      setSelectedFilters(prev => ({
+        ...prev,
+        favouriteList: [...jobLists]
+      }));
+    }
+  }, [activeViewParam, jobLists]);
 
   const [quickFilters, setQuickFilters] = useState({
     status: [],
@@ -316,6 +451,7 @@ export default function JobsPage() {
   const handleResetFilters = () => {
     setSelectedFilters({
       department: [],
+      favouriteList: [],
       position: [],
       location: [],
       experience: [],
@@ -325,6 +461,9 @@ export default function JobsPage() {
       aiHealth: [],
       posted: []
     });
+    if (activeViewParam === 'favorites') {
+      handleViewFilterChange('all');
+    }
     setQuickFilters({
       status: [],
       skills: [],
@@ -549,7 +688,20 @@ export default function JobsPage() {
       );
     }
 
- return matchesSearch && matchesStatus && matchesDept && matchesLoc && matchesType && matchesHM && matchesSkills;
+    // Left Filter Panel: Favourite List
+    let matchesFavList = true;
+    if (selectedFilters.favouriteList && selectedFilters.favouriteList.length > 0) {
+      const storedFavs = getStoredFavorites().filter(f => f.type === 'Job');
+      const jobFav = storedFavs.find(f => 
+        String(f.relatedId) === String(job.id) || String(f.relatedId) === `job-${job.id}`
+      );
+      if (!jobFav) return false;
+      const jobTag = jobFav.tag || jobLists[0];
+      matchesFavList = selectedFilters.favouriteList.includes(jobTag);
+      if (!matchesFavList) return false;
+    }
+
+ return matchesSearch && matchesStatus && matchesDept && matchesFavList && matchesLoc && matchesType && matchesHM && matchesSkills;
  });
 
  // Apply Sort
@@ -570,7 +722,7 @@ export default function JobsPage() {
  return (b.score || 0) - (a.score || 0) || a.id - b.id;
  }
  });
- }, [jobs, searchQuery, selectedFilters, quickFilters, sortBy, activeViewParam, favRefreshKey]);
+ }, [jobs, searchQuery, selectedFilters, quickFilters, sortBy, activeViewParam, favRefreshKey, jobLists]);
 
  // Reset to page 1 when filters or sort change
  useEffect(() => {
@@ -785,6 +937,8 @@ export default function JobsPage() {
  onResetAll={handleResetFilters}
  totalResultsCount={filteredJobs.length}
           panelHeight={filterPanelHeight}
+          favouriteListItems={favouriteListItems}
+          showFavouriteList={true}
         />
 
  {/* MAIN CONTENT AREA: Jobs Table & Pagination */}
@@ -802,8 +956,8 @@ export default function JobsPage() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             onSortChange={setSortBy}
-            showPresetFilters={true}
-            showFavoritesFilter={true}
+            showPresetFilters={false}
+            showFavoritesFilter={false}
             showFollowingFilter={false}
             activeView={activeViewParam}
             onViewChange={handleViewFilterChange}
@@ -1651,6 +1805,216 @@ export default function JobsPage() {
             <X size={16} />
           </button>
         </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* ADD JOB TO FAVOURITE MODAL                                     */}
+      {/* ============================================================== */}
+      {addToFavModal.isOpen && addToFavModal.job && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-800 animate-scale-up text-left">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center shrink-0">
+                  <Star size={20} className="fill-amber-400 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    Add to Favourite
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Save job to your favourites list or priority hiring pool
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddToFavModal({ isOpen: false, job: null, targetList: '', isCreatingNew: false, newListName: '' })}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg cursor-pointer transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmAddToFav} className="space-y-4 text-xs mt-4">
+
+              {/* Selected Job Card Summary */}
+              <div className="p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-xl flex items-center justify-between">
+                <div className="min-w-0 pr-2">
+                  <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Target Job</p>
+                  <p className="text-sm font-bold text-[#212b36] dark:text-white mt-0.5 truncate">{addToFavModal.job.title}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{addToFavModal.job.department} • {addToFavModal.job.location}</p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${
+                  isItemFavorited('Job', addToFavModal.job.id)
+                    ? 'bg-amber-500 text-white flex items-center gap-1'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                }`}>
+                  {isItemFavorited('Job', addToFavModal.job.id) ? (
+                    <>
+                      <Star size={11} className="fill-white" />
+                      <span>In Favourites</span>
+                    </>
+                  ) : (
+                    'Not Favorited'
+                  )}
+                </span>
+              </div>
+
+              {/* Choose List Mode */}
+              <div>
+                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
+                  Select Favourites List <span className="text-[#FF5630]">*</span>
+                </label>
+
+                {!addToFavModal.isCreatingNew ? (
+                  <div className="space-y-2">
+                    <SearchableSelect
+                      options={jobLists.map(list => ({
+                        label: list,
+                        value: list,
+                        description: list.includes('High Priority')
+                          ? 'Critical roles needing immediate recruiter attention'
+                          : list.includes('Pipeline')
+                            ? 'Strategic engineering & leadership searches'
+                            : list.includes('Urgent')
+                              ? 'Requisitions with tight SLA deadlines'
+                              : 'Curated favourite job collection'
+                      }))}
+                      value={addToFavModal.targetList}
+                      onChange={(val) => setAddToFavModal(prev => ({ ...prev, targetList: val }))}
+                      placeholder="Select a Favourites List..."
+                      searchPlaceholder="Search favourites lists..."
+                      showSearch={true}
+                      size="default"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setAddToFavModal(prev => ({ ...prev, isCreatingNew: true, newListName: '' }))}
+                      className="text-xs font-bold text-[#1890FF] hover:underline flex items-center gap-1 cursor-pointer pt-1"
+                    >
+                      <Plus size={13} />
+                      <span>Create a new list instead</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="e.g. Q1 Expansion Hires"
+                      value={addToFavModal.newListName}
+                      onChange={(e) => setAddToFavModal(prev => ({ ...prev, newListName: e.target.value }))}
+                      className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-[#1890FF] text-xs font-semibold text-[#212b36] dark:text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAddToFavModal(prev => ({ ...prev, isCreatingNew: false }))}
+                      className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline cursor-pointer"
+                    >
+                      Select an existing list instead
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
+                {isItemFavorited('Job', addToFavModal.job.id) ? (
+                  <button
+                    type="button"
+                    onClick={handleRemoveJobFromFav}
+                    className="text-xs font-bold text-rose-500 hover:text-rose-600 hover:underline cursor-pointer"
+                  >
+                    Remove from Favourites
+                  </button>
+                ) : (
+                  <div></div>
+                )}
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAddToFavModal({ isOpen: false, job: null, targetList: '', isCreatingNew: false, newListName: '' })}
+                    className="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addToFavModal.isCreatingNew && !addToFavModal.newListName.trim()}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-[#1890FF] hover:bg-[#0077e6] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm text-xs cursor-pointer"
+                  >
+                    <Star size={13} className="fill-white text-white" />
+                    <span>{isItemFavorited('Job', addToFavModal.job.id) ? 'Save to Favourite' : 'Add to Favourite'}</span>
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ============================================================== */}
+      {/* CONFIRM UN-FAVOURITE JOB CUSTOMIZED ALERT                      */}
+      {/* ============================================================== */}
+      {unfavConfirmJob && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in text-left">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4 animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center shrink-0">
+                  <Star size={18} className="fill-amber-400 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    Remove from Favourite
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUnfavConfirmJob(null)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg cursor-pointer transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Are you sure you want to remove <strong className="text-[#212b36] dark:text-white">"{unfavConfirmJob.title}"</strong> from your favourites?
+            </p>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setUnfavConfirmJob(null)}
+                className="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmUnfavJob}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-amber-500 hover:bg-amber-600 text-xs transition-colors shadow-sm cursor-pointer"
+              >
+                <Star size={13} />
+                <span>Remove from Favourite</span>
+              </button>
+            </div>
+
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* View Job Modal */}

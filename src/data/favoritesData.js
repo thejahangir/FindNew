@@ -11,7 +11,34 @@ export const INITIAL_FAVORITES = [
     type: 'Job', 
     meta: 'Engineering • Bangalore, India', 
     path: '/dashboard/jobs',
-    tag: 'Open'
+    tag: 'High Priority Roles (Q4)'
+  },
+  { 
+    id: 'fav-job-2', 
+    relatedId: '2',
+    title: 'Senior Frontend Developer', 
+    type: 'Job', 
+    meta: 'Engineering • San Francisco, CA', 
+    path: '/dashboard/jobs',
+    tag: 'Engineering Leadership Pipeline'
+  },
+  { 
+    id: 'fav-job-3', 
+    relatedId: '3',
+    title: 'Staff Backend Engineer', 
+    type: 'Job', 
+    meta: 'Engineering • New York, NY', 
+    path: '/dashboard/jobs',
+    tag: 'Urgent Client Requisitions'
+  },
+  { 
+    id: 'fav-job-4', 
+    relatedId: '4',
+    title: 'Principal Product Manager', 
+    type: 'Job', 
+    meta: 'Product Management • London, UK', 
+    path: '/dashboard/jobs',
+    tag: 'Executive & Director Searches'
   },
   { 
     id: 'fav-job-5', 
@@ -20,7 +47,7 @@ export const INITIAL_FAVORITES = [
     type: 'Job', 
     meta: 'Engineering • Remote', 
     path: '/dashboard/jobs',
-    tag: 'Open'
+    tag: 'Remote-First Openings'
   },
   { 
     id: 'fav-cand-1', 
@@ -29,7 +56,7 @@ export const INITIAL_FAVORITES = [
     type: 'Candidate', 
     meta: '9.8 AI Match • Senior AI Research Scientist', 
     path: '/dashboard/candidates',
-    tag: 'Technical Interview'
+    tag: 'Shortlisted Talent (Q4)'
   },
   { 
     id: 'fav-cand-2', 
@@ -38,7 +65,7 @@ export const INITIAL_FAVORITES = [
     type: 'Candidate', 
     meta: '9.4 AI Match • Principal Cloud Architect', 
     path: '/dashboard/candidates',
-    tag: 'Shortlisted'
+    tag: 'Senior Tech Leads Pipeline'
   }
 ];
 

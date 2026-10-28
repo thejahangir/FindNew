@@ -507,18 +507,30 @@ export default function CandidatesPage({ defaultTab }) {
     };
   }, []);
 
+  const [unfavConfirmCand, setUnfavConfirmCand] = useState(null);
+
   const handleToggleFav = (cand, e) => {
     if (e) e.stopPropagation();
-    const res = toggleFavorite({
-      relatedId: cand.id,
-      title: cand.name,
-      type: 'Candidate',
-      meta: `${cand.role} • ${cand.company || cand.department}`,
-      path: `/dashboard/candidates/${cand.id}`,
-      tag: cand.stage || 'Shortlisted'
-    });
-    setToastMessage(res.isFavorited ? `Added ${cand.name} to Favorites!` : `Removed ${cand.name} from Favorites.`);
-    setTimeout(() => setToastMessage(''), 3000);
+    if (isItemFavorited('Candidate', cand.id)) {
+      setUnfavConfirmCand(cand);
+      return;
+    }
+    handleOpenAddToListModal([cand.id], cand.name);
+  };
+
+  const handleConfirmUnfavCand = () => {
+    if (!unfavConfirmCand) return;
+    const cand = unfavConfirmCand;
+    if (isItemFavorited('Candidate', cand.id)) {
+      toggleFavorite({
+        relatedId: cand.id,
+        title: cand.name,
+        type: 'Candidate'
+      });
+      setFavRefreshKey(k => k + 1);
+      showToast(`Removed "${cand.name}" from Favourites.`);
+    }
+    setUnfavConfirmCand(null);
   };
 
   const [followConfirmation, setFollowConfirmation] = useState(null);
@@ -599,6 +611,7 @@ export default function CandidatesPage({ defaultTab }) {
   // Selected filters for left JobFilterPanel
   const [selectedFilters, setSelectedFilters] = useState({
     department: [],
+    favouriteList: [],
     position: [],
     location: [],
     experience: [],
@@ -608,6 +621,28 @@ export default function CandidatesPage({ defaultTab }) {
     aiHealth: [],
     posted: []
   });
+
+  const allCandidateLists = useMemo(() => getStoredLists(), [favRefreshKey, storedListsCount]);
+
+  const favouriteListItems = useMemo(() => {
+    return allCandidateLists.map(list => ({
+      id: list.id,
+      label: list.name,
+      count: (list.candidateIds || []).length
+    }));
+  }, [allCandidateLists]);
+
+  // When user lands via filter drawer on right side (activeViewParam === 'favorites'),
+  // select ALL favourite lists so all favourite items are shown with all checkboxes checked.
+  useEffect(() => {
+    if (activeViewParam === 'favorites') {
+      const allListIds = allCandidateLists.map(l => l.id);
+      setSelectedFilters(prev => ({
+        ...prev,
+        favouriteList: allListIds
+      }));
+    }
+  }, [activeViewParam, allCandidateLists]);
 
   // Quick filters for horizontal JobQuickFilterBar
   const [quickFilters, setQuickFilters] = useState({
@@ -644,6 +679,7 @@ export default function CandidatesPage({ defaultTab }) {
   const handleResetFilters = () => {
     setSelectedFilters({
       department: [],
+      favouriteList: [],
       position: [],
       location: [],
       experience: [],
@@ -653,6 +689,9 @@ export default function CandidatesPage({ defaultTab }) {
       aiHealth: [],
       posted: []
     });
+    if (activeViewParam === 'favorites') {
+      handleViewFilterChange('all');
+    }
     setQuickFilters({
       status: [],
       skills: [],
@@ -1002,6 +1041,17 @@ export default function CandidatesPage({ defaultTab }) {
         if (!matchesDept) return false;
       }
 
+      // 7.5 Left Filter Panel - Favourite List
+      if (selectedFilters.favouriteList && selectedFilters.favouriteList.length > 0) {
+        const matchesFavList = selectedFilters.favouriteList.some(listId => {
+          const list = allCandidateLists.find(l => l.id === listId || l.name === listId);
+          return list && list.candidateIds && list.candidateIds.some(cid => 
+            String(cid) === String(cand.id) || String(cid) === `cand-${cand.id}` || String(cand.id) === `cand-${cid}`
+          );
+        });
+        if (!matchesFavList) return false;
+      }
+
       // 8. Left Filter Panel - Position
       if (selectedFilters.position && selectedFilters.position.length > 0) {
         const activePositions = FILTER_DATA.position
@@ -1102,7 +1152,7 @@ export default function CandidatesPage({ defaultTab }) {
           return (b.numericScore || 0) - (a.numericScore || 0);
       }
     });
-  }, [candidates, searchQuery, quickFilters, selectedFilters, sortBy, dynamicQuickParameters, activeViewParam, favRefreshKey]);
+  }, [candidates, searchQuery, quickFilters, selectedFilters, sortBy, dynamicQuickParameters, activeViewParam, favRefreshKey, allCandidateLists]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredCandidates.length / itemsPerPage));
@@ -1611,60 +1661,6 @@ export default function CandidatesPage({ defaultTab }) {
                 : 'Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.'}
             </p>
           </div>
-
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            {/* Switch Button (Pure button, not link) */}
-            <div 
-              role="group" 
-              aria-label="View Switcher"
-              className="inline-flex items-center bg-gray-100/90 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700/80 shadow-2xs transition-colors duration-300 select-none"
-            >
-              <button
-                type="button"
-                onClick={() => handleSwitchView('candidates')}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none ${
-                  activeTab === 'candidates'
-                    ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
-                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-                title="Switch to All Candidates"
-              >
-                <Users size={14} className={`transition-all duration-300 ${activeTab === 'candidates' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
-                <span>All Candidates</span>
-              </button>
-
-              <button
-                type="button"
-                role="switch"
-                aria-checked={activeTab === 'my-lists'}
-                onClick={() => handleSwitchView(activeTab === 'candidates' ? 'my-lists' : 'candidates')}
-                className={`mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 cursor-pointer ${
-                  activeTab === 'my-lists' ? 'bg-[#1890FF]/25 dark:bg-[#1890FF]/30' : 'bg-gray-300 dark:bg-gray-700'
-                }`}
-                title={activeTab === 'candidates' ? 'Switch to Favourites' : 'Switch to All Candidates'}
-              >
-                <span
-                  className={`w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs ${
-                    activeTab === 'my-lists' ? 'translate-x-3.5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSwitchView('my-lists')}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none ${
-                  activeTab === 'my-lists'
-                    ? 'bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]'
-                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-                title="Switch to Favourites"
-              >
-                <Star size={14} className={`transition-all duration-300 ${activeTab === 'my-lists' ? 'text-[#1890FF] scale-105' : 'text-gray-400'}`} />
-                <span>Favourites</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1723,6 +1719,8 @@ export default function CandidatesPage({ defaultTab }) {
           onResetAll={handleResetFilters}
           totalResultsCount={filteredCandidates.length}
           panelHeight={filterPanelHeight}
+          favouriteListItems={favouriteListItems}
+          showFavouriteList={true}
         />
 
         {/* MAIN CONTENT AREA: Candidates Horizontal Filter, Table / Cards & Pagination */}
@@ -1741,8 +1739,8 @@ export default function CandidatesPage({ defaultTab }) {
             viewMode={viewMode === 'table' ? 'grid' : 'card'}
             onViewModeChange={(mode) => setViewMode(mode === 'grid' ? 'table' : 'grid')}
             onSortChange={setSortBy}
-            showPresetFilters={true}
-            showFavoritesFilter={true}
+            showPresetFilters={false}
+            showFavoritesFilter={false}
             showFollowingFilter={false}
             activeView={activeViewParam}
             onViewChange={handleViewFilterChange}
@@ -2942,6 +2940,63 @@ export default function CandidatesPage({ defaultTab }) {
               </div>
 
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ============================================================== */}
+      {/* CONFIRM UN-FAVOURITE CANDIDATE CUSTOMIZED ALERT                */}
+      {/* ============================================================== */}
+      {unfavConfirmCand && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in text-left">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4 animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center shrink-0">
+                  <Star size={18} className="fill-amber-400 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    Remove from Favourite
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUnfavConfirmCand(null)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg cursor-pointer transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Are you sure you want to remove <strong className="text-[#212b36] dark:text-white">"{unfavConfirmCand.name}"</strong> from your favourites?
+            </p>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setUnfavConfirmCand(null)}
+                className="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmUnfavCand}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold bg-amber-500 hover:bg-amber-600 text-xs transition-colors shadow-sm cursor-pointer"
+              >
+                <Star size={13} />
+                <span>Remove from Favourite</span>
+              </button>
+            </div>
+
           </div>
         </div>,
         document.body

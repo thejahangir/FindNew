@@ -113,7 +113,7 @@ export default function JobQuickFilterBar({
   favoritesCount = 0,
   followupsCount = 0,
   showPresetFilters = false,
-  showFavoritesFilter = true,
+  showFavoritesFilter = false,
   showFollowingFilter = true
 }) {
   const [activeDropdown, setActiveDropdown] = useState(null);

@@ -36,6 +36,28 @@ export const INITIAL_FOLLOWUPS = [
     priority: 'Normal', 
     isDone: false,
     path: '/dashboard/applications'
+  },
+  { 
+    id: 4, 
+    relatedId: 'app-4',
+    type: 'Application',
+    title: 'Portfolio presentation feedback', 
+    subject: 'Maya Chen (Product Design Lead)', 
+    due: '29 Oct • 10:00 AM', 
+    priority: 'High', 
+    isDone: false,
+    path: '/dashboard/applications'
+  },
+  { 
+    id: 5, 
+    relatedId: 'app-6',
+    type: 'Application',
+    title: 'Offer letter rollout check', 
+    subject: 'Ankita Rao (Frontend Developer)', 
+    due: 'Today • 5:00 PM', 
+    priority: 'Urgent', 
+    isDone: false,
+    path: '/dashboard/applications'
   }
 ];
 

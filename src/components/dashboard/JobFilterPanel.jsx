@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Filter, Search, X, ChevronDown, ChevronUp, 
   Briefcase, MapPin, Award, Building2, Clock, Laptop, 
-  Sparkles, Calendar, Check, RotateCcw, SlidersHorizontal 
+  Sparkles, Calendar, Check, RotateCcw, SlidersHorizontal,
+  Star
 } from 'lucide-react';
 
 // ============================================================================
@@ -33,6 +34,14 @@ export const FILTER_DATA = {
     { id: 'legal', label: 'Legal & Compliance', count: 7 },
     { id: 'support', label: 'Technical Customer Support', count: 11 },
     { id: 'partner', label: 'Strategic Partnerships', count: 6 }
+  ],
+
+  favouriteList: [
+    { id: 'High Priority Roles (Q4)', label: 'High Priority Roles (Q4)', count: 4 },
+    { id: 'Engineering Leadership Pipeline', label: 'Engineering Leadership Pipeline', count: 3 },
+    { id: 'Urgent Client Requisitions', label: 'Urgent Client Requisitions', count: 5 },
+    { id: 'Remote-First Openings', label: 'Remote-First Openings', count: 6 },
+    { id: 'Executive & Director Searches', label: 'Executive & Director Searches', count: 2 }
   ],
 
   position: [
@@ -395,9 +404,14 @@ export default function JobFilterPanel({
   totalResultsCount,
   currency = '$',
   panelHeight,
-  filterData = FILTER_DATA
+  filterData = FILTER_DATA,
+  favouriteListItems = [],
+  showFavouriteList
 }) {
   const activeFilterData = filterData || FILTER_DATA;
+  const isFavouriteListVisible = showFavouriteList !== undefined 
+    ? showFavouriteList 
+    : Boolean(favouriteListItems && favouriteListItems.length > 0);
 
   // Generic multi-select toggle
   const handleToggleOption = (categoryKey, id) => {
@@ -492,6 +506,20 @@ export default function JobFilterPanel({
           onToggle={(id) => handleToggleOption('department', id)}
           defaultExpanded={true}
         />
+
+        {/* =================================================================== */}
+        {/* 2.5 FAVOURITE LIST (Directly after Department)                      */}
+        {/* =================================================================== */}
+        {isFavouriteListVisible && (
+          <FilterCategoryItem
+            title="Favourite List"
+            icon={Star}
+            items={(favouriteListItems && favouriteListItems.length > 0) ? favouriteListItems : (activeFilterData.favouriteList || FILTER_DATA.favouriteList || [])}
+            selectedIds={selectedFilters.favouriteList || []}
+            onToggle={(id) => handleToggleOption('favouriteList', id)}
+            defaultExpanded={true}
+          />
+        )}
 
         {/* =================================================================== */}
         {/* 3. POSITION                                                         */}

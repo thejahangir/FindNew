@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   FileCheck,
@@ -355,6 +356,28 @@ export default function ApplicationsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeViewParam = searchParams.get('view') || 'all';
+  const isFollowingView = activeViewParam === 'followups' || activeViewParam === 'following';
+
+  // When user lands via following drawer (?view=followups), reset any leftover narrowing filters so all followed applications are visible
+  useEffect(() => {
+    if (isFollowingView) {
+      setSelectedFilters({
+        department: [],
+        position: [],
+        location: [],
+        experience: [],
+        company: [],
+        employmentType: [],
+        workMode: [],
+        aiHealth: [],
+        posted: []
+      });
+      setQuickFilters(prev => ({
+        ...prev,
+        status: []
+      }));
+    }
+  }, [isFollowingView]);
 
   // Primary Applications State
   const [applications, setApplications] = useState(INITIAL_APPLICATIONS);
@@ -483,33 +506,40 @@ export default function ApplicationsPage() {
     showToast(res.isFavorited ? `Added application to Favorites!` : `Removed from Favorites.`);
   };
 
-  const [followConfirmation, setFollowConfirmation] = useState(null);
-  const followConfirmTimerRef = useRef(null);
+  const [followAlertModal, setFollowAlertModal] = useState({
+    isOpen: false,
+    app: null,
+    isFollowing: false
+  });
 
   const handleToggleFollow = (app, e) => {
     if (e) e.stopPropagation();
+    const isCurrentlyFollowed = isItemFollowed('Application', app.id);
+    setFollowAlertModal({
+      isOpen: true,
+      app,
+      isFollowing: isCurrentlyFollowed
+    });
+  };
+
+  const handleConfirmToggleFollow = () => {
+    if (!followAlertModal.app) return;
+    const app = followAlertModal.app;
     const res = toggleFollowItem({
       relatedId: app.id,
       type: 'Application',
       title: `${app.candidateName} (${app.jobTitle})`,
       subject: `Application: ${app.candidateName} • ${app.jobTitle}`,
-      meta: `Stage: ${app.stage} • Applied: ${app.appliedOn}`
+      meta: `Stage: ${app.stage} • Applied: ${app.appliedOn}`,
+      path: '/dashboard/applications'
     });
     setFavRefreshKey(k => k + 1);
-
-    if (followConfirmTimerRef.current) clearTimeout(followConfirmTimerRef.current);
-
-    setFollowConfirmation({
-      name: app.candidateName,
-      isUnfollow: !res.isFollowed,
-      message: res.isFollowed
-        ? 'You will be getting all notification of all activity.'
-        : 'You will no longer receive activity notifications.'
-    });
-
-    followConfirmTimerRef.current = setTimeout(() => {
-      setFollowConfirmation(null);
-    }, 4500);
+    setFollowAlertModal({ isOpen: false, app: null, isFollowing: false });
+    showToast(
+      res.isFollowed 
+        ? `Following ${app.candidateName}. You will receive all activity notifications.` 
+        : `Unfollowed ${app.candidateName}.`
+    );
   };
 
   const handleOpenFollowup = (app, e) => {
@@ -609,7 +639,7 @@ export default function ApplicationsPage() {
       if (activeViewParam === 'favorites' && !isItemFavorited('Application', app.id)) {
         return false;
       }
-      if (activeViewParam === 'followups' && !isItemFollowedUp('Application', app.id)) {
+      if (isFollowingView && !isItemFollowedUp('Application', app.id)) {
         return false;
       }
 
@@ -843,10 +873,12 @@ export default function ApplicationsPage() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                Applications
+                {isFollowingView ? 'Following Applications' : 'Applications'}
               </h1>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
-                {applications.length} Total
+                {isFollowingView
+                  ? `${followedApplicationsCount} Followed`
+                  : `${applications.length} Total`}
               </span>
             </div>
             <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
@@ -914,6 +946,7 @@ export default function ApplicationsPage() {
           onResetAll={handleResetFilters}
           totalResultsCount={filteredApplications.length}
           panelHeight={filterPanelHeight}
+          showFavouriteList={false}
         />
 
         {/* RIGHT MAIN CONTENT AREA: Horizontal Filter Bar, Pre-Grid Panel, Grid / Card View & Pagination */}
@@ -935,7 +968,7 @@ export default function ApplicationsPage() {
             showPresetFilters={true}
             showFavoritesFilter={false}
             showFollowingFilter={true}
-            activeView={activeViewParam}
+            activeView={isFollowingView ? 'followups' : activeViewParam}
             onViewChange={handleViewFilterChange}
             favoritesCount={favoritedApplicationsCount}
             followupsCount={followedApplicationsCount}
@@ -1496,29 +1529,84 @@ export default function ApplicationsPage() {
         onFollowupAdded={() => showToast('Follow reminder scheduled!')}
       />
 
-      {/* CUSTOMIZED FOLLOW CONFIRMATION NOTIFICATION */}
-      {followConfirmation && (
-        <div className="fixed bottom-6 right-6 z-[9999] flex items-center gap-3.5 px-4 py-3.5 bg-white dark:bg-[#161c24] text-[#212b36] dark:text-white rounded-2xl shadow-2xl border border-[#1890FF]/30 dark:border-gray-800 animate-fade-in max-w-md">
-          <div className="w-10 h-10 rounded-xl bg-[#1890FF]/15 text-[#1890FF] flex items-center justify-center shrink-0">
-            <Bookmark size={20} className={followConfirmation.isUnfollow ? '' : 'fill-[#1890FF]'} />
+      {/* ============================================================== */}
+      {/* CUSTOMIZED FOLLOW / UNFOLLOW ALERT MODAL                       */}
+      {/* ============================================================== */}
+      {followAlertModal.isOpen && followAlertModal.app && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-fade-in text-left">
+          <div className="bg-white dark:bg-[#161c24] rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-gray-800 space-y-4 animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                  followAlertModal.isFollowing 
+                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' 
+                    : 'bg-blue-50 dark:bg-blue-950/40 text-[#1890FF]'
+                }`}>
+                  <Bookmark size={18} className={followAlertModal.isFollowing ? '' : 'fill-[#1890FF]'} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#212b36] dark:text-white">
+                    {followAlertModal.isFollowing ? 'Unfollow Application' : 'Follow Application'}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFollowAlertModal({ isOpen: false, app: null, isFollowing: false })}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg cursor-pointer transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                {followAlertModal.isFollowing ? (
+                  <>
+                    Are you sure you want to unfollow <strong className="text-[#212b36] dark:text-white">"{followAlertModal.app.candidateName}"</strong>?
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to follow <strong className="text-[#212b36] dark:text-white">"{followAlertModal.app.candidateName}"</strong> for <strong className="text-[#212b36] dark:text-white">{followAlertModal.app.jobTitle}</strong>?
+                  </>
+                )}
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                {followAlertModal.isFollowing 
+                  ? 'You will no longer receive activity notifications or pipeline updates for this candidate application.'
+                  : 'You will receive real-time notifications for all activities, interview stages, and status updates.'}
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setFollowAlertModal({ isOpen: false, app: null, isFollowing: false })}
+                className="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmToggleFollow}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold text-xs transition-colors shadow-sm cursor-pointer ${
+                  followAlertModal.isFollowing
+                    ? 'bg-amber-500 hover:bg-amber-600'
+                    : 'bg-[#1890FF] hover:bg-[#0077e6]'
+                }`}
+              >
+                <Bookmark size={13} className={followAlertModal.isFollowing ? '' : 'fill-white'} />
+                <span>{followAlertModal.isFollowing ? 'Unfollow' : 'Follow'}</span>
+              </button>
+            </div>
+
           </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="text-xs sm:text-sm font-bold text-[#212b36] dark:text-white">
-              {followConfirmation.isUnfollow ? `Unfollowed ${followConfirmation.name}` : `Following ${followConfirmation.name}`}
-            </h4>
-            <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
-              {followConfirmation.message}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setFollowConfirmation(null)}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
-            title="Dismiss"
-          >
-            <X size={16} />
-          </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

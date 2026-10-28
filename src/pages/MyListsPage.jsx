@@ -696,45 +696,6 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
                 Curate, organize, and track candidate talent pools created for target roles, pipelines, and upcoming hiring rounds.
               </p>
             </div>
-
-            <div className="flex items-center gap-3 shrink-0 flex-wrap">
-              {/* Switch Button (Pure button, not link) */}
-              <div
-                role="group"
-                aria-label="View Switcher"
-                className="inline-flex items-center bg-gray-100/90 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700/80 shadow-2xs transition-colors duration-300 select-none"
-              >
-                <button
-                  type="button"
-                  onClick={() => navigate('/dashboard/candidates')}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
-                  title="Switch to All Candidates"
-                >
-                  <Users size={14} className="text-gray-400 transition-colors duration-300" />
-                  <span>All Candidates</span>
-                </button>
-
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={true}
-                  onClick={() => navigate('/dashboard/candidates')}
-                  className="mx-1 relative inline-flex w-8 h-4.5 items-center rounded-full transition-colors duration-300 ease-in-out p-0.5 bg-[#1890FF]/25 dark:bg-[#1890FF]/30 cursor-pointer"
-                  title="Switch to All Candidates"
-                >
-                  <span className="w-3.5 h-3.5 bg-[#1890FF] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-xs translate-x-3.5" />
-                </button>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none bg-white dark:bg-[#161c24] text-[#1890FF] shadow-xs scale-[1.01]"
-                  title="Favourites (Active)"
-                >
-                  <Star size={14} className="text-[#1890FF] transition-colors duration-300 scale-105" />
-                  <span>Favourites</span>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

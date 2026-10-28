@@ -61,7 +61,7 @@ export default function FollowupsPanel({ isOpen, onClose }) {
 
   const handleViewMore = () => {
     onClose();
-    navigate('/dashboard/applications');
+    navigate('/dashboard/applications?view=followups');
   };
 
   return createPortal(
@@ -121,7 +121,7 @@ export default function FollowupsPanel({ isOpen, onClose }) {
                   key={task.id}
                   onClick={() => {
                     onClose();
-                    navigate(task.path || '/dashboard/applications');
+                    navigate('/dashboard/applications?view=followups');
                   }}
                   className={`p-3.5 bg-gray-50/70 dark:bg-gray-800/40 hover:bg-white dark:hover:bg-[#1E293B] border border-gray-200/80 dark:border-gray-800 rounded-2xl transition-all shadow-2xs hover:shadow-sm cursor-pointer group ${
                     task.isDone ? 'opacity-50 bg-gray-100/50 dark:bg-gray-800/20' : ''
