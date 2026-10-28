@@ -13,8 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { getStoredFavorites, saveStoredFavorites } from '../../data/favoritesData';
 
 const CATEGORIES = [
-  { id: 'Job', label: 'All Jobs', path: '/dashboard/jobs' },
-  { id: 'Candidate', label: 'All Candidates', path: '/dashboard/candidates' },
+  { id: 'Job', label: 'Jobs', path: '/dashboard/jobs' },
+  { id: 'Candidate', label: 'Candidates', path: '/dashboard/candidates' },
 ];
 
 export default function FavoritesPanel({ isOpen, onClose }) {

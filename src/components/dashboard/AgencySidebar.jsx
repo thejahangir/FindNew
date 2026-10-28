@@ -47,10 +47,10 @@ export default function AgencySidebar({ isSidebarCollapsed }) {
 
    const sidebarLinks = [
     { name: 'Hiring Overview', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'All Jobs', path: '/dashboard/jobs', icon: Briefcase },
+    { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
     { name: 'Job Dashboard', path: '/dashboard/agencies', icon: LayoutDashboard },
     { name: 'Sourcing', path: '/dashboard/sourcing', icon: Search },
-    { name: 'All Candidates', path: '/dashboard/candidates', icon: Users },
+    { name: 'Candidates', path: '/dashboard/candidates', icon: Users },
     { name: 'Favourites', path: '/dashboard/my-lists', icon: Star },
     { name: 'Applications', path: '/dashboard/applications', icon: FileSignature },
     { name: 'Pipeline', path: '/dashboard/pipeline', icon: Columns },

@@ -672,7 +672,7 @@ export default function MyListsPage({ isEmbedded = false, externalOpenCreateModa
           </Link>
           <ChevronRight size={14} className="text-gray-400 shrink-0" />
           <Link to="/dashboard/candidates" className="hover:text-[#1890FF] transition-colors cursor-pointer">
-            All Candidates
+            Candidates
           </Link>
           <ChevronRight size={14} className="text-gray-400 shrink-0" />
           <span className="text-[#212b36] dark:text-white">Favourites</span>

@@ -857,7 +857,7 @@ export default function JobsPage() {
           Dashboard
         </Link>
         <ChevronRight size={14} className="text-gray-400 shrink-0" />
-        <span className="text-[#212b36] dark:text-white">All Jobs</span>
+        <span className="text-[#212b36] dark:text-white">Jobs</span>
       </nav>
 
       {/* JOB HEADER CARD */}
@@ -866,7 +866,7 @@ export default function JobsPage() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#212b36] dark:text-white tracking-tight leading-none">
-                All Jobs
+                Jobs
               </h1>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1890FF]/10 text-[#1890FF]">
                 {jobs.length} Total

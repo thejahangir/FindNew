@@ -282,7 +282,7 @@ export default function UserMenu({ isSidebarCollapsed }) {
                 >
                   <option value="Hiring Overview">Hiring Overview</option>
                   <option value="Jobs Dashboard">Jobs Dashboard</option>
-                  <option value="All Candidates">All Candidates</option>
+                  <option value="Candidates">Candidates</option>
                   <option value="Pipeline">Pipeline</option>
                   <option value="Career Page">Career Page</option>
                 </select>
